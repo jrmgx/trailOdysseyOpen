@@ -21,7 +21,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * The name was 'segment' but it gets blocked by adBlock (with the .js extension seen later).

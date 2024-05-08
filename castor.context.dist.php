@@ -9,6 +9,7 @@ use function Castor\load_dot_env;
 function dev_context(): Context
 {
     $env = load_dot_env();
+
     return new Context(
         data: [
             'in_builder' => isset($_SERVER['IN_BUILDER']) && '1' === $_SERVER['IN_BUILDER'],
@@ -25,6 +26,7 @@ function dev_context(): Context
 function prod_context(): Context
 {
     $env = load_dot_env();
+
     return new Context(
         data: [
             'in_builder' => isset($_SERVER['IN_BUILDER']) && '1' === $_SERVER['IN_BUILDER'],

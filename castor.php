@@ -9,7 +9,6 @@ use function Castor\capture;
 use function Castor\context;
 use function Castor\import;
 use function Castor\io;
-use function Castor\load_dot_env;
 use function Castor\run;
 use function Castor\variable;
 
