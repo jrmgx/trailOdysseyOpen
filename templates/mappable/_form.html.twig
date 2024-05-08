@@ -1,0 +1,53 @@
+<div class="card-header">
+    <div class="input-group">
+        {% if form.symbol is defined %}
+            {{ form_widget(form.symbol, { attr: { style: 'width: 3rem; flex: 0 1 auto;' }}) }}
+        {% endif %}
+        {{ form_widget(form.name) }}
+    </div>
+</div>
+<div class="card-body" data-controller="form-mappable">
+    <div>
+        {{ form_widget(form.description) }}
+        {{ form_errors(form.name) }}
+        {{ form_errors(form.description) }}
+        {{ form_errors(form.arrivingAt) }}
+        {% if form.leavingAt is defined %}
+            {{ form_errors(form.leavingAt) }}
+        {% endif %}
+        {{ form_errors(form) }}
+    </div>
+    <div>
+        <label class="fs-small mt-3">{{ 'mappable.arriving_at'|trans({date: ''}) }}</label>
+        {{ form_widget(form.arrivingAt, { attr: {
+            'data-form-mappable-target': 'arrivingAt'
+        }}) }}
+
+        {% if form.leavingAt is defined %}
+            <label class="fs-small mt-3">{{ 'mappable.leaving_at'|trans({date: ''}) }}</label>
+            {{ form_widget(form.leavingAt, { attr: {
+                'data-form-mappable-target': 'leavingAt'
+            }}) }}
+        {% endif %}
+        {% if form.cascadeTimeChange is defined %}
+            {{ form_widget(form.cascadeTimeChange) }}
+            <script>
+                var cascadeTimeChangeInput = document.getElementById('{{ form.cascadeTimeChange.vars.id }}');
+                var form = cascadeTimeChangeInput.form;
+                form.addEventListener('submit', () => {
+                   if (!cascadeTimeChangeInput.checked) return;
+                   form.dataset.turboFrame = 'sidebar-{{ object_name_plural }}';
+                });
+            </script>
+        {% endif %}
+    </div>
+</div>
+<div class="card-body">
+    <button class="btn btn-primary" data-role="submit">{{ 'action.save'|trans }}</button>
+    <a class="btn btn-outline-secondary" data-role="cancel" href="{{ path(object_name ~ '_show', { trip: trip.id }) }}">cancel</a>
+</div>
+
+<div class="d-none">
+    {{ form_widget(form.point.lon) }}
+    {{ form_widget(form.point.lat) }}
+</div>

@@ -1,0 +1,19 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <div class="row">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'title.register'|trans,
+            header_back_title: 'action.back'|trans,
+            header_back_href: path('home'),
+        }) }}
+        <div class="col-12" data-turbo="false">
+            {{ form_start(registrationForm) }}
+            {{ form_row(registrationForm.username, { attr: { autofocus: 'autofocus' }}) }}
+            {{ form_row(registrationForm.plainPassword) }}
+            {{ form_row(registrationForm.agreeTerms) }}
+            <button type="submit" class="btn btn-primary">{{ 'action.register'|trans }}</button>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+{% endblock %}

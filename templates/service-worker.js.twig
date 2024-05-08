@@ -1,0 +1,101 @@
+const CACHE_NAME = '{{ offline_cache_name }}';
+const OFFLINE_TILE = '{{ offlineTile|raw }}';
+const URL_BASE_REGEX = /{{ projectBaseUrlRegex|raw }}\/..\/trip/i;
+const URL_PUBLIC_REGEX = /{{ projectBaseUrlRegex|raw }}\/..\/public/i;
+const URL_TILE_REGEX = /{{ projectBaseUrlRegex|raw }}\/t\/p\//i;
+// {# This is a trick so Twig syntax does not interfere with javascript in IDE
+/* #}
+
+const files = {{ files|json_encode(constant("JSON_UNESCAPED_SLASHES"))|raw }};
+
+{# */
+// #}
+const isCachableUrl = (url) => {
+  for (const file of files) {
+    if (url.endsWith(file)) return true;
+  }
+  if (URL_PUBLIC_REGEX.test(url)) {
+    return false; // No cache for public pages and photos
+  }
+  // noinspection RedundantIfStatementJS
+  if (URL_BASE_REGEX.test(url)) {
+    return true;
+  }
+  return false;
+};
+
+const installHandler = (event) => {
+  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    return cache.addAll(files);
+  })());
+};
+
+const activateHandler = async (event) => {
+  event.waitUntil(clients.claim());
+  event.waitUntil((async () => {
+    const keyList = await caches.keys();
+    return Promise.all(
+      keyList.map((key) => {
+        if (key !== CACHE_NAME) {
+          return caches.delete(key);
+        }
+      }),
+    );
+  })());
+};
+
+const messageHandler = async (event) => {
+  if (event.data.fetch) {
+    const cache = await caches.open(CACHE_NAME);
+    const fetchedResponse = await fetch(event.data.fetch);
+    await cache.put(event.data.fetch, fetchedResponse.clone());
+    return fetchedResponse;
+  }
+
+  if (event.data.forceOffline) {
+    forceOffline = event.data.forceOffline;
+    // return;
+  }
+};
+
+const fetchHandler = (event) => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  const isTile = URL_TILE_REGEX.test(event.request.url);
+  if (!isCachableUrl(event.request.url) && !isTile) return;
+
+  const cacheHandler = async () => {
+    const cache = await caches.open(CACHE_NAME);
+    try {
+      // Fetch request
+      const fetchedResponse = await fetch(event.request.url);
+      // Save it to cache for offline use
+      await cache.put(event.request, fetchedResponse.clone());
+      return fetchedResponse;
+    } catch (error) {
+      // If fetch error (offline for example)
+      return async () => {
+        const cachedResponse = await cache.match(event.request.url);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        if (isTile) {
+          return cache.match(OFFLINE_TILE);
+        }
+
+        return Promise.reject(new Error('Not found in the Offline cache'));
+      };
+    }
+  };
+
+  event.respondWith(cacheHandler());
+};
+
+self.addEventListener('install', installHandler);
+self.addEventListener('activate', activateHandler);
+self.addEventListener('message', messageHandler);
+self.addEventListener('fetch', fetchHandler);

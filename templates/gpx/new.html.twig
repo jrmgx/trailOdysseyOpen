@@ -1,0 +1,39 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <div class="row">
+            {% if onBoarding %}
+                <div class="col-12 my-3">
+                    <h1 class="fs-4">{{ 'title.choose_workflow'|trans }}</h1>
+                </div>
+            {% else %}
+                {{ include('common/_header_page.html.twig', {
+                    header_title: 'title.import_file'|trans,
+                    header_back_title: 'action.back'|trans,
+                    header_back_href: path('segment_show', { trip: trip.id }),
+                }) }}
+            {% endif %}
+    </div>
+    <div class="row">
+        {{ form_start(form, { attr: { 'data-turbo-frame': '_top' }}) }}
+        <div class="col-12">
+            <h2 class="fs-6">{{ onBoarding ? 'gpx.workflow.import.title'|trans : 'gpx.workflow.import.pick'|trans }}</h2>
+            <div class="mb-3">{{ 'gpx.workflow.import.detail'|trans }}</div>
+            <div class="input-group">
+                {{ form_widget(form.files) }}
+                <button class="btn btn-primary">{{ 'action.upload'|trans }} {{ onBoarding ? 'action.and_continue'|trans : '' }}</button>
+            </div>
+        </div>
+        {% if onBoarding %}
+        <div class="col-12 mt-5">
+            <h2 class="fs-6">{{ 'gpx.workflow.scratch.title'|trans }}</h2>
+            <div class="mb-3">{{ 'gpx.workflow.scratch.detail'|trans }}</div>
+            <a class="btn btn-primary"
+               href="{{ path('stage_show', { trip: trip.id }) }}"
+               data-turbo-frame="_top"
+            >{{ 'action.continue'|trans }}</a>
+        </div>
+        {% endif %}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

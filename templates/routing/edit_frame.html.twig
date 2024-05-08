@@ -1,0 +1,36 @@
+{% extends 'base_frame.html.twig' %}
+
+{% block frame %}
+<turbo-frame id="routing_{{ routing.id }}">
+    <div class="card m-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a data-turbo-frame="sidebar-stages"
+                       href="{{ path('stage_split', { trip: trip.id, id: routing.id }) }}"
+                       class="btn btn-secondary">
+                        {{ 'action.split'|trans }}
+                    </a>
+                </div>
+                <form method="post"
+                      action="{{ path('routing_update_path', { trip: trip.id, id: routing.id }) }}">
+                    <button class="btn btn-secondary">{{ 'action.update'|trans }}</button>
+                    <input type="hidden" name="_token" value="{{ csrf_token('update_path' ~ routing.id) }}">
+                </form>
+                <form method="post"
+                      action="{{ path('routing_clear_path', { trip: trip.id, id: routing.id }) }}">
+                    <button class="btn btn-secondary">{{ 'action.clear'|trans }}</button>
+                    <input type="hidden" name="_token" value="{{ csrf_token('clear_path' ~ routing.id) }}">
+                </form>
+                <div>
+                    <a class="btn btn-outline-secondary"
+                       href="{{ path('stage_show', { trip: trip.id }) }}">
+                        cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</turbo-frame>
+{# TODO all frames with this mechanism #}
+{% endblock %}

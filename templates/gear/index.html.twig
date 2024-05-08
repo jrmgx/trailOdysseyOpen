@@ -1,0 +1,43 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <div class="row">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'title.your_gears'|trans,
+            header_back_title: 'title.your_trails'|trans,
+            header_back_href: path('trip_index'),
+        }) }}
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <ul class="list-group">
+                {% for gear in gears %}
+                    <li class="list-group-item {{ loop.index is even ? 'list-group-item-light' }} clearfix">
+                        <div class="float-end">
+                            <a class="btn btn-outline-secondary border-0"
+                               href="{{ path('gear_edit', { id: gear.id }) }}">
+                                {{ include('common/_icon.html.twig', {
+                                    icon_name: 'pencil-square',
+                                    icon_title: 'action.edit.title'|trans,
+                                    icon_size: 1,
+                                }) }}
+                            </a>
+                        </div>
+                        <div>
+                            {{ gear.name }}
+                            {% if gear.weight %}({{ gear.weight }}gr){% endif %}
+                            {% if gear.description %}<div class="fs-small">{{ gear.description }}</div>{% endif %}
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">{{ 'info.no_gear_found_create_one_to_start'|trans|raw }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="row my-3">
+        <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+            <a class="btn btn-primary" href="{{ path('gear_new') }}">{{ 'action.new_gear'|trans }}</a>
+        </div>
+    </div>
+{% endblock %}

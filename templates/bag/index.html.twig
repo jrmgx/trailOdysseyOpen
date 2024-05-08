@@ -1,0 +1,138 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <div data-controller="bag">
+        <div class="row">
+            <div class="d-flex justify-content-between align-items-start my-3 flex-column">
+                <h1 class="fs-4">{{ trip.name }}</h1>
+                {{ include('common/_trip_buttons.html.twig', { with_back: true }) }}
+            </div>
+        </div>
+        <hr>
+        {% for bag in bags %}
+            <div class="row">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="flex-grow-1">
+                        <h2 class="fs-5 col-12">{{ bag.name }}</h2>
+                        <div>{{ bag.description|default('')|markdown_to_html }}</div>
+                    </div>
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ path('bag_edit', { trip: trip.id, id: bag.id }) }}">{{ 'action.edit.title'|trans }}</a>
+                </div>
+                <div class="col-12">
+                    {# No turbo frame here so the whole form + weight is refreshed #}
+                    {# <turbo-frame id="gears-in-bag-{{ bag.id }}"> #}
+                    <ul class="list-group">
+                        {% for inBag in bag.inBag %}
+                            {% set thing = inBag.thing %}
+                            <li class="list-group-item {{ loop.index is even ? 'list-group-item-light' }} clearfix">
+                                <form method="post" class="float-end"
+                                      {% if thing.isBag %}
+                                          action="{{ path('bag_bag_out', { trip: trip.id, id: thing.id }) }}"
+                                      {% else %}
+                                          action="{{ path('bag_gear_out', { trip: trip.id, id: inBag.id }) }}"
+                                      {% endif %}
+                                >
+                                    <button class="btn btn-sm btn-outline-danger border-0 text-center">
+                                        {{ 'action.remove_from_bag'|trans }}
+                                    </button>
+                                </form>
+                                {% if not thing.isBag %}
+                                <form method="post" class="float-end"
+                                      action="{{ path('bag_gear_more', { trip: trip.id, id: inBag.id }) }}"
+                                >
+                                    <button class="btn btn-sm btn-outline-success border-0 text-center" style="width: 2rem;">
+                                        {{ 'action.add_again_to_bag'|trans }}
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <div class="d-flex">
+                                    <input data-action="change->bag#checkedAction"
+                                           class="form-check-input me-1"
+                                            {% if thing.isBag %}
+                                                data-bag-url-param="{{ path('bag_bag_check', { trip: trip.id, id: thing.id }) }}"
+                                            {% else %}
+                                                data-bag-url-param="{{ path('bag_gear_check', { trip: trip.id, id: inBag.id }) }}"
+                                            {% endif %}
+                                           name="checked"
+                                           type="checkbox"
+                                            {{ inBag.checked ? 'checked="checked"' }}
+                                           id="gear-in-bag-{{ inBag.id }}"
+                                    >
+                                    <label for="gear-in-bag-{{ inBag.id }}" class="form-check-label ms-1">
+                                        <div>
+                                            {% if thing.isBag %}🛄{% endif %}
+                                            {{ thing.name }}
+                                            {% set weight = thing.isBag ? inBag.totalWeight : (inBag.weight ? inBag.weight : null) %}
+                                            {% if inBag.count > 1 and weight %}
+                                                ({{ inBag.count }} = {{ weight }}gr)
+                                            {% elseif weight %}
+                                                ({{ weight }}gr)
+                                            {% elseif inBag.count > 1 %}
+                                                ({{ inBag.count }})
+                                            {% endif %}
+                                        </div>
+                                        {% if thing.description %}<div class="fs-small">{{ thing.description }}</div>{% endif %}
+                                    </label>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {# </turbo-frame> #}
+                </div>
+                <div class="col-12 my-3">
+                    <div id="bag-form-{{ bag.id }}" class="d-none">
+                        {% set bagForm = bagForms[bag.id] %}
+                        {{ form_start(bagForm) }}
+                        <div class="input-group">
+                            {{ form_widget(bagForm.things, { attr: {
+                                style: 'height: 10rem;',
+                            }}) }}
+                            <button class="btn btn-success">{{ 'action.add_to_bag'|trans }}</button>
+                        </div>
+                        {{ form_end(bagForm) }}
+                    </div>
+                    <div class="d-grid">
+                        <button id="bag-form-show-{{ bag.id }}" class="btn btn-outline-success">{{ 'action.add_to_bag'|trans }}</button>
+                        <script>(function () {
+                            window.bagFormOpen = window.bagFormOpen || [];
+                            const bagForm = document.getElementById('bag-form-{{ bag.id }}');
+                            const bagFormShow = document.getElementById('bag-form-show-{{ bag.id }}');
+                            if (navigator.platform === 'iPhone') {
+                                const selectElement = bagForm.querySelector('select');
+                                selectElement.style.height = '38px';
+                            }
+                            const onclick = function () {
+                                bagForm.classList.remove('d-none');
+                                bagFormShow.parentElement.classList.add('d-none');
+                                window.bagFormOpen.push({{ bag.id }});
+                            };
+                            if (window.bagFormOpen.includes({{ bag.id }})) {
+                                onclick();
+                            }
+                            bagFormShow.onclick = onclick;
+                        })();</script>
+                    </div>
+                </div>
+                <div class="col-12">
+                    {{ 'info.total_kg'|trans({ weight: (bag.totalWeight / 1000) }) }}
+                    {% if bag.weight %}<small>(incl. bag {{ bag.weight }}gr)</small>{% endif %}
+                </div>
+            </div>
+            <hr class="mb-3">
+        {% else %}
+            <div class="row my-3">
+                <div class="col-12">
+                    {{ 'info.no_bag_found_create_one_to_start'|trans|raw }}
+                </div>
+            </div>
+            <hr class="mb-3">
+        {% endfor %}
+        <div class="row">
+            <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+                <a class="btn btn-primary" href="{{ path('bag_new', { trip: trip.id }) }}">{{ 'action.new_bag'|trans }}</a>
+                <a class="btn btn-primary" href="{{ path('gear_new', { trip: trip.id }) }}">{{ 'action.new_gear'|trans }}</a> {# TODO redirect here then #}
+                <a class="btn btn-primary" href="{{ path('bag_import', { trip: trip.id }) }}">{{ 'action.import_bag'|trans }}</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

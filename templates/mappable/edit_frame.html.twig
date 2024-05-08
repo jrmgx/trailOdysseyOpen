@@ -1,0 +1,14 @@
+{% set object_name_plural = object_name_plural|default(object_name ~ 's') %}
+<div class="card m-3 position-relative">
+    <form method="post"
+          style="position: absolute; right: 1rem; bottom: 1rem;"
+          action="{{ path(object_name ~ '_delete', { trip: trip.id, id: mappable.id }) }}"
+          data-turbo-frame="sidebar-{{ object_name_plural }}"
+          onsubmit="return confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`);">
+        <button class="btn btn-outline-danger">{{ 'action.delete'|trans }}</button>
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ mappable.id) }}">
+    </form>
+    {{ form_start(form) }}
+    {{ include('mappable/_form.html.twig') }}
+    {{ form_end(form) }}
+</div>

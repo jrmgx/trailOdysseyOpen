@@ -1,0 +1,16 @@
+<turbo-frame id="diaryEntry-new">
+    <div class="p-3">
+        {{ form_start(form, { attr: {
+            'data-turbo-frame': 'sidebar-diaryEntries'
+        }}) }}
+        {{ form_errors(form) }}
+        <label for="{{ form.files.vars.id }}" class="form-label">{{ 'action.click_to_select_photos'|trans }}</label>
+        <div class="input-group mb-3">
+            {{ form_widget(form.files, { attr: { class: 'hidden' }}) }}
+            <button class="btn btn-primary">{{ 'action.send'|trans }}</button>
+        </div>
+        {{ form_end(form) }}
+        <a class="btn btn-outline-secondary"
+           href="{{ path('diaryEntry_show', { trip: trip.id }) }}">Cancel</a>
+    </div>
+</turbo-frame>

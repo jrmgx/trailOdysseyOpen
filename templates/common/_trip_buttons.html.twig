@@ -1,0 +1,28 @@
+<div class="btn-group btn-group-sm" role="group">
+    <a class="btn btn-{{ app.current_route != 'segment_show' ? 'outline-' }}primary" data-turbo-frame="_top"
+       href="{{ path('segment_show', { trip: trip.id }) }}">
+        {{ 'action.map.path'|trans }}
+    </a>
+    <a class="btn btn-{{ app.current_route != 'stage_show' ? 'outline-' }}primary" data-turbo-frame="_top"
+       href="{{ path('stage_show', { trip: trip.id }) }}">
+        {{ 'action.map.plan'|trans }}
+    </a>
+     <a class="btn btn-{{ app.current_route != 'live_show' ? 'outline-' }}primary" data-turbo-frame="_top"
+        href="{{ path('live_show', { trip: trip.id }) }}">
+         {{ 'action.map.live'|trans }}
+     </a>
+    <a class="btn btn-{{ app.current_route != 'diaryEntry_show' ? 'outline-' }}primary" data-turbo-frame="_top"
+       href="{{ path('diaryEntry_show', { trip: trip.id }) }}">
+        {{ 'action.map.diary'|trans }}
+    </a>
+    <a class="btn btn-{{ app.current_route != 'bag_index' ? 'outline-' }}primary"
+       href="{{ path('bag_index', { trip: trip.id }) }}">
+        {{ 'action.map.bags'|trans }}
+    </a>
+    {% if with_back is defined %}
+        <a class="btn btn-outline-primary" data-turbo-frame="_top"
+           href="{{ path('trip_index') }}">
+            {{ 'action.back'|trans }}
+        </a>
+    {% endif %}
+</div>

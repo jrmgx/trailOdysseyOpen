@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ trip.name }} - {{ parent() }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script defer data-turbo-track="reload"
+            src="{{ path('segment_show_js', { trip: trip.id, firstLoad: 1 }) }}">
+    </script>
+{% endblock %}
+
+{% set translations = {
+    newSegment: 'action.new_segment'|trans,
+    addPoints: 'action.add_points'|trans,
+    duplicateThisPoint: 'action.duplicate_this_point'|trans,
+    splitAtThisPoint: 'action.split_at_this_point'|trans,
+    deleteThisPoint: 'action.delete_this_point'|trans,
+    areYouSureSegmentDelete: 'confirm.are_you_sure_segment_delete'|trans,
+    areYouSureSegmentSplit: 'confirm.are_you_sure_segment_split'|trans,
+    areYouSureSegmentDeleteMulti: 'confirm.are_you_sure_segment_delete_multi'|trans,
+    clickMapToAdd: 'action.click_map_to_add'|trans,
+    andHereToFinish: 'action.and_here_to_finish'|trans,
+    orHereToCancel: 'action.or_here_to_cancel'|trans,
+    clickMapToAddStartFinish: 'action.click_map_to_add_start_finish'|trans,
+} %}
+
+{% block body %}
+    <div data-controller="sidebar map-common segment"
+
+         data-map-common-options-value="{{ options|e('html_attr') }}"
+         data-map-common-tiles-value="{{ tiles|e('html_attr') }}"
+         data-map-common-urls-value="{{ urls|e('html_attr') }}"
+         data-map-common-cache-name-value="{{ offline_cache_name }}"
+
+         data-segment-urls-value="{{ urls|e('html_attr') }}"
+         data-segment-translations-value="{{ translations|json_encode|e('html_attr') }}"
+         data-segment-mapbox-key-value="{{ MAPBOX_KEY|e('html_attr') }}"
+
+         data-sidebar-urls-value="{{ urls|e('html_attr') }}"
+    >
+        <div class="map-button-container">
+            <a class="map-button switch-trip with-box-shadow-radius mobile-only hide"
+               data-sidebar-target="switchToSidebar"
+               data-action="click->sidebar#switchToSidebarAction:prevent"
+               title="{{ 'action.show_trip_information.title'|trans }}"
+            >≣</a>
+            <a class="map-button toggle-visibility with-box-shadow-radius hide-mobile"
+               data-sidebar-target="toggleVisibility"
+               data-action="click->sidebar#toggleVisibilityAction:prevent"
+               title="{{ 'action.toggle_visibility.title'|trans }}"
+            >👁️</a>
+            <a class="map-button toggle-visibility with-box-shadow-radius hide-mobile"
+               data-action="click->segment#lassoClickAction:prevent"
+               title="{{ 'action.lasso.title'|trans }}"
+            >🌀</a>
+        </div>
+        <div class="map" id="map" data-segment-target="map" data-map-common-target="map"></div>
+        <div class="container-fluid bg-white sidebar" data-sidebar-target="sidebar">
+            <div class="map-button-container">
+                <a class="map-button switch-map mobile-only"
+                   data-sidebar-target="switchToMap"
+                   data-action="click->sidebar#switchToMapAction:prevent"
+                   title="{{ 'action.show_map.title'|trans }}"
+                >🌍</a>
+            </div>
+            <div class="row px-3">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-start my-3 flex-column">
+                        <h1 class="fs-4">{{ trip.name }}</h1>
+                        {{ include('common/_trip_buttons.html.twig', { with_back: true }) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <turbo-frame id="sidebar-segments">
+                    <script>
+                      if (typeof segmentController !== 'undefined') {
+                        segmentController.newSegmentCommonCancelAction();
+                      }
+                    </script>
+                    <div class="col-12">
+                        {% for segment in segments %}
+                            {{ include('segment/show_frame.html.twig') }}
+                        {% else %}
+                            <div class="my-3 px-3">
+                                <hr class="mb-3">
+                                {{ 'info.no_segment_found_create_one_to_start'|trans|raw }}
+                                <hr class="mb-3">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="sidebar-mappable-new">
+                        <turbo-frame id="segment-new">
+                            <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+                                <a class="btn btn-primary"
+                                   data-action="click->segment#newSegmentDrawAction:prevent"
+                                   href="#"
+                                >
+                                    {{ 'action.draw_new_segment'|trans }}
+                                </a>
+                                <a class="btn btn-primary"
+                                   data-action="click->segment#itineraryStartStopAction"
+                                   href="{{ path('segment_new_itinerary', { trip: trip.id }) }}"
+                                >
+                                    {{ 'action.itinerary'|trans }}
+                                </a>
+                                <a class="btn btn-primary"
+                                   data-turbo-frame="_top"
+                                   href="{{ path('gpx_new', { trip: trip.id, onBoarding: false }) }}"
+                                >
+                                    {{ 'action.import_gpx'|trans }}
+                                </a>
+                            </div>
+                        </turbo-frame>
+                    </div>
+                    {{ include('common/_save_map_option_form.html.twig') }}
+                    {{ form(segment_multiple_delete_form, { attr: {
+                        'data-segment-target': 'segmentMultipleDeleteForm',
+                        'class': 'hide'
+                    } }) }}
+                </turbo-frame>
+            </div>
+            <div id="sidebar-bottom-end">&nbsp;</div>
+        </div>
+    </div>
+{% endblock %}

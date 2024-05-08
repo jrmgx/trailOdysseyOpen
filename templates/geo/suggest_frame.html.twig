@@ -1,0 +1,14 @@
+<turbo-frame id="{{ type }}-new">
+    <div class="p-3">
+        <div class="btn-group-vertical" role="group">
+            {% for result in results %}
+                <a class="btn btn-outline-primary text-start"
+                   href="{{ path(type ~ '_new', { lon: result.lon, lat: result.lat, trip: trip.id, name: name }) }}">
+                    {{ result.display_name }}
+                </a>
+            {% endfor %}
+            <a class="btn btn-outline-secondary"
+               href="{{ path('stage_show', { trip: trip.id }) }}">Cancel</a>
+        </div>
+    </div>
+</turbo-frame>

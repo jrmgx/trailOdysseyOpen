@@ -1,0 +1,29 @@
+{{ stimulus_js_load_start('publicController', first_load is defined and first_load) }}
+
+{% for diaryEntry in diaryEntries %}
+publicController.addDiaryEntry(
+  '{{ diaryEntry.id }}',
+  '{{ diaryEntry.point.lat }}',
+  '{{ diaryEntry.point.lon }}',
+  '{{ diaryEntry.symbol }}'
+);
+{% endfor %}
+
+{% if first_load is defined and first_load and is_granted('EDIT', trip) %}
+{% for routing in routings %}
+mapCommonController.addPath({{ routing.pathPoints|json_encode|raw }});
+{% endfor %}
+{% endif %}
+
+{% if trip.progressPoint %}
+mapCommonController.addProgress(
+    ['{{ trip.progressPoint.lat }}', '{{ trip.progressPoint.lon }}'],
+{% for routing in routings %}
+    {{ routing.pathPoints|json_encode|raw }},
+{% endfor %}
+);
+{% endif %}
+
+mapCommonController.refreshPlan();
+
+{{ stimulus_js_load_end(first_load is defined and first_load) }}

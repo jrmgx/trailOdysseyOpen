@@ -1,0 +1,9 @@
+{% set header_column = header_column|default(false) %}
+<div class="d-flex justify-content-between align-items-start my-3 {{ header_column ? 'flex-column' }}">
+    <h1 class="fs-4 flex-grow-1">{{ header_title }}</h1>
+    {% if header_back_title is defined %}
+    <a class="btn btn-sm {{ header_column ? 'btn-outline-secondary' : 'btn-secondary' }}"
+       {{ header_back_extra|default('') }}
+       href="{{ header_back_href }}">{{ header_back_title }}</a>
+    {% endif %}
+</div>

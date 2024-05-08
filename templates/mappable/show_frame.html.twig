@@ -1,0 +1,64 @@
+{% set controller = controller|default('plan') %}
+{% set dataClickAction =
+    'data-action="click->' ~ controller ~ '#' ~ object_name ~ 'ClickAction" ' ~
+    'data-' ~ controller ~ '-id-param="' ~ mappable.id ~ '" '
+%}
+<div class="card object-type-{{ mappable.type|default('none') }} m-3">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="pe-2" {{ dataClickAction|raw }}>{{ mappable.symbol }}</span>
+            <span class="flex-grow-1" {{ dataClickAction|raw }}>
+                <span>{{ mappable.nameWithPointName }}</span>
+                {% if mappable.extra %}
+                    <span>(+{{ mappable.extra.distance|to_km }}&nbsp;km)</span>
+                {% endif %}
+            </span>
+            <a class="icon-link link-secondary js-edit-action"
+               href="{{ path(object_name ~ '_edit', { trip: trip.id, id: mappable.id}) }}">
+                {{ include('common/_icon.html.twig', { icon_name: 'pencil-square', icon_title: 'action.edit.label'|trans }) }}
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if mappable.description %}
+            <div id="mappableDescription{{ mappable.id }}">
+                <div class="markdown-container clearfix">
+                    {{ mappable.description|markdown_to_html }}
+                </div>
+            </div>
+            {% if false and mappable.type|default('none') == 'photo' %}
+                <script>
+                    var descriptionElement = document.getElementById('mappableDescription{{ mappable.id }}');
+                    var img = descriptionElement.querySelectorAll('img');
+                    if (img.length === 1) {
+                        img[0].classList.add('card-img-top');
+                        var cardElement = descriptionElement.closest('.card');
+                        cardElement.prepend(img[0]);
+                        var editActionElement = cardElement.querySelector('.js-edit-action');
+                        editActionElement.classList.add('float-end');
+                        descriptionElement.append(editActionElement);
+                        cardElement.querySelector('.card-header').remove();
+                    }
+                </script>
+            {% endif %}
+        {% endif %}
+        <div>
+            {% if object_name == 'interest' %}
+            {# NO OP #}
+            {% elseif object_name == 'diaryEntry' %}
+                {% if mappable.arrivingAt is defined %}
+                    <div class="fs-small" {{ dataClickAction|raw }}>
+                        {{ mappable.arrivingAt|format_datetime_app }}
+                    </div>
+                {% endif %}
+            {% else %}
+                {% if mappable.arrivingAt is defined and loop and not loop.first %}
+                    <div class="fs-small">{{ 'mappable.arriving_at'|trans({date: mappable.arrivingAt|format_datetime_app}) }}</div>
+                {% endif %}
+                {% if mappable.leavingAt is defined and loop and not (loop.last or loop.length == 1) %}
+                    <div class="fs-small">{{ 'mappable.leaving_at'|trans({date: mappable.leavingAt|format_datetime_app}) }}</div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>

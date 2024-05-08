@@ -1,0 +1,11 @@
+<turbo-frame id="stage_{{ stage.id }}">
+    {{ include('mappable/show_frame.html.twig', { object_name: 'stage', mappable: stage }) }}
+    <script>
+      if (typeof planController !== 'undefined') {
+        planController.updateStage(
+          {{ stage.id }},
+          `{{ include('common/_stage_popup.html.twig') }}`
+        );
+      }
+    </script>
+</turbo-frame>

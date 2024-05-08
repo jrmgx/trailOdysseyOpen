@@ -1,0 +1,36 @@
+{{ stimulus_js_load_start('liveController', first_load is defined and first_load) }}
+
+{% if first_load is defined and first_load and is_granted('EDIT', trip) %}
+
+{% for stage in stages %}
+liveController.addStage(
+  {{ stage.id }},
+  '{{ stage.point.lat }}',
+  '{{ stage.point.lon }}',
+  '{{ stage.symbol }}'
+);
+{% endfor %}
+
+{% for routing in routings %}
+mapCommonController.addPath(
+  {{ routing.pathPoints|json_encode|raw }},
+  {{ routing.startStage.id }}
+);
+{% endfor %}
+{% endif %}
+
+{% for extra in extras %}
+liveController.addExtra(
+  '{{ extra.startPoint.lat }}',
+  '{{ extra.startPoint.lon }}',
+  '{{ extra.finishPoint.lat }}',
+  '{{ extra.finishPoint.lon }}',
+  '{{ extra.distance|to_km }}'
+);
+{% endfor %}
+
+mapCommonController.refreshPlan();
+
+if (typeof liveShowJsReady !== 'undefined') { liveShowJsReady(); }
+
+{{ stimulus_js_load_end(first_load is defined and first_load) }}

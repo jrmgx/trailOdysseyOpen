@@ -1,0 +1,58 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <div class="row">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'title.your_trails'|trans,
+            header_back_title: 'title.your_gears'|trans,
+            header_back_href: path('gear_index'),
+        }) }}
+    </div>
+    {% for trip in trips %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-3">
+                    <div class="card-body clearfix">
+                        <a class="btn btn-outline-secondary border-0 float-end" title="{{ 'action.edit.title'|trans }}" href="{{ path('trip_edit', {trip: trip.id}) }}">
+                            {{ include('common/_icon.html.twig', {
+                                icon_name: 'pencil-square',
+                                icon_title: 'action.edit.title'|trans,
+                                icon_size: 1,
+                            }) }}
+                        </a>
+                        <h5 class="card-title">{{ trip.name }}</h5>
+                        <p class="card-text">{{ trip.description }}</p>
+                        <div class="mb-3">
+                            {{ include('common/_trip_buttons.html.twig') }}
+                        </div>
+                        {% if trip.isShared %}
+                            <small>
+                                Trip published at:
+                                <a href="{{ path('public_index', { trip: trip.shareKey }) }}"
+                                   target="_blank"
+                                   data-turbo="false"
+                                >
+                                    {{ url('public_index', { trip: trip.shareKey }) }}
+                                </a>
+                            </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                {{ 'info.no_trip_found_create_one_to_start'|trans|raw }}
+            </div>
+        </div>
+    {% endfor %}
+    <div class="row my-3">
+        <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+            <a class="btn btn-primary" href="{{ path('trip_new') }}">{{ 'action.new_trip'|trans }}</a>
+        </div>
+        <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+            <a class="btn btn-secondary" href="{{ path('user_edit') }}">Preferences</a>
+        </div>
+    </div>
+{% endblock %}

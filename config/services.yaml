@@ -1,0 +1,51 @@
+parameters:
+    project_name: Trail Odyssey
+    project_host: '%env(PROJECT_HOST)%'
+    project_base_url: '%env(PROJECT_BASE_URL)%'
+    locale_default: en
+    locale_available: ['en', 'fr']
+    locale_requirement: en|fr
+    offline_cache_name: cache-202405081000
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            $projectName: '%project_name%'
+            $projectHost: '%project_host%'
+            $projectBaseUrl: '%project_base_url%'
+            $publicDirectory: '%kernel.project_dir%/public'
+            $uploadsDirectory: '%kernel.project_dir%/public/uploads'
+            $env: '%env(APP_ENV)%'
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Model/'
+            - '../src/Kernel.php'
+
+    twig.markdown.league_common_mark_converter_factory:
+        class: App\Override\LeagueCommonMarkConverterFactory
+
+    App\Twig\HelperExtension:
+        arguments:
+            $intlExtension: '@twig.extension.intl'
+
+#    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+#        arguments:
+#            - '%env(resolve:DATABASE_URL)%'
+
+    Liip\ImagineBundle\Service\FilterService:
+        alias: liip_imagine.service.filter
+
+    App\EventSubscriber\LocaleSubscriber:
+        arguments:
+            $localeAvailable: '%locale_available%'
+            $localeRequirement: '%locale_requirement%'
+
+when@dev:
+    services:
+        Symfony\Component\HttpKernel\Profiler\Profiler: '@profiler'

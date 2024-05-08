@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="{{ app.locale }}">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ project_name }}</title>
+        <meta http-equiv="refresh" content="0;URL={{ parent_url|default(path('trip_index')) }}">
+    </head>
+    <body>
+        {% block frame %}{% endblock %}
+    </body>
+</html>

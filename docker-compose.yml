@@ -1,0 +1,56 @@
+networks:
+    traefik_default:
+        external: true
+        name: "traefik_default"
+
+volumes:
+    trailodyssey-redis-data:
+    trailodyssey-mysql-data:
+
+services:
+    # NEVER ADD ports DIRECTIVES IN PROD
+    php-fpm:
+        image: jrmgx/php-8.2-fpm-nginx:2
+        container_name: trailodyssey-php-fpm
+        restart: "always"
+        volumes:
+            - "./:/var/www"
+            - "../data:/var/www/var/data"
+            - "../sessions:/var/www/var/sessions"
+            - "../uploads:/var/www/public/uploads"
+            - "./docker/php-fpm/etc/ImageMagick-6:/etc/ImageMagick-6"
+            - "./docker/php-fpm/usr/local/etc:/usr/local/etc"
+            - "./docker/php-fpm/nginx.conf:/etc/nginx/nginx.conf:ro"
+        networks:
+            - "traefik_default"
+        environment:
+            - "IN_BUILDER=1"
+        labels:
+            # common
+            - "traefik.enable=true"
+            - "traefik.http.services.trailodyssey-common.loadbalancer.server.port=80"
+            # trailodyssey.net
+            - "traefik.http.routers.trailodyssey-app.rule=Host(`trailodyssey.net`)"
+            - "traefik.http.routers.trailodyssey-app.service=trailodyssey-common"
+
+    # NEVER ADD ports DIRECTIVES IN PROD
+    database:
+        image: mysql:8
+        container_name: trailodyssey-mysql
+        restart: "always"
+        volumes:
+            - "trailodyssey-mysql-data:/var/lib/mysql"
+        networks:
+            - "traefik_default"
+        environment:
+            - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}"
+
+    # NEVER ADD ports DIRECTIVES IN PROD
+    redis:
+        image: redis:latest
+        container_name: trailodyssey-redis
+        restart: "always"
+        volumes:
+            - "trailodyssey-redis-data:/data"
+        networks:
+            - "traefik_default"

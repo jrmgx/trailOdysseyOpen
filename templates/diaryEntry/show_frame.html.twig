@@ -1,0 +1,16 @@
+<turbo-frame id="diaryEntry_{{ diaryEntry.id }}">
+    {{ include('mappable/show_frame.html.twig', {
+        object_name: 'diaryEntry',
+        mappable: diaryEntry,
+        controller: 'diary'
+    }) }}
+    <script>
+      if (typeof diaryController !== 'undefined') {
+        diaryController.updateDiaryEntry(
+          {{ diaryEntry.id }},
+          '{{ diaryEntry.symbol }}',
+          `{{ include('common/_mappable_popup.html.twig', { object_name: 'diaryEntry',  mappable: diaryEntry }) }}`
+        );
+      }
+    </script>
+</turbo-frame>

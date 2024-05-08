@@ -1,0 +1,10 @@
+<turbo-frame id="segment-new">
+    {{ form_start(form, { attr: { 'data-turbo-frame': 'sidebar-segments' }}) }}
+    {{ include('segment/_form.html.twig') }}
+    {{ form_end(form) }}
+    <script>
+      if (typeof segmentController !== 'undefined') {
+        segmentController.newSegment([]);
+      }
+    </script>
+</turbo-frame>

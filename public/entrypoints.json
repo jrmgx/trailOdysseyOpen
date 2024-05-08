@@ -1,0 +1,9 @@
+{
+  "entrypoints": {
+    "service-worker": {
+      "js": [
+        "/service-worker.07cc87e3.js"
+      ]
+    }
+  }
+}

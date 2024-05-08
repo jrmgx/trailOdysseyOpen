@@ -1,0 +1,34 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <script>
+        {# Reset cache (this page is also called at logout) #}
+        caches.keys().then(keyList => {
+            Promise.all(keyList.map((key) => { return caches.delete(key); }))
+        });
+    </script>
+    <div class="row">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'title.login'|trans,
+            header_back_title: 'action.back'|trans,
+            header_back_href: path('home'),
+        }) }}
+        <div class="col-12" data-turbo="false">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+            <form method="post">
+                <div class="mb-3">
+                    <label for="inputUsername" class="form-label required">{{ 'label.email'|trans }}</label>
+                    <input type="email" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" autocomplete="email" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="inputPassword" class="form-label required">{{ 'label.password'|trans }}</label>
+                    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                </div>
+                <button class="btn btn-primary" type="submit">{{ 'action.log_in'|trans }}</button>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<turbo-frame id="routing_{{ routing.id }}">
+    <div class="card m-3">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="flex-grow-1"
+                      data-action="click->plan#routingClickAction"
+                      data-plan-id-param="{{ routing.id }}"
+                >
+                    <strong>{{ routing.distance|to_km }}&nbsp;km</strong>
+                    <span>
+                        {% if routing.asTheCrowFly %}{{ 'routing.as_the_crow_fly'|trans }}{% endif %}
+                        {% if routing.elevationPositive %}
+                            {{ 'routing.elevation'|trans }} +{{ routing.elevationPositive }}&nbsp;/&nbsp;-{{ routing.elevationNegative }}
+                        {% endif %}
+                    </span>
+                </span>
+                <a class="icon-link link-secondary"
+                   href="{{ path('routing_edit', { trip: trip.id, id: routing.id }) }}">
+                    {{ include('common/_icon.html.twig', { icon_name: 'pencil-square', icon_title: 'action.edit.label'|trans }) }}
+                </a>
+            </div>
+        </div>
+        <div class="live-graph">
+            <div id="stage-elevation-{{ routing.startStage.id }}"
+                 style="position: relative; top: 0.5rem;"></div>
+        </div>
+        <div class="card-body mt-2">
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-xs btn-outline-secondary"
+                        data-action="click->plan#routingOfflineAction"
+                        data-plan-id-param="{{ routing.id }}"
+                        data-plan-target="offlineButton"
+                >
+                    {{ 'routing.save_offline'|trans }}
+                </button>
+                <a class="btn btn-xs btn-outline-secondary"
+                   data-turbo-frame="_top"
+                   href="{{ path('live_show_stage', { trip: trip.id, stage: routing.startStage.id }) }}">
+                    {{ 'routing.live'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        if (typeof planController !== 'undefined') {
+            planController.updateRouting(
+                {{ routing.id }},
+                '{{ routing.startStage.point.lat }}',
+                '{{ routing.startStage.point.lon }}',
+                '{{ routing.finishStage.point.lat }}',
+                '{{ routing.finishStage.point.lon }}',
+                '{{ routing.distance|to_km }}',
+                '{% if routing.asTheCrowFly %}{{ 'routing.as_the_crow_fly'|trans }}{% endif %}',
+                '{% if routing.elevationPositive %}{{ 'routing.elevation'|trans }} +{{ routing.elevationPositive }}&nbsp;/&nbsp;-{{ routing.elevationNegative }}{% endif %}',
+                    {{ routing.pathPoints|json_encode|raw }}
+            );
+            mapCommonController.addElevation({{ routing.startStage.id }}, true);
+            mapCommonController.refreshPlan();
+        }
+    </script>
+</turbo-frame>

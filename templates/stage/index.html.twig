@@ -1,0 +1,190 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ trip.name }} - {{ parent() }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script defer data-turbo-track="reload"
+            src="{{ path('stage_show_js', { trip: trip.id, firstLoad: 1 }) }}">
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div data-controller="sidebar map-common plan"
+
+         data-map-common-options-value="{{ options|e('html_attr') }}"
+         data-map-common-tiles-value="{{ tiles|e('html_attr') }}"
+         data-map-common-urls-value="{{ urls|e('html_attr') }}"
+         data-map-common-cache-name-value="{{ offline_cache_name }}"
+
+         data-plan-urls-value="{{ urls|e('html_attr') }}"
+
+         data-sidebar-urls-value="{{ urls|e('html_attr') }}"
+    >
+        <div class="container-progress container-fluid position-absolute bg-white hide"
+             data-map-common-target="containerProgress"
+        >
+            <div class="pt-2 pb-1 fs-small">Donwloading tiles for Offline use</div>
+            <div class="pb-3">
+                <div class="progress" role="progressbar">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0">0%</div>
+                </div>
+            </div>
+        </div>
+        <div class="map-button-container">
+            <a class="map-button switch-trip with-box-shadow-radius mobile-only hide"
+               data-sidebar-target="switchToSidebar"
+               data-action="click->sidebar#switchToSidebarAction:prevent"
+               title="{{ 'action.show_trip_information.title'|trans }}"
+            >≣</a>
+            <div class="map-button map-search with-box-shadow-radius hide-mobile"
+                 data-sidebar-target="searchContainer"
+                 title="{{ 'action.search.title'|trans }}"
+            >
+                <turbo-frame id="geo-elements" src="{{ path('geo_elements', { trip: trip.id }) }}">
+                    🔍
+                </turbo-frame>
+            </div>
+            <a class="map-button toggle-visibility with-box-shadow-radius hide-mobile"
+               data-sidebar-target="toggleVisibility"
+               data-action="dblclick->plan#centerMapAction:prevent click->sidebar#toggleVisibilityAction:prevent"
+               title="{{ 'action.toggle_visibility.title'|trans }}"
+            >👁️</a>
+        </div>
+        <div class="map" id="map" data-map-common-target="map"></div>
+        <div class="container-fluid bg-white sidebar" data-sidebar-target="sidebar">
+            <div class="map-button-container">
+                <a class="map-button switch-map mobile-only"
+                   data-sidebar-target="switchToMap"
+                   data-action="click->sidebar#switchToMapAction:prevent"
+                   title="{{ 'action.show_map.title'|trans }}"
+                >🌍</a>
+            </div>
+            <div class="row px-3">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-start my-3 flex-column">
+                        <h1 class="fs-4">{{ trip.name }}</h1>
+                        {{ include('common/_trip_buttons.html.twig', { with_back: true }) }}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="mb-3">
+                        <div>{{ trip.description }}</div>
+                        <div data-plan-target="totalDistance" class="trip-total">{{ total_distance|to_km }}&nbsp;km</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item ms-3">
+                        <a href="#"
+                           data-action="click->plan#tabSwitchAction:prevent"
+                           data-plan-tab-param="stages"
+                           {{ tab == 'stage' ? 'aria-current="page"' }}
+                           class="tab-stages nav-link {{ tab == 'stages' ? 'active' }}"
+                        >{{ 'tab.plan'|trans }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"
+                           data-action="click->plan#tabSwitchAction:prevent"
+                           data-plan-tab-param="interests"
+                           {{ tab == 'interest' ? 'aria-current="page"' }}
+                           class="tab-interests nav-link {{ tab == 'interests' ? 'tab-active' }}"
+                        >{{ 'tab.interest'|trans }}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="row">
+                <turbo-frame id="sidebar-stages"
+                             data-plan-target="sidebarStages"
+                             class="{{ tab == 'stages' ? '' : 'hide' }}"
+                >
+                    <div class="col-12">
+                        {% for result in results %}
+                            {% if result|is_instanceof('App\\Entity\\Stage') %}
+                                {% set stage = result %}
+                                {{ include('stage/show_frame.html.twig') }}
+                            {% elseif result|is_instanceof('App\\Entity\\Routing') %}
+                                {% set routing = result %}
+                                {{ include('routing/show_frame.html.twig') }}
+                            {% endif %}
+                        {% else %}
+                            <div class="my-3 px-3">
+                                {{ 'info.no_stage_found_create_one_to_start'|trans|raw }}
+                                <hr class="mb-3">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-12">
+                        <turbo-frame id="stage-new">
+                            <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+                                <a class="btn btn-primary"
+                                   data-action="click->map-common#newPinAction"
+                                   data-map-common-type-param="stage"
+                                   data-map-common-on-param="{{ 'action.add_a_new_stage_from_the_map'|trans }}"
+                                   data-map-common-off-param="{{ 'action.click_map_to_add'|trans }}<br><small>{{ 'action.or_here_to_cancel'|trans }}</small>"
+                                >
+                                    {{ 'action.add_a_new_stage_from_the_map'|trans }}
+                                </a>
+                                <a class="btn btn-primary"
+                                   href="{{ path('geo_search', { trip: trip.id, type: 'stage' }) }}"
+                                >
+                                    {{ 'action.search_to_create_a_new_stage'|trans }}
+                                </a>
+                            </div>
+                        </turbo-frame>
+                    </div>
+                    {{ include('common/_save_map_option_form.html.twig') }}
+                    <script>
+                        {{ include('stage/index.js.twig') }}
+                        if (typeof planController !== 'undefined') {
+                          planController.updateDistance('{{ total_distance|to_km }}');
+                        }
+                    </script>
+                </turbo-frame>
+                <turbo-frame id="sidebar-interests"
+                             data-plan-target="sidebarInterests"
+                             class="{{ tab == 'interests' ? '' : 'hide' }}"
+                >
+                    <div class="col-12">
+                        {% for interest in interests %}
+                            {{ include('interest/show_frame.html.twig') }}
+                        {% else %}
+                            <div class="my-3 px-3">
+                                {{ 'info.no_interest_found_create_one_to_start'|trans|raw }}
+                                <hr class="mb-3">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-12">
+                        <turbo-frame id="interest-new">
+                            <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+                                <a class="btn btn-primary"
+                                   data-action="click->map-common#newPinAction"
+                                   data-map-common-type-param="interest"
+                                   data-map-common-on-param="{{ 'action.add_a_new_interest_on_the_map'|trans }}"
+                                   data-map-common-off-param="{{ 'action.click_map_to_add'|trans }}<br><small>{{ 'action.or_here_to_cancel'|trans }}</small>"
+                                >
+                                    {{ 'action.add_a_new_interest_on_the_map'|trans }}
+                                </a>
+                                <a class="btn btn-primary"
+                                   href="{{ path('geo_search', { trip: trip.id, type: 'interest' }) }}"
+                                >
+                                    {{ 'action.search_to_create_a_new_interest'|trans }}
+                                </a>
+                            </div>
+                        </turbo-frame>
+                    </div>
+                    <script>
+                        {{ include('stage/index.js.twig') }}
+                        if (typeof mapCommonController !== 'undefined') {
+                          mapCommonController.removeAllElements();
+                        }
+                    </script>
+                </turbo-frame>
+            </div>
+            <div id="sidebar-bottom-end">&nbsp;</div>
+        </div>
+    </div>
+{% endblock %}

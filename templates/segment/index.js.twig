@@ -1,0 +1,7 @@
+{{ stimulus_js_load_start('segmentController', first_load is defined and first_load) }}
+
+{% for segment in segments %}
+  segmentController.addSegment({{segment.id }}, {{ segment.points|json_encode|raw }}, '{{ color_from_index(segment.id) }}');
+{% endfor %}
+
+{{ stimulus_js_load_end(first_load is defined and first_load) }}

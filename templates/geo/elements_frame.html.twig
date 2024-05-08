@@ -1,0 +1,65 @@
+<turbo-frame id="geo-elements">
+    <a data-action="click->sidebar#searchContainerAction">🔍</a>
+    {{ form_start(form, { attr : {
+        'data-turbo-frame': 'geo-elements',
+        'class': 'hide',
+    }}) }}
+        <div class="input-group position-relative" style="top: -2px">
+            {{ form_widget(form.element, { attr: {
+                'data-action': 'change->map-common#updateSearchBoundingBox',
+                'class': 'form-select-sm'
+            }}) }}
+            <button class="btn btn-sm btn-primary">{{ 'action.search.label'|trans }}</button>
+        </div>
+        {{ form_widget(form.southWest.lon, { attr: { class: 'hide' }}) }}
+        {{ form_widget(form.southWest.lat, { attr: { class: 'hide' }}) }}
+        {{ form_widget(form.northEast.lon, { attr: { class: 'hide' }}) }}
+        {{ form_widget(form.northEast.lat, { attr: { class: 'hide' }}) }}
+    {{ form_end(form) }}
+    <script>
+    mapCommonController.removeAllElements();
+    {% if results is not null %}
+        {% for element in results %}
+        {%- set description -%}
+        {%- for k, v in element.details -%}
+        {%- if v matches '{^https?:}' -%}
+            <a href="{{ v }}">{{ k|title }}</a><br>{{ "\n" }}
+        {%- else -%}
+            {{ k|title }}: {{ v }}<br>{{ "\n" }}
+        {%- endif -%}
+        {%- endfor -%}
+        {%- endset -%}
+          {# TODO open the right tab when saving to interest #}
+            setTimeout(() => {
+              mapCommonController.addElement(
+                    {{ element.point.lat }},
+                    {{ element.point.lon }},
+                    `{% autoescape %}<span class="element-marker">
+                        {% if element.error %}
+                            <span class="element-error">{{ element.name }}</span>
+                        {% else %}
+                        <strong>{{ element.name }}</strong>
+                        {{ description }}
+                        <a data-action="click->sidebar#switchToSidebarAction click->plan#tabSwitchAction"
+                        {# TODO here the switchToSidebarAction won't scroll to the end of the sidebar #}
+                            data-plan-tab-param="interests"
+                            data-turbo-frame="interest-new"
+                            href="{{ path('interest_new', {
+                                lat: element.point.lat,
+                                lon: element.point.lon,
+                                trip: trip.id,
+                                name: element.name,
+                                description: description
+                            }) }}">
+                            {{ 'action.save_in_interest'|trans }}
+                        </a>
+                        {% endif %}
+                    </span>{% endautoescape %}`,
+                );
+            }, {{ loop.index }});
+        {% else %}
+            alert('{{ 'alert.no_results'|trans }}');
+        {% endfor %}
+        {% endif %}
+    </script>
+</turbo-frame>

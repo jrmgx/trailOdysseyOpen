@@ -1,0 +1,175 @@
+premium:
+  a:
+    title:
+      Ceci est une fonctionnalité avancée.
+      Pour m'aider à développer ce service, pensez à devenir PREMIUM !
+action:
+  copy_to_my_trips: Copier dans mes randos
+  share: Partager
+  publish: Publier
+  search:
+    label: Chercher
+    title: Chercher
+  save_in_interest: Sauvegarder dans mes Intérêts
+  back: Retour
+  continue: Continuer
+  upload: Envoyer
+  and_continue: et Continuer
+  log_in: Connexion
+  sign_up: Inscription
+  help_info: Aide et Info
+  support_my_work: Supportez le projet
+  register: Inscription
+  save: Enregister
+  delete: Supprimer
+  edit:
+    label_: '<i class="icon-edit" title="éditer"></i>'
+    label: Éditer
+    title: Éditer
+  click_to_select_photos: Sélectionner des photos
+  send: Envoyer
+  clear: Effacer
+  split: Couper
+  update: M.à.j.
+  show_trip_information:
+    title: Voir les informations de la rando
+  toggle_visibility:
+    title: Changer la visibilité
+  show_map:
+    title: Voir la carte
+    help: Vue carte ➞ 
+  itinerary: Itinéraire
+  add_points: Ajouter des points
+  draw_new_segment: Nouveau segment
+  import_gpx: Importer un GPX
+  add_a_new_stage_from_the_map: Ajouter une étape depuis la carte
+  search_to_create_a_new_stage: Chercher pour créer une étape
+  add_a_new_interest_on_the_map: Ajouter un point d'intérêt sur la carte
+  search_to_create_a_new_interest: Chercher pour créer un point d'intérêt
+  upload_a_photo: Ajouter une photo
+  add: Ajouter
+  save_changes: Sauvegarder
+  export_trail: Exporter la rando
+  new_trip: Nouvelle rando
+  cancel:
+    title: Annuler
+  create: Créer
+  delete_this_point: Supprimer ce point
+  new_segment: Nouveau segment
+  duplicate_this_point: Dupliquer ce point
+  split_at_this_point: Couper à ce point
+  more: Plus
+  less: Moins
+  click_map_to_add: Cliquez sur la carte pour ajouter !
+  click_map_to_add_start_finish: Cliquez sur la carte pour ajouter un point de départ et d'arrivé !
+  and_here_to_finish: Et ici à nouveau pour terminer
+  or_here_to_cancel: Ou ici pour annuler
+  start_now: Commencer
+  lasso:
+    title: Selectionner pour supprimer en masse
+  new_gear: Nouveau matériel
+  remove_from_bag: '-'
+  add_to_bag: Ajouter
+  back_to_trail: Retour
+  new_bag: Nouveau sac
+  show_bags: Voir le sac
+label:
+  search_for_an_address: 'Rechercher une adresse :'
+  email: Email
+  password: Mot de passe
+  name: Nom
+  description: Description
+  url: URL
+  overlay: Par dessus
+  public: Public
+  tiles: Tuiles
+gpx:
+  workflow:
+    import:
+      title: Commencer avec un fichier GPX
+      detail: Importez un ou plusieurs fichiers GPX pour vous aider à planifier votre rando.
+      pick: Choisissez un fichier GPX
+    scratch:
+      title: Commencer sans fichier GPX
+      detail: Créez une rando depuis la carte, recherchez des lieux et créez des itinéraires directement sur la carte.
+title:
+  help: Aide
+  login: Connexion
+  register: Inscription
+  support: Supporter mon travail !
+  edit_trip: Éditer la rando
+  your_trails: Vos randos
+  new_trip: Nouvelle rando
+  choose_workflow: Choisissez un workflow
+  import_file: Importez un fichier
+  your_gears: Votre matériel
+  your_bags: Vos sacs
+  bags: Sacs
+pitch:
+  description: L'outil idéal pour planifier votre randonnée !
+  pitch_01_01: Êtes-vous fatigué de passer des heures à rechercher les meilleurs itinéraires de randonnée ou de vélo dans votre région, pour finir sur un sentier qui ne vous convient pas ?
+  pitch_01_02: '{project_name} propose un service de planification complet qui vous permet de trouver l''itinéraire parfait pour votre prochaine aventure.'
+  pitch_02_01: Que vous soyez un randonneur expérimenté ou que vous commenciez tout juste, nous avons les informations dont vous avez besoin pour profiter au maximum de votre excursion en plein air.
+  pitch_02_02: Notre interface conviviale facilite la planification de votre prochain voyage !
+  pitch_hello_01: Bonjour, je suis Jérôme, la personne derrière {project_name}.
+  pitch_hello_02: J'ai toujours eu une passion pour la randonnée et le vélo, et je connais le défi que consiste la planification de l'itinéraire parfait.
+  pitch_03_01: C'est pourquoi j'ai créé {project_name}, une plateforme qui permet aux passionnés de plein air comme moi de planifier leurs aventures en toute facilité.
+  pitch_03_02: Avec {project_name}, vous pouvez explorer le monde qui vous entoure en sachant que vous êtes sur la bonne voie, que vous soyez un randonneur expérimenté ou que vous commenciez tout juste.
+  pitch_cta_01: Alors pourquoi attendre ?
+  pitch_cta_02: Inscrivez-vous à {project_name} dès aujourd'hui et commencez à planifier votre prochaine aventure !
+  public: Planifiez votre prochaine rando avec {project_name} ! C'est simple et super utile.
+alt:
+  illustrative_picture: Image d'illustration
+badge:
+  help: Aide
+alert:
+  no_results: Pas de résultat.
+confirm:
+  are_you_sure: Êtes-vous sûr de vouloir supprimer ceci ?
+  are_you_sure_segment_delete: Êtes-vous sûr de vouloir supprimer ce segment ?
+  are_you_sure_segment_split: Êtes-vous sûr de vouloir diviser ce segment ?
+  are_you_sure_segment_delete_multi: Êtes-vous sûr de vouloir supprimer ces segments ?
+tab:
+  plan: Planifier
+  interest: Point d'intérêt
+  paths: Chemins
+info:
+  no_trip_found_create_one_to_start: Aucune randonnée.<br>Créez en une pour commencer !
+  segments_are_warming_up: Pré-calcul des segments en tâche de fond ...
+  segments_are_not_warming_up: ''
+  gps_information_not_found_on_this_photo: 'Note: Les informations GPS sont introuvables pour cette photo.'
+  date_information_not_found_on_this_photo: 'Note: La date est introuvable pour cette photo.'
+  no_gear_found_create_one_to_start: Pas de matériel.<br> Ajouter quelque chose pour commencer!
+  no_bag_found_create_one_to_start: Pas de sac.<br> Ajouter en un pour commencer !
+  no_bag_found: Pas de sac.
+  total_kg: 'Total : {weight} kg'
+form:
+  label:
+    internal:
+      map_center: Centre
+      map_zoom: Zoom
+      point: Point
+      json_points: Points
+    lon: Longitude
+    lat: Latitude
+    point: Point
+    gpx_files: Fichiers GPX
+    photo_files: Photos
+    symbol: Symbole
+    name: Nom
+    description: Description
+    email: Email
+    password: Mot de passe
+    agree_terms: Accepter les conditions d'utilisation
+    arriving_at: Arrivée à
+    leaving_at: Départ à
+    address: Adresse
+    url: URL
+    overlay: Par-dessus ?
+    public: Public ?
+    tiles: Tuiles
+  placeholder:
+    choose_an_element: Choisissez un élément
+routing:
+  as_the_crow_fly: (à vol d'oiseau)
+  elevation: 'avec'

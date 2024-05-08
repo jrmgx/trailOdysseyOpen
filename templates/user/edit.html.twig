@@ -1,0 +1,17 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <div class="row">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'Edit Account',
+            header_back_title: 'action.back'|trans,
+            header_back_href: path('trip_index'),
+        }) }}
+        <div class="col-12">
+            {{ form_start(form) }}
+            {{ form_row(form.timezone) }}
+            <button class="btn btn-primary">{{ 'action.update'|trans }}</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

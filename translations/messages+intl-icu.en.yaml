@@ -1,0 +1,212 @@
+premium:
+  a:
+    title:
+      This is an advanced feature. 
+      To help me develop further the service, please think about paying a PREMIUM membership!
+action:
+  copy_to_my_trips: Copy to my Trails
+  share: Share
+  publish: Publish
+  search:
+    label: Search
+    title: Search
+  save_in_interest: Save in Interest
+  back: Back
+  continue: Continue
+  upload: Upload
+  and_continue: and Continue
+  log_in: Log In
+  sign_up: Sign Up
+  help_info: Help & Info
+  support_my_work: Support The Project!
+  register: Register
+  save: Save
+  delete: Delete
+  edit:
+    label: edit
+    title: Edit
+  click_to_select_photos: Click to select photos
+  send: Send
+  clear: Clear
+  split: Split
+  update: Update
+  show_trip_information:
+    title: Show Trail Information
+  toggle_visibility:
+    title: Toggle Visibility
+  show_map:
+    title: Show Map
+    help: Switch to map ➞ 
+  itinerary: Itinerary
+  add_points: Add Points
+  draw_new_segment: New segment
+  import_gpx: Import GPX
+  add_a_new_stage_from_the_map: Add a new stage from the map
+  search_to_create_a_new_stage: Search to create a new stage
+  add_a_new_interest_on_the_map: Add a new interest on the map
+  search_to_create_a_new_interest: Search to create a new interest
+  upload_a_photo: Upload a Photo
+  add: Add
+  save_changes: Save Changes
+  export_trail: Export Trail
+  new_trip: New Trip
+  cancel:
+    title: Cancel
+  create: Create
+  delete_this_point: Delete this point
+  new_segment: New Segment
+  duplicate_this_point: Duplicate this point
+  split_at_this_point: Split at this point
+  more: More
+  less: Less
+  click_map_to_add: Now click on the map to add!
+  click_map_to_add_start_finish: Now click on the map to add a start and finish point!
+  and_here_to_finish: And back here to finish
+  or_here_to_cancel: Or here to cancel
+  start_now: Start Now
+  lasso:
+    title: Select and delete multiple
+  new_gear: New Gear
+  remove_from_bag: '-'
+  add_to_bag: Add
+  back_to_trail: Back
+  new_bag: New Bag
+  show_bags: Show Bag
+  my_live_position:
+    title: My Geolocation
+  map:
+    edit: 'Edit'
+    plan: 'Plan'
+    live: 'Live'
+    bags: 'Bags'
+    diary: 'Diary'
+    public: 'Public Link'
+    make_public: 'Make Public'
+    path: 'Path'
+    make_private: 'Make Private'
+  add_a_new_diary_entry_on_the_map: 'Add a new diary entry on the map'
+  add_tiles: 'Add Tiles'
+  delete_trail: Delete Trail
+  add_those_tiles: 'Add those Tiles'
+  duplicate_trail: 'Duplicate Trail'
+  add_again_to_bag: '+'
+  import_bag: 'Import Bag'
+label:
+  search_for_an_address: 'Search for an address:'
+  email: Email
+  password: Password
+  name: Name
+  description: Description
+  url: Url
+  overlay: Overlay
+  public: Public
+  tiles: Tiles
+gpx:
+  workflow:
+    import:
+      title: GPX based workflow
+      detail: Import one or multiple GPX file to help you plan your trail.
+      pick: Pick a GPX file
+    scratch:
+      title: Point and click workflow
+      detail: Create a trail from scratch, create itineraries directly on the map.
+title:
+  help: Help
+  login: Login
+  register: Register
+  support: Support My Work!
+  edit_trip: Edit Trail
+  your_trails: Your Trails
+  new_trip: New Trail
+  choose_workflow: Choose a Workflow
+  import_file: Import a File
+  your_gears: Your Gears
+  your_bags: Your Bags
+  bags: Bags
+pitch:
+  description: The best tool to plan your next outdoor trail.
+  pitch_01_01: Are you tired of spending hours researching the best hiking or biking routes in your area, only to end up on a trail that's not quite right for you?
+  pitch_01_02: '{project_name} offers a comprehensive planning service that allows you to find the perfect route for your next adventure.'
+  pitch_02_01: Whether you're an experienced hiker or just starting out, we have the information you need to make the most of your outdoor excursion.
+  pitch_02_02: Our user-friendly interface makes it easy to plan your next trip!
+  pitch_hello_01: Hello I'm Jerome, the person behind {project_name}.
+  pitch_hello_02: I have always had a passion for hiking and biking, and I know firsthand the challenges of planning the perfect route.
+  pitch_03_01: That's why I created {project_name}, a platform that makes it easy for outdoor enthusiasts like me to plan their adventures with confidence and ease.
+  pitch_03_02: With {project_name}, you can explore the world around you with the knowledge that you're on the right path, whether you're an experienced hiker or just starting out.
+  pitch_cta_01: So why wait?
+  pitch_cta_02: Sign up for {project_name} today and start planning your next adventure!
+  public: You too make your own planning with {project_name}! It is easy to use and really useful.
+alt:
+  illustrative_picture: Illustrative picture
+badge:
+  help: Help
+alert:
+  no_results: No Result found.
+confirm:
+  are_you_sure: Are you sure?
+  are_you_sure_segment_delete: Are you sure to delete this segment?
+  are_you_sure_segment_split: Are you sure to split this segment in two?
+  are_you_sure_segment_delete_multi: Are you sure to delete those segments?
+  are_you_sure_delete: 'Are you sure you want to delete this?'
+  are_you_sure_duplicate: 'Are you sure you want to duplicate this?'
+tab:
+  plan: Plan
+  interest: Interest
+  paths: Paths
+info:
+  no_trip_found_create_one_to_start: No Trail Found.<br> Create one to Start!
+  segments_are_warming_up: Optimizing segment in the background ...
+  segments_are_not_warming_up: ''
+  gps_information_not_found_on_this_photo: 'Note: GPS information not found for this photo.'
+  date_information_not_found_on_this_photo: 'Note: Date not found for this photo.'
+  no_gear_found_create_one_to_start: No Gear Found.<br> Create one to Start!
+  no_bag_found_create_one_to_start: No Bag Found.<br> Create one to Start!
+  no_bag_found: No Bag Found.
+  total_kg: 'Total: {weight} kg'
+  no_stage_found_create_one_to_start: 'No Stage Found.<br> Create one to Start!'
+  no_interest_found_create_one_to_start: 'No Point of Interest Found.<br> Create one to Start!'
+  no_segment_found_create_one_to_start: 'No Segment Found.<br> Create one to Start!'
+  no_diary_found_create_one_to_start: 'No Diary Entry Found.<br> Create one to Start!'
+form:
+  label:
+    internal:
+      map_center: Center
+      map_zoom: Zoom
+      point: Point
+      json_points: Points
+    select_trip_import_bag: Select a Trip to import its Bags
+    lon: Longitude
+    add_existing_tiles: Add from existing Tiles
+    lat: Latitude
+    cascade_time_change: Cascade time change
+    point: Point
+    gpx_files: GPX Files
+    photo_files: Photos
+    symbol: Symbol
+    name: Name
+    description: Description
+    email: Email
+    password: Password
+    agree_terms: Agree Terms
+    arriving_at: Arriving At
+    leaving_at: Leaving At
+    address: Address
+    url: URL
+    overlay: Overlay?
+    public: Public?
+    geo_json: Geo JSON?
+    geo_json_html: Geo JSON HTML Binding (advanced)
+    tiles: Tiles
+  placeholder:
+    choose_an_element: Choose an Element
+routing:
+  as_the_crow_fly: (as the crow fly)
+  elevation: 'with'
+  save_offline: 'Save Offline'
+  live: 'Live'
+  progress: 'Progress'
+mappable:
+  arriving_at: 'Arriving at: {date}'
+  leaving_at: 'Leaving at: {date}'
+segment:
+  generic_title: 'Segment'

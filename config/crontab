@@ -1,0 +1,2 @@
+0 * * * * echo "Cron is up at $(date +\%H:\%M)" >> /var/www/var/log/cron-$(date +\%Y-\%m-\%d).log 2>&1
+1 * * * * logrotate -f /var/www/config/logrotate.conf

@@ -1,0 +1,27 @@
+root:
+    # Root needs to have its own entry because it does not pass the prefix step
+    path: /
+    controller: App\Controller\HomeController::home
+
+tiles_proxy_get:
+    path: /t/p/{id}/{x}/{y}/{z}
+    controller: App\Controller\TilesProxyController
+
+service_worker:
+    path: /{cacheName}/service-worker.js
+    controller: App\Controller\ServiceWorkerController
+
+web_manifest:
+    path: /manifest.webmanifest
+    controller: App\Controller\ManifestController
+
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+    prefix: /{_locale}
+    requirements:
+        _locale: '%locale_requirement%'
+    defaults:
+        _locales: '%locale_default%'

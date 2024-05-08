@@ -1,0 +1,193 @@
+{% extends 'home/index.html.twig' %}
+
+{% macro tiles_form(index, position = 1, name = "", description = "", url = "", overlay = false, public = false, geoJson = false, geoJsonHtml = "") %}
+    <div id="trip_edit_tiles_{{ index }}" class="mb-3 tiles-form-entry card">
+        <div class="card-body clearfix">
+            <div class="buttons-container float-end"></div>
+            <div class="card-text mt-2">
+                <input type="hidden" id="trip_edit_tiles_{{ index }}_position" name="trip_edit[tiles][{{ index }}][position]" required="required" value="{{ position }}" class="form-control"/>
+                <div class="mb-3">
+                    <label for="trip_edit_tiles_{{ index }}_name" class="form-label required">{{ 'form.label.name'|trans }}</label>
+                    <input type="text" id="trip_edit_tiles_{{ index }}_name" name="trip_edit[tiles][{{ index }}][name]" required="required" maxlength="255" value="{{ name }}" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="trip_edit_tiles_{{ index }}_description" class="form-label required">{{ 'form.label.description'|trans }}</label>
+                    <input type="text" id="trip_edit_tiles_{{ index }}_description" name="trip_edit[tiles][{{ index }}][description]" maxlength="255" value="{{ description }}" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="trip_edit_tiles_{{ index }}_url" class="form-label required">{{ 'form.label.url'|trans }}</label>
+                    <input type="text" id="trip_edit_tiles_{{ index }}_url" name="trip_edit[tiles][{{ index }}][url]" required="required" maxlength="255" value="{{ url }}" class="form-control"/>
+                </div>
+                <div class="row">
+                    <div class="mb-3 col-6 col-sm-4">
+                        <div class="form-check">
+                            <input type="checkbox" id="trip_edit_tiles_{{ index }}_overlay" name="trip_edit[tiles][{{ index }}][overlay]" {{ overlay ? 'checked=checked' : '' }} value="1" class="form-check-input"/>
+                            <label class="form-check-label required" for="trip_edit_tiles_{{ index }}_overlay">{{ 'form.label.overlay'|trans }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-6 col-sm-4">
+                        <div class="form-check">
+                            <input type="checkbox" id="trip_edit_tiles_{{ index }}_public" name="trip_edit[tiles][{{ index }}][public]" {{ public ? 'checked=checked' : '' }} value="1" class="form-check-input"/>
+                            <label class="form-check-label required" for="trip_edit_tiles_{{ index }}_public">{{ 'form.label.public'|trans }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-6 col-sm-4 d-none">
+                        <div class="form-check">
+                            <input type="checkbox" id="trip_edit_tiles_{{ index }}_geo_json" name="trip_edit[tiles][{{ index }}][geoJson]" {{ geoJson ? 'checked=checked' : '' }} value="1" class="form-check-input"/>
+                            <label class="form-check-label required" for="trip_edit_tiles_{{ index }}_geo_json">{{ 'form.label.geo_json'|trans }}</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 {{ geoJson ? '' : 'd-none' }}" id="trip_edit_tiles_{{ index }}_geo_json_html_container">
+                    <label for="trip_edit_tiles_{{ index }}_geo_json_html" class="form-label required">{{ 'form.label.geo_json_html'|trans }}</label>
+                    <textarea id="trip_edit_tiles_{{ index }}_geo_json_html" name="trip_edit[tiles][{{ index }}][geoJsonHtml]" class="form-control">{{ geoJsonHtml }}</textarea>
+                </div>
+                <script>
+                    (function () {
+                        let geoJsonCheckbox = document.getElementById('trip_edit_tiles_{{ index }}_geo_json');
+                        let geoJsonHtmlContainer = document.getElementById('trip_edit_tiles_{{ index }}_geo_json_html_container');
+                        geoJsonCheckbox.addEventListener('change', () => {
+                            if (geoJsonCheckbox.checked) {
+                                geoJsonHtmlContainer.classList.remove('d-none');
+                            } else {
+                                geoJsonHtmlContainer.classList.add('d-none');
+                            }
+                        });
+                    })();
+                </script>
+            </div>
+            <div class="buttons-container-delete float-end"></div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% block main %}
+    {# This javascript is only used here, and it is needed to be loaded on a turbo frame (so not in <head>) #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <div class="row">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'title.edit_trip'|trans,
+            header_back_title: 'action.cancel.title'|trans,
+            header_back_href: path('trip_index'),
+        }) }}
+    </div>
+    <turbo-frame id="trip-edit">
+        {{ form_start(form, { attr: {
+            id: 'trip-edit-form',
+            class: 'row',
+            'data-turbo-frame': '_top',
+        }}) }}
+        <div class="col-12">
+            {{ form_errors(form) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.description) }}
+            {{ form_errors(form.tiles) }}
+        </div>
+        <div class="col-12 clearfix">
+            <h5 class="my-3">{{ 'label.tiles'|trans }}</h5>
+            {% do form.tiles.setRendered %}
+            <div data-controller="form-tiles-collection"
+                 data-form-tiles-collection-index-value="{{ form.tiles|length > 0 ? form.tiles|last.vars.name + 1 : 0 }}"
+                 data-form-tiles-collection-prototype-value="{{ _self.tiles_form('__name__')|e('html_attr') }}"
+            >
+                <div data-form-tiles-collection-target="collectionContainer">
+                    {% for tiles in form.tiles %}
+                        {{ _self.tiles_form(loop.index0, tiles.position.vars.value, tiles.name.vars.value, tiles.description.vars.value, tiles.url.vars.value, tiles.overlay.vars.checked, tiles.public.vars.checked, tiles.geoJson.vars.checked) }}
+                    {% endfor %}
+                </div>
+                <div class="tiles-form-entry tiles-form-entry-add">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-action="click->form-tiles-collection#addCollectionElementAction"
+                    >{{ 'action.add_tiles'|trans }}</button>
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+
+        {% if formTilesList %}
+            {{ form_start(formTilesList, { attr: { class: 'row mt-3' }}) }}
+            <div class="col-12 col-md-8">
+                {{ form_widget(formTilesList.tiles) }}
+            </div>
+            <div class="col-12 col-md-4">
+                <button class="btn btn-secondary">{{ 'action.add_those_tiles'|trans }}</button>
+            </div>
+            {{ form_end(formTilesList) }}
+        {% endif %}
+
+        <div class="row mt-5" data-turbo-frame="_top">
+            <div class="col-6">
+                <button onclick="document.getElementById('trip-edit-form').requestSubmit();"
+                        class="btn btn-primary">
+                    {{ 'action.save_changes'|trans }}
+                </button>
+            </div>
+            <div class="col-6 text-end">
+
+
+                <div class="btn-group" role="group" aria-label="More Actions">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            More Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            {#                            <li><a class="dropdown-item" href="#">Dropdown link</a></li>#}
+                            <li>
+                                <form method="post"
+                                      data-turbo-frame="_top"
+                                      class="d-inline"
+                                      action="{{ path('trip_delete', { trip: trip.id }) }}"
+                                      onsubmit="return confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`);"
+                                >
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trip.id) }}">
+                                    <button class="dropdown-item">{{ 'action.delete_trail'|trans }}</button>
+                                </form>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   data-turbo-frame="_top"
+                                   href="{{ path('gpx_export', { trip: trip.id }) }}"
+                                >{{ 'action.export_trail'|trans }}</a>
+                            </li>
+                            <li>
+                                {% if trip.isShared %}
+                                    <form method="post"
+                                          data-turbo-frame="_top"
+                                          class="d-inline"
+                                          action="{{ path('trip_make_private', { trip: trip.id }) }}"
+                                          onsubmit="return confirm(`{{ 'confirm.are_you_sure'|trans }}`);"
+                                    >
+                                        <input type="hidden" name="_token" value="{{ csrf_token('make_private' ~ trip.id) }}">
+                                        <button class="dropdown-item">{{ 'action.map.make_private'|trans }}</button>
+                                    </form>
+                                {% else %}
+                                    <form method="post"
+                                          data-turbo-frame="_top"
+                                          class="d-inline"
+                                          action="{{ path('trip_make_public', { trip: trip.id }) }}"
+                                          onsubmit="return confirm(`{{ 'confirm.are_you_sure'|trans }}`);"
+                                    >
+                                        <input type="hidden" name="_token" value="{{ csrf_token('make_public' ~ trip.id) }}">
+                                        <button class="dropdown-item">{{ 'action.map.make_public'|trans }}</button>
+                                    </form>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <form method="post"
+                                      data-turbo-frame="_top"
+                                      class="d-inline"
+                                      action="{{ path('trip_duplicate', { trip: trip.id }) }}"
+                                      onsubmit="return confirm(`{{ 'confirm.are_you_sure_duplicate'|trans }}`);"
+                                >
+                                    <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ trip.id) }}">
+                                    <button class="dropdown-item">{{ 'action.duplicate_trail'|trans }}</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </turbo-frame>
+{% endblock %}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="{{ app.locale }}">
+    <head>
+        {% set public = public is defined and public %}
+        <meta charset="UTF-8">
+        <title>{% block title %}{{ project_name }}{% endblock %}</title>
+        <meta name="description" content="{{ 'pitch.description'|trans }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+        {# TODO change meta/og when public #}
+        <meta property="og:title" content="{{ block('title') }}" />
+        <meta property="og:description" content="{{ 'pitch.description'|trans }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="{{ project_base_url }}{{ app.request.pathInfo }}" />
+        <meta property="og:image" content="{{ project_base_url }}
+            {%- if app.locale == 'fr' -%}
+            {{ asset('build/images/cover_32c_fr.png') }}
+            {%- else -%}
+            {{ asset('build/images/cover_32c_en.png') }}
+            {%- endif -%}
+            " />
+        <meta property="og:image:alt" content="{{ 'pitch.description'|trans }}">
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('build/images/favicons/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('build/images/favicons/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('build/images/favicons/favicon-16x16.png') }}">
+        <meta name="application-name" content="{{ project_name }}">
+        <meta name="apple-mobile-web-app-title" content="{{ project_name }}">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="theme-color" content="#ffffff">
+        <link rel="mask-icon" href="{{ asset('build/images/favicons/safari-pinned-tab.svg') }}" color="#5bbad5">
+        <link rel="manifest" href="{{ path('web_manifest', { url: path(app.current_route, app.current_route_parameters) }) }}">
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+        <script>const onLoad = function (load) { window.addEventListener('load', load); }</script>
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </head>
+    <body {% block body_attr %}{% endblock %}>
+        {% block body %}{% endblock %}
+        {% if app.user and not public %}
+        <script>
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('{{ path('service_worker', { cacheName: offline_cache_name }) }}')
+                .then((registration) => {
+                    if (registration.active) {
+                        setTimeout(() => {
+                            registration.active.postMessage({fetch: "{{ path('trip_index') }}"});
+                            {# Prepare all the app urls for offline #}
+                            {% if trip is defined %}
+                            {% set offlineUrls = [
+                                path('segment_show', { trip: trip.id }),
+                                path('segment_show_js', { trip: trip.id, firstLoad: 1 }),
+                                path('stage_show', { trip: trip.id }),
+                                path('stage_show_js', { trip: trip.id, firstLoad: 1 }),
+                                path('live_show', { trip: trip.id }),
+                                path('live_show_js', { trip: trip.id, firstLoad: 1 }),
+                                path('diaryEntry_show', { trip: trip.id }),
+                                path('diaryEntry_show_js', { trip: trip.id, firstLoad: 1 }),
+                                path('bag_index', { trip: trip.id }),
+                            ] %}
+                            {% for u in offlineUrls %}
+                            registration.active.postMessage({fetch: '{{ u }}'});
+                            {% endfor %}
+                            {% for stage in trip.stages %}
+                            registration.active.postMessage({fetch: '{{ path('live_show_stage', { trip: trip.id, stage: stage.id }) }}'});
+                            {% endfor %}
+                            {% endif %}
+                        }, 500); // wait a bit
+                    }
+                })
+                .catch((error) => {
+                    console.error('SW LOAD ERROR', error);
+                });
+            }
+        </script>
+        {% endif %}
+    </body>
+</html>

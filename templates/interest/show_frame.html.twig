@@ -1,0 +1,12 @@
+<turbo-frame id="interest_{{ interest.id }}">
+    {{ include('mappable/show_frame.html.twig', { object_name: 'interest', mappable: interest }) }}
+    <script>
+      if (typeof planController !== 'undefined') {
+        planController.updateInterest(
+          {{ interest.id }},
+          '{{ interest.symbol }}',
+          `{{ include('common/_mappable_popup.html.twig', { object_name: 'interest', mappable: interest }) }}`
+        );
+      }
+    </script>
+</turbo-frame>

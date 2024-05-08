@@ -1,0 +1,38 @@
+<turbo-frame id="segment_{{ segment.id }}">
+    <div class="card m-3">
+        <div class="card-header"
+             data-action="click->segment#sidebarSegmentClickAction"
+             data-segment-id-param="{{ segment.id }}"
+        >
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="pe-2"
+                     style="color:#{{ color_from_index(segment.id) }}">
+                    {{ include('common/_icon.html.twig', {
+                        icon_name: 'sign-turn-right-fill',
+                        icon_size: 1.5,
+                    }) }}
+                </div>
+                <div class="flex-grow-1"
+                     style="color:#{{ color_from_index(segment.id) }}">
+                    {{ 'segment.generic_title'|trans }}
+                </div>
+                <a class="icon-link link-secondary js-segment-edit-action"
+                   data-action="click->segment#sidebarEditSegmentClickAction"
+                   data-segment-id-param="{{ segment.id }}"
+                   href="{{ path('segment_edit', { trip: trip.id, id: segment.id}) }}"
+                >
+                    {{ include('common/_icon.html.twig', {
+                        icon_name: 'pencil-square',
+                        icon_title: 'action.edit.label'|trans
+                    }) }}
+                </a>
+            </div>
+        </div>
+        <div class="card-body">{{ segment.name }}</div>
+    </div>
+    <script>
+    if (typeof segmentController !== 'undefined') {
+        segmentController.updateSegment({{segment.id }}, {{ segment.points|json_encode|raw }}, '{{ color_from_index(segment.id) }}');
+    }
+    </script>
+</turbo-frame>

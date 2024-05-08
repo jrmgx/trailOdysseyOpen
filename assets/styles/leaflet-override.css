@@ -1,0 +1,46 @@
+/** LEAFLET TOGGLE LAYER OVERRIDE **/
+.leaflet-control-layers {
+    min-width: 2.6rem;
+    min-height: 2.6rem;
+}
+.leaflet-control-layers-toggle {
+    width: 2.6rem;
+    height: 2.6rem;
+}
+.leaflet-control-layers label {
+    font-size: 1rem;
+}
+
+/** Leaflet doubleTouchDragZoom Plugin **/
+.leaflet-double-touch {
+    user-select: none;
+}
+.leaflet-double-touch-drag {
+    cursor: row-resize;
+}
+
+/** Leaflet Routing **/
+.leaflet-routing-container {
+    display: none !important;
+}
+
+/** Leaflet Compass override **/
+.leaflet-control.leaflet-compass {
+    margin: 0 !important;
+    min-width: 2.6rem;
+    min-height: 2.6rem;
+}
+
+.leaflet-compass .compass-button {
+    background: white !important;
+    display: flex !important;
+    width: 2.6rem !important;
+    height: 2.6rem !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 0 !important;
+}
+
+.leaflet-compass .compass-button.active {
+    background: #95d5b7 !important;
+}

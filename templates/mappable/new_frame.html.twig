@@ -1,0 +1,9 @@
+{% set object_name_plural = object_name_plural|default(object_name ~ 's') %}
+<div class="card m-3">
+{{ form_start(form, { attr: {
+    class: 'mappable -flex-container',
+    'data-turbo-frame': 'sidebar-' ~ object_name_plural
+}}) }}
+{{ include('mappable/_form.html.twig') }}
+{{ form_end(form) }}
+</div>

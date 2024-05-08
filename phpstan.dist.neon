@@ -1,0 +1,11 @@
+parameters:
+    level: 8
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+        - tests/
+includes:
+    - vendor/ekino/phpstan-banned-code/extension.neon
+#   - phar://phpstan.phar/conf/bleedingEdge.neon

@@ -1,0 +1,16 @@
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/ssl/certs/cert.pem # *.test
+        keyFile: /etc/ssl/certs/key.pem
+
+  certificates:
+    - certFile: /etc/ssl/certs/trailodyssey.test.pem
+      keyFile: /etc/ssl/certs/trailodyssey.test-key.pem
+
+http:
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https

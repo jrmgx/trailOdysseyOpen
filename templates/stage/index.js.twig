@@ -1,0 +1,65 @@
+{{ stimulus_js_load_start('planController', first_load is defined and first_load) }}
+
+planController.removeAllStageRoutingExtra();
+planController.removeAllInterests();
+
+{% for stage in stages %}
+planController.addStage(
+  {{ stage.id }},
+  '{{ stage.point.lat }}',
+  '{{ stage.point.lon }}',
+  '{{ stage.symbol }}',
+  `{{ include('common/_stage_popup.html.twig') }}`
+);
+{% endfor %}
+
+{% for routing in routings %}
+planController.addRouting(
+  {{ routing.id }},
+  '{{ routing.startStage.point.lat }}',
+  '{{ routing.startStage.point.lon }}',
+  '{{ routing.finishStage.point.lat }}',
+  '{{ routing.finishStage.point.lon }}',
+  '{{ routing.distance|to_km }}',
+  '{% if routing.asTheCrowFly %}{{ 'routing.as_the_crow_fly'|trans }}{% endif %}',
+  '{% if routing.elevationPositive %}{{ 'routing.elevation'|trans }} +{{ routing.elevationPositive }}&nbsp;/&nbsp;-{{ routing.elevationNegative }}{% endif %}',
+  {{ routing.pathPoints|json_encode|raw }}
+);
+mapCommonController.addPathReference(
+  {{ routing.pathPoints|json_encode|raw }},
+  {{ routing.startStage.id }}
+);
+mapCommonController.addElevation({{ routing.startStage.id }}, true);
+{% endfor %}
+
+mapCommonController.refreshPlan();
+
+{% for interest in interests %}
+planController.addInterest(
+  {{ interest.id }},
+  '{{ interest.point.lat }}',
+  '{{ interest.point.lon }}',
+  '{{ interest.symbol }}',
+  `{{ include('common/_mappable_popup.html.twig', { object_name: 'interest', mappable: interest }) }}`
+);
+{% endfor %}
+
+{% for extra in extras %}
+planController.addExtra(
+  '{{ extra.startPoint.lat }}',
+  '{{ extra.startPoint.lon }}',
+  '{{ extra.finishPoint.lat }}',
+  '{{ extra.finishPoint.lon }}',
+  '{{ extra.distance|to_km }}'
+);
+{% endfor %}
+
+{% if first_load is defined and first_load and is_granted('EDIT', trip) %}
+{% for segment in segments %}
+mapCommonController.addPath({{ segment.points|json_encode|raw }});
+{% endfor %}
+{% endif %}
+
+mapCommonController.refreshPlan();
+
+{{ stimulus_js_load_end(first_load is defined and first_load) }}

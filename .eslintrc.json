@@ -1,0 +1,28 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "ignorePatterns": ["assets/js/*.js", "assets/controllers/TileLayer.GeoJSON.js"],
+    "extends": [
+        "airbnb-base"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-restricted-syntax": "off",
+        "guard-for-in": "off",
+        "class-methods-use-this": "off",
+        "no-param-reassign": "off"
+    },
+    "globals": {
+        "sidebarController": true,
+        "planController": true,
+        "segmentController": true,
+        "mapCommonController": true,
+        "liveController": true,
+        "ApexCharts": true
+    }
+}

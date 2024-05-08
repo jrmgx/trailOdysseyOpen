@@ -1,0 +1,34 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+    #csrf_protection: true
+    http_method_override: false
+    handle_all_throwables: true
+    trusted_proxies: '172.16.0.0/12'
+
+    session:
+        handler_id: session.handler.native_file
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        cookie_secure: auto
+        cookie_samesite: lax
+        cookie_lifetime: 15552000 # 180 days
+        storage_factory_id: session.storage.factory.native
+        gc_maxlifetime: 15552000 # 180 days
+
+    set_locale_from_accept_language: true
+    set_content_language_from_locale: true
+    enabled_locales: '%locale_available%'
+    default_locale: '%locale_default%'
+    translator:
+        default_path: '%kernel.project_dir%/translations'
+
+    php_errors:
+        log: true
+
+    ide: '%env(SYMFONY_FRAMEWORK_IDE)%'
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file

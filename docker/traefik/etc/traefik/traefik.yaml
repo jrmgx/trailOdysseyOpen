@@ -1,0 +1,21 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+providers:
+  docker:
+    exposedByDefault: true
+  file:
+    filename: /etc/traefik/dynamic_conf.yaml
+
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+  traefik:
+    address: ":8080"

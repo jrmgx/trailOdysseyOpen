@@ -1,0 +1,15 @@
+<div class="popup-object-type-{{ mappable.type|default('none') }}">
+    <div class="popup-name">
+        <span>{{ mappable.symbol }}&nbsp;|&nbsp;</span>
+        <span>{{ mappable.nameWithPointName }}</span>
+    </div>
+    {% if mappable.extra %}
+        <div class="popup-extra-distance"> (+{{ mappable.extra.distance|to_km }}&nbsp;km)</div>
+    {% endif %}
+    <div class="popup-markdown-container">{{ mappable.description|default|markdown_to_html }}</div>
+    {% if object_name != 'interest' %}
+        <div class="popup-arriving-at">
+        ➔&nbsp;{{ mappable.arrivingAt|format_datetime_app }}
+    </div>
+    {% endif %}
+</div>

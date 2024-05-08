@@ -1,0 +1,6 @@
+{# Icons at: https://icons.getbootstrap.com #}
+{% if icon_size is defined %}
+{% set icon_style = icon_style|default('') ~ ';width:' ~ icon_size ~ 'rem;height:' ~ icon_size ~ 'rem;' %}
+{% endif %}
+<svg class="bi" fill="currentColor" style="{{ icon_style|default('') }}" aria-hidden="true"><use xlink:href="{{ asset('build/images/bootstrap-icons.svg') }}#{{ icon_name }}"></use></svg>
+{% if icon_title is defined %}<span class="visually-hidden">{{ icon_title }}</span>{% endif %}

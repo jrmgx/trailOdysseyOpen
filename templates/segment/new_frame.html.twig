@@ -1,0 +1,19 @@
+<turbo-frame id="segment-new">
+    <div class="card m-3">
+        <div class="card-body">
+            {{ form_start(form, { attr: { 'data-turbo-frame': 'sidebar-segments' }}) }}
+            {{ include('segment/_form.html.twig') }}
+            {{ form_end(form) }}
+        </div>
+        <div class="card-body">
+            <a class="btn btn-primary" href="#"
+               data-action="click->segment#pointForSegmentStartStopAction:prevent">
+                {{ 'action.add_points'|trans }}
+            </a>
+        </div>
+    <script>
+      if (typeof segmentController !== 'undefined') {
+        segmentController.newSegment({{ segment.points|json_encode|raw }});
+      }
+    </script>
+</turbo-frame>
