@@ -1,16 +1,35 @@
 # Trail Odyssey
 
-Trail Odyssey is a website that allows you to plan hikes from A to Z. 
-Including: 
- - creation of the path 
- - planning the hike 
- - preparing your bag
- - live use during the hike
- - and finally share with your friends
+![](./documentation/assets/cover_32c_en.png)
+[This introduction comes from my blog](https://jerome.gangneux.net/2024/04/15/trail-odyssey/)
 
-[Read more on my blog](https://jerome.gangneux.net/2024/04/15/trail-odyssey/)
+What is Trail Odyssey?
 
-## Concepts
+It’s a website that allows you to plan hikes from A to Z.
+
+And what do I mean by that:
+
+- The creation of the path itself, that is to say importing GPX or creating routes (even if needed by tracing point-to-point segments), managing your base maps.
+- Planning the hike, namely placing the stages, studying altitudes, looking for points of interest (water or viewpoint for example).
+- Preparing your bag, including weight management.
+- Export of the final GPX to import it into external apps if necessary.
+- Live use during the hike, with offline display of the current stage, GPS for position, elevation, progress in real time.
+- And finally share photos of the itinerary with a public version for your friends.
+
+
+## Technical choices
+
+Trail Odyssey is developed for mobile first.
+
+It is also a “web app” which includes these features in particular:
+
+- Offline map.
+- Installable on mobile.
+
+More technical details in the form of keywords: PHP, Symfony, Javascript, Turbo, LeafletJS, BoostrapCSS, PWA, Mobile First.
+
+
+## Technical Concepts
 
 ### Stage and Routing relation
 
@@ -76,6 +95,46 @@ Head up to https://trailodyssey.test and you should have a running instance!
 
 See `castor` for other commands
 
+
+## Some screens
+
+![trail_odyssey_screen_public_2.png](./documentation/assets/trail_odyssey_screen_public_2.png)
+
+Public: Display of photos with the position on the map, mobile first (but a desktop version exists)
+
+![trail_odyssey_screen_public_1.png](./documentation/assets/trail_odyssey_screen_public_1.png)
+
+Public: Public sharing home page with mileage and bag summary
+
+![trail_odyssey_screen_plan.png](./documentation/assets/trail_odyssey_screen_plan.png)
+
+Planning: Display of the different stages, elevation differences, desired dates and times. Desktop version (available in mobile)
+
+![trail_odyssey_screen_path.png](./documentation/assets/trail_odyssey_screen_path.png)
+
+Path: display of paths coming either from multiple GPXs, or from routes traced by hand or via the tool integrated into Trail Odyssey. Desktop version (available in mobile)
+
+![trail_odyssey_screen_live_1.png](./documentation/assets/trail_odyssey_screen_live_1.png)
+
+Live: Display of the current stage with real-time GPS position, elevation and progress in percentage
+
+![trail_odyssey_screen_home.png](./documentation/assets/trail_odyssey_screen_home.png)
+
+Main page with all hikes
+
+![trail_odyssey_screen_geras.png](./documentation/assets/trail_odyssey_screen_geras.png)
+
+Equipment page, with the list of equipment. From this page, you can add elements (with their weight) to find them in bag management later
+
+![trail_odyssey_screen_diary.png](./documentation/assets/trail_odyssey_screen_diary.png)
+
+"Diary" part which allows you to add geotagged photos and texts, for the public version
+
+![trail_odyssey_screen_bags.png](./documentation/assets/trail_odyssey_screen_bags.png)
+
+Bag management: Adding items, managing multiple bags, bags within bags and total weight. The checkboxes allow you to prepare your bag and not forget anything.
+
+
 ## Resources
 
 - [symfony.com/ux-turbo](https://symfony.com/bundles/ux-turbo/current/index.html#accelerating-navigation-with-turbo-drive)
@@ -99,9 +158,11 @@ See `castor` for other commands
 - [icons.getbootstrap.com](https://icons.getbootstrap.com/)
 - [Offline](https://github.com/allartk/leaflet.offline)
 
+
 ## Licence
 
 Code, and assets are under Apache License 2.0
+
 
 ## Contributing
 
