@@ -92,10 +92,12 @@ class PhotoController extends AbstractController
                     if ($exif) {
                         $point = GeoHelper::getPointFromExif($exif);
                         try {
+                            // We consider that the picture uploaded is on the same timezone as the user/trip
+                            $timezone = new \DateTimeZone($user->getTimezone());
                             if (isset($exif['DateTimeDigitized'])) {
-                                $date = new \DateTimeImmutable($exif['DateTimeDigitized']);
+                                $date = new \DateTimeImmutable($exif['DateTimeDigitized'], $timezone);
                             } elseif (isset($exif['DateTimeOriginal'])) {
-                                $date = new \DateTimeImmutable($exif['DateTimeOriginal']);
+                                $date = new \DateTimeImmutable($exif['DateTimeOriginal'], $timezone);
                             }
                         } catch (\Exception $e) {
                             // Date related exception, ignore
