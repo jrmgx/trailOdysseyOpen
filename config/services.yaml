@@ -5,7 +5,7 @@ parameters:
     locale_default: en
     locale_available: ['en', 'fr']
     locale_requirement: en|fr
-    offline_cache_name: cache-202405081000
+    offline_cache_name: cache-20240509-001
 
 services:
     _defaults:

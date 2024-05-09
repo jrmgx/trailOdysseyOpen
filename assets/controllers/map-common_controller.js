@@ -386,16 +386,16 @@ export default class extends Controller {
   };
 
   setIsOffline = (routingId) => {
-    localStorage.setItem('offline_tiles_for_' + routingId, 'true');
+    localStorage.setItem(this.cacheNameValue + '_offline_tiles_' + routingId, 'true');
   }
 
   getIsOffline = (routingId) => {
-    return localStorage.getItem('offline_tiles_for_' + routingId) !== null;
+    return localStorage.getItem(this.cacheNameValue + '_offline_tiles_' + routingId) !== null;
   }
 
   // This does not delete the cache, only the flag
   removeOffline = (routingId) => {
-    return localStorage.removeItem('offline_tiles_for_' + routingId);
+    return localStorage.removeItem(this.cacheNameValue + '_offline_tiles_' + routingId);
   }
 
   // This one will delete the cache

@@ -44,33 +44,50 @@
         {% block body %}{% endblock %}
         {% if app.user and not public %}
         <script>
+            function ready(serviceWorkerReady) {
+                serviceWorkerReady.postMessage({fetch: "{{ path('trip_index') }}"});
+                serviceWorkerReady.postMessage({fetch: "{{ path('web_manifest', { url: path(app.current_route, app.current_route_parameters) }) }}"});
+                {# Prepare all the app urls for offline  #}
+                {% if trip is defined %}
+                {% set offlineUrls = [
+                    path('segment_show', { trip: trip.id }),
+                    path('segment_show_js', { trip: trip.id, firstLoad: 1 }),
+                    path('stage_show', { trip: trip.id }),
+                    path('stage_show_js', { trip: trip.id, firstLoad: 1 }),
+                    path('live_show', { trip: trip.id }),
+                    path('live_show_js', { trip: trip.id, firstLoad: 1 }),
+                    path('diaryEntry_show', { trip: trip.id }),
+                    path('diaryEntry_show_js', { trip: trip.id, firstLoad: 1 }),
+                    path('bag_index', { trip: trip.id }),
+                ] %}
+                {% for u in offlineUrls %}
+                serviceWorkerReady.postMessage({fetch: '{{ u }}'});
+                {% endfor %}
+                {% for stage in trip.stages %}
+                {% set url = path('live_show_stage', { trip: trip.id, stage: stage.id }) %}
+                serviceWorkerReady.postMessage({fetch: '{{ url }}'});
+                serviceWorkerReady.postMessage({fetch: "{{ path('web_manifest', { url }) }}"});
+                {% endfor %}
+                {% endif %}
+            }
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('{{ path('service_worker', { cacheName: offline_cache_name }) }}')
                 .then((registration) => {
-                    if (registration.active) {
-                        setTimeout(() => {
-                            registration.active.postMessage({fetch: "{{ path('trip_index') }}"});
-                            {# Prepare all the app urls for offline #}
-                            {% if trip is defined %}
-                            {% set offlineUrls = [
-                                path('segment_show', { trip: trip.id }),
-                                path('segment_show_js', { trip: trip.id, firstLoad: 1 }),
-                                path('stage_show', { trip: trip.id }),
-                                path('stage_show_js', { trip: trip.id, firstLoad: 1 }),
-                                path('live_show', { trip: trip.id }),
-                                path('live_show_js', { trip: trip.id, firstLoad: 1 }),
-                                path('diaryEntry_show', { trip: trip.id }),
-                                path('diaryEntry_show_js', { trip: trip.id, firstLoad: 1 }),
-                                path('bag_index', { trip: trip.id }),
-                            ] %}
-                            {% for u in offlineUrls %}
-                            registration.active.postMessage({fetch: '{{ u }}'});
-                            {% endfor %}
-                            {% for stage in trip.stages %}
-                            registration.active.postMessage({fetch: '{{ path('live_show_stage', { trip: trip.id, stage: stage.id }) }}'});
-                            {% endfor %}
-                            {% endif %}
-                        }, 500); // wait a bit
+
+                    let serviceWorker;
+                    if (registration.installing) {
+                        serviceWorker = registration.installing;
+                    } else if (registration.waiting) {
+                        serviceWorker = registration.waiting;
+                    } else if (registration.active) {
+                        ready(registration.active);
+                    }
+                    if (serviceWorker) {
+                        serviceWorker.addEventListener("statechange", (e) => {
+                            if (e.target.state === 'activated' || e.target.state === 'redundant') {
+                                ready(e.target);
+                            }
+                        });
                     }
                 })
                 .catch((error) => {
