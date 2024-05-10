@@ -33,8 +33,8 @@ const installHandler = (event) => {
 };
 
 const activateHandler = async (event) => {
-  event.waitUntil(clients.claim());
   event.waitUntil((async () => {
+    await clients.claim();
     const keyList = await caches.keys();
     return Promise.all(
       keyList.map((key) => {
@@ -52,11 +52,6 @@ const messageHandler = async (event) => {
     const fetchedResponse = await fetch(event.data.fetch);
     await cache.put(event.data.fetch, fetchedResponse.clone());
     return fetchedResponse;
-  }
-
-  if (event.data.forceOffline) {
-    forceOffline = event.data.forceOffline;
-    // return;
   }
 };
 
@@ -77,18 +72,16 @@ const fetchHandler = (event) => {
       return fetchedResponse;
     } catch (error) {
       // If fetch error (offline for example)
-      return async () => {
-        const cachedResponse = await cache.match(event.request.url);
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+      const cachedResponse = await cache.match(event.request.url);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
 
-        if (isTile) {
-          return cache.match(OFFLINE_TILE);
-        }
+      if (isTile) {
+        return cache.match(OFFLINE_TILE);
+      }
 
-        return Promise.reject(new Error('Not found in the Offline cache'));
-      };
+      return Promise.reject(new Error('Not found in the Offline cache: ' + event.request.url));
     }
   };
 

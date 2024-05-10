@@ -5,6 +5,8 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ServiceWorkerController extends AbstractController
 {
@@ -16,7 +18,7 @@ class ServiceWorkerController extends AbstractController
     ) {
     }
 
-    public function __invoke(string $cacheName): Response
+    public function __invoke(#[MapQueryParameter] string $cacheName): Response
     {
         $finder = new Finder();
         $offlineTile = self::OFFLINE_TILE . 'png';
@@ -29,6 +31,9 @@ class ServiceWorkerController extends AbstractController
         $files = $finder->in($this->publicDirectory . '/build')->name('/\.(jpe?g|js|css|svg|gif|png)$/')->files();
         foreach ($files as $file) {
             $pathname = $file->getRelativePathname();
+            if (str_contains($pathname, '/photos/')) {
+                continue;
+            }
             if (str_contains($pathname, self::OFFLINE_TILE)) {
                 $offlineTile = "$this->projectBaseUrl/build/$pathname";
             }

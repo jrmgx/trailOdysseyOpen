@@ -8,7 +8,7 @@ tiles_proxy_get:
     controller: App\Controller\TilesProxyController
 
 service_worker:
-    path: /{cacheName}/service-worker.js
+    path: /service-worker.js
     controller: App\Controller\ServiceWorkerController
 
 web_manifest:
