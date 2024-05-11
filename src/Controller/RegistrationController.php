@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RegistrationController extends AbstractController
 {
@@ -20,7 +21,9 @@ class RegistrationController extends AbstractController
         private readonly UserPasswordHasherInterface $userPasswordHasher,
         private readonly UserAuthenticatorInterface $userAuthenticator,
         private readonly Authenticator $authenticator,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TranslatorInterface $translator,
+        private readonly bool $instanceOpen,
     ) {
     }
 
@@ -29,6 +32,10 @@ class RegistrationController extends AbstractController
     #[Template('home/register.html.twig')]
     public function register(Request $request): Response|null|array
     {
+        if (!$this->instanceOpen) {
+            throw $this->createAccessDeniedException($this->translator->trans('info.registration_closed'));
+        }
+
         if ($this->getUser()) {
             return $this->redirectToRoute('trip_index');
         }

@@ -37,7 +37,13 @@
                             <div class="col-12 mb-3" style="position: relative; top: -5px;">{{ 'pitch.description'|trans }}</div>
                             <div class="d-flex justify-content-around align-items-start mt-4 mb-5">
                                 <a class="btn btn-primary" href="{{ path('trip_index') }}">{{ 'action.log_in'|trans }}</a>
-                                <a class="btn btn-primary" href="{{ path('register') }}">{{ 'action.sign_up'|trans }}</a>
+                                {% if instance_open %}
+                                    <a class="btn btn-primary" href="{{ path('register') }}">{{ 'action.sign_up'|trans }}</a>
+                                {% else %}
+                                    <a class="btn btn-secondary" href="javascript:alert('{{ 'info.registration_closed'|trans }}')"
+                                       title="{{ 'info.registration_closed'|trans }}"
+                                    >{{ 'action.sign_up'|trans }}</a>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="row">
@@ -83,7 +89,9 @@
                         Powered by: {{ project_name }}
                         {% if not is_granted('ROLE_USER') %}
                             | <a href="{{ path('login') }}">{{ 'action.log_in'|trans }}</a>
-                            | <a href="{{ path('register') }}">{{ 'action.sign_up'|trans }}</a>
+                            {% if instance_open %}
+                                | <a href="{{ path('register') }}">{{ 'action.sign_up'|trans }}</a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </footer>
