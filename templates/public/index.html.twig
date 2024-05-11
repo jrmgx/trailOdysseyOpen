@@ -7,6 +7,11 @@
     <script defer data-turbo-track="reload"
             src="{{ path('public_index_js', { trip: trip.shareKey, firstLoad: 1 }) }}">
     </script>
+    {# Maybe a bit overkill but ... #}
+    <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
+            integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
+            crossorigin="anonymous" async>
+    </script>
 {% endblock %}
 
 {% block body %}
@@ -61,7 +66,7 @@
                         {% endif %}
                         {% if bags|length > 0 %}
                             <hr>
-                            <div class="bags row fs-small">
+                            <div class="bags row fs-small" data-masonry='{"percentPosition": true, "transitionDuration": 0}'>
                                 {% for bag in bags|filter((b) => b.totalCheckedWeight > 0 and b.somethingIsChecked) %}
                                     <div class="col-12 col-md-6">
                                         <div class="d-flex justify-content-between align-items-start mt-{{ loop.first ? 1 : 2 }} mb-2">
