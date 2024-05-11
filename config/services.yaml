@@ -6,6 +6,8 @@ parameters:
     locale_available: ['en', 'fr']
     locale_requirement: en|fr
     offline_cache_name: cache-20240509-001
+    instance_open: '%env(bool:INSTANCE_OPEN)%'
+    app_env: '%env(APP_ENV)%'
 
 services:
     _defaults:
@@ -17,7 +19,8 @@ services:
             $projectBaseUrl: '%project_base_url%'
             $publicDirectory: '%kernel.project_dir%/public'
             $uploadsDirectory: '%kernel.project_dir%/public/uploads'
-            $env: '%env(APP_ENV)%'
+            $instanceOpen: '%instance_open%'
+            $env: '%app_env%'
 
     App\:
         resource: '../src/'

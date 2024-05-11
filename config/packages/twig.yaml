@@ -9,10 +9,11 @@ twig:
         project_base_url: '%project_base_url%'
         public_uploads: /uploads
         offline_cache_name: '%offline_cache_name%'
-        app_env: '%env(APP_ENV)%'
+        app_env: '%app_env%'
         prod: prod
         dev: dev
         test: test
+        instance_open: '%instance_open%'
         MAPBOX_KEY: '%env(MAPBOX_KEY)%'
 
 when@test:

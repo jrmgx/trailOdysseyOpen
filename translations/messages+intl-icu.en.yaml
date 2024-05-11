@@ -1,8 +1,3 @@
-premium:
-  a:
-    title:
-      This is an advanced feature. 
-      To help me develop further the service, please think about paying a PREMIUM membership!
 action:
   copy_to_my_trips: Copy to my Trails
   share: Share
@@ -168,6 +163,7 @@ info:
   no_segment_found_create_one_to_start: 'No Segment Found.<br> Create one to Start!'
   no_diary_found_create_one_to_start: 'No Diary Entry Found.<br> Create one to Start!'
   downloading_tiles_for_offline_use: 'Downloading tiles for Offline use'
+  registration_closed: 'Registration are closed on this instance.'
 form:
   label:
     internal:
