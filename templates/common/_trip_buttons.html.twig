@@ -19,10 +19,8 @@
        href="{{ path('bag_index', { trip: trip.id }) }}">
         {{ 'action.map.bags'|trans }}
     </a>
-    {% if with_back is defined %}
-        <a class="btn btn-outline-primary" data-turbo-frame="_top"
-           href="{{ path('trip_index') }}">
-            {{ 'action.back'|trans }}
-        </a>
-    {% endif %}
+    <a class="btn btn-{{ app.current_route != 'trip_edit' ? 'outline-' }}primary" data-turbo-frame="_top"
+       href="{{ path('trip_edit', { trip: trip.id }) }}">
+        {{ 'action.map.edit'|trans }}
+    </a>
 </div>

@@ -63,13 +63,16 @@
 
 {% block main %}
     {# This javascript is only used here, and it is needed to be loaded on a turbo frame (so not in <head>) #}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
     <div class="row">
-        {{ include('common/_header_page.html.twig', {
-            header_title: 'title.edit_trip'|trans,
-            header_back_title: 'action.cancel.title'|trans,
-            header_back_href: path('trip_index'),
-        }) }}
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start my-3 flex-column">
+                {{ include('common/_trip_title.html.twig') }}
+                {{ include('common/_trip_buttons.html.twig', { with_back: true }) }}
+            </div>
+        </div>
     </div>
     <turbo-frame id="trip-edit">
         {{ form_start(form, { attr: {

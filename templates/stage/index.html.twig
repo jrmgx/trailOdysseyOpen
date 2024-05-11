@@ -25,7 +25,7 @@
         <div class="container-progress container-fluid position-absolute bg-white hide"
              data-map-common-target="containerProgress"
         >
-            <div class="pt-2 pb-1 fs-small">Donwloading tiles for Offline use</div>
+            <div class="pt-2 pb-1 fs-small">{{ 'info.downloading_tiles_for_offline_use'|trans }}</div>
             <div class="pb-3">
                 <div class="progress" role="progressbar">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0">0%</div>
@@ -64,7 +64,7 @@
             <div class="row px-3">
                 <div class="col-12">
                     <div class="d-flex justify-content-between align-items-start my-3 flex-column">
-                        <h1 class="fs-4">{{ trip.name }}</h1>
+                        {{ include('common/_trip_title.html.twig') }}
                         {{ include('common/_trip_buttons.html.twig', { with_back: true }) }}
                     </div>
                 </div>

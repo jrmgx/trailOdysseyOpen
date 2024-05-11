@@ -4,7 +4,7 @@
     <div data-controller="bag">
         <div class="row">
             <div class="d-flex justify-content-between align-items-start my-3 flex-column">
-                <h1 class="fs-4">{{ trip.name }}</h1>
+                {{ include('common/_trip_title.html.twig') }}
                 {{ include('common/_trip_buttons.html.twig', { with_back: true }) }}
             </div>
         </div>
