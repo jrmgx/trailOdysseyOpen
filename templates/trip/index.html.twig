@@ -13,13 +13,6 @@
             <div class="col-12">
                 <div class="card mb-3">
                     <div class="card-body clearfix">
-                        <a class="btn btn-outline-secondary border-0 float-end" title="{{ 'action.edit.title'|trans }}" href="{{ path('trip_edit', {trip: trip.id}) }}">
-                            {{ include('common/_icon.html.twig', {
-                                icon_name: 'pencil-square',
-                                icon_title: 'action.edit.title'|trans,
-                                icon_size: 1,
-                            }) }}
-                        </a>
                         <h5 class="card-title">{{ trip.name }}</h5>
                         <p class="card-text">{{ trip.description }}</p>
                         <div class="mb-3">

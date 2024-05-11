@@ -167,6 +167,7 @@ info:
   no_interest_found_create_one_to_start: 'No Point of Interest Found.<br> Create one to Start!'
   no_segment_found_create_one_to_start: 'No Segment Found.<br> Create one to Start!'
   no_diary_found_create_one_to_start: 'No Diary Entry Found.<br> Create one to Start!'
+  downloading_tiles_for_offline_use: 'Downloading tiles for Offline use'
 form:
   label:
     internal:
