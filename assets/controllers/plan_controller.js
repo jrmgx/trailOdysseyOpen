@@ -49,13 +49,13 @@ export default class extends Controller {
   };
 
   updateOfflineButtonStatus = () => {
-    for (let offlineButton of this.offlineButtonTargets) {
+    for (const offlineButton of this.offlineButtonTargets) {
       if (mapCommonController.getIsOffline(offlineButton.dataset.planIdParam)) {
         offlineButton.classList.remove('btn-outline-secondary');
         offlineButton.classList.add('btn-success');
       }
     }
-  }
+  };
 
   map = () => window.mapCommonController.map;
 
@@ -114,7 +114,11 @@ export default class extends Controller {
 
   routingOfflineAction = (e) => {
     const { id } = e.params;
-    mapCommonController.downloadOfflinePoints(id, this.routings[id].getLatLngs(), this.updateOfflineButtonStatus);
+    mapCommonController.downloadOfflinePoints(
+      id,
+      this.routings[id].getLatLngs(),
+      this.updateOfflineButtonStatus,
+    );
   };
 
   interestClickAction = (e) => {

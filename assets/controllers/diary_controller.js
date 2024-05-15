@@ -135,15 +135,23 @@ export default class extends Controller {
     const divElement = document.createElement('div');
     divElement.classList.add('d-flex', 'flex-column');
 
+    const marker = mapCommonController.addElement(e.latlng.lat, e.latlng.lng, divElement);
+
     const addDiaryEntry = document.createElement('a');
     addDiaryEntry.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'mb-2');
     addDiaryEntry.innerHTML = 'Add to my Diary';
-    addDiaryEntry.addEventListener('click', () => this.mapLocationFoundAddDiary(e));
+    addDiaryEntry.addEventListener(
+      'click',
+      () => this.mapLocationFoundAddDiary(marker),
+    );
 
     const updateProgress = document.createElement('a');
     updateProgress.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'mb-2');
     updateProgress.innerHTML = 'Add progress';
-    updateProgress.addEventListener('click', () => this.mapLocationFoundUpdateProgress(e));
+    updateProgress.addEventListener(
+      'click',
+      () => this.mapLocationFoundUpdateProgress(marker),
+    );
 
     const deleteElement = document.createElement('a');
     deleteElement.innerHTML = 'Delete this marker';
@@ -156,12 +164,14 @@ export default class extends Controller {
     divElement.appendChild(updateProgress);
     divElement.appendChild(deleteElement);
 
-    mapCommonController.addElement(e.latlng.lat, e.latlng.lng, divElement).openPopup();
+    marker.dragging.enable();
+    marker.openPopup();
   };
 
-  mapLocationFoundAddDiary = (e) => {
+  mapLocationFoundAddDiary = (marker) => {
+    const latLng = marker.getLatLng();
     Turbo.visit(
-      addLatLonToUrl(e.latlng.lat, e.latlng.lng, this.urlsValue.diaryEntryNew),
+      addLatLonToUrl(latLng.lat, latLng.lng, this.urlsValue.diaryEntryNew),
       { frame: 'diaryEntry-new' },
     );
 
@@ -169,9 +179,10 @@ export default class extends Controller {
     mapCommonController.removeAllElements();
   };
 
-  mapLocationFoundUpdateProgress = (e) => {
+  mapLocationFoundUpdateProgress = (marker) => {
+    const latLng = marker.getLatLng();
     Turbo.visit(
-      addLatLonToUrl(e.latlng.lat, e.latlng.lng, this.urlsValue.diaryUpdateProgress),
+      addLatLonToUrl(latLng.lat, latLng.lng, this.urlsValue.diaryUpdateProgress),
       { frame: 'sidebar-diaryEntries' },
     );
 
