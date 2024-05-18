@@ -9,7 +9,7 @@ import { LatLng } from 'leaflet/src/geo';
 import 'leaflet-geometryutil';
 import '@elfalem/leaflet-curve';
 import '../js/leaflet-double-touch-drag-zoom';
-import { markerDefaultIcon } from '../helpers';
+import { markerDefaultIcon, removeFromMap } from '../helpers';
 // import './TileLayer.GeoJSON';
 
 export default class extends Controller {
@@ -40,7 +40,7 @@ export default class extends Controller {
     this.activeChart = null;
     this.isPublic = !!this.isPublicValue;
     this.isLive = !!this.isLiveValue;
-
+    this.hasPreciseMouse = matchMedia('(pointer:fine)').matches;
     this.findPathCloseToPointOnce = false;
 
     // Init map
@@ -109,7 +109,6 @@ export default class extends Controller {
       addElement: this.addElement,
       removeAllElements: this.removeAllElements,
       addProgress: this.addProgress,
-      // updateProgress: this.updateProgress,
       addPath: this.addPath,
       addPathReference: this.addPathReference,
       addElevation: this.addElevation,
@@ -174,8 +173,7 @@ export default class extends Controller {
 
   removeAllElements = () => {
     for (let marker of this.elements) {
-      marker.remove();
-      marker = null;
+      marker = removeFromMap(marker, this.map);
     }
   };
 
@@ -441,14 +439,16 @@ export default class extends Controller {
 
   formatVoid = () => '';
 
-  elevationMouseMove = (event, chartContext, chartOptions) => {
-    if (this.elevationCurrentPoint) {
-      this.elevationCurrentPoint.remove();
-    }
-    const { dataPointIndex } = chartOptions;
+  elevationMouseCommon = (event, chartContext, chartOptions) => {
     const { config } = chartOptions;
-    if (config.series[0].data[dataPointIndex]) {
-      const point = config.series[0].data[dataPointIndex];
+    const { dataPointIndex } = chartOptions;
+    if (!config.series[0].data[dataPointIndex]) {
+      return null;
+    }
+    const point = config.series[0].data[dataPointIndex];
+    if (this.elevationCurrentPoint) {
+      this.elevationCurrentPoint.setLatLng(L.latLng(point.lat, point.lon));
+    } else {
       this.elevationCurrentPoint = L.circleMarker(
         [point.lat, point.lon],
         {
@@ -456,21 +456,31 @@ export default class extends Controller {
         },
       ).addTo(this.map);
     }
+    if (this.elevationRemovePointHandle) {
+      clearTimeout(this.elevationRemovePointHandle);
+      this.elevationRemovePointHandle = null;
+    }
+    // On mobile device the elevationMouseLeave is not always triggered so the red marker would stay
+    this.elevationRemovePointHandle = setTimeout(this.elevationMouseLeave, 10 * 1000);
+    return L.latLng(point.lat, point.lon);
+  };
+
+  elevationMouseMove = (event, chartContext, chartOptions) => {
+    const latLng = this.elevationMouseCommon(event, chartContext, chartOptions);
+    if (latLng && (!this.hasPreciseMouse || event.shiftKey)) {
+      this.map.panTo(latLng);
+    }
   };
 
   elevationMouseClick = (event, chartContext, chartOptions) => {
-    const { dataPointIndex } = chartOptions;
-    const { config } = chartOptions;
-    if (config.series[0].data[dataPointIndex]) {
-      const point = config.series[0].data[dataPointIndex];
-      this.map.panTo({ lat: point.lat, lng: point.lon });
+    const latLng = this.elevationMouseCommon(event, chartContext, chartOptions);
+    if (latLng) {
+      this.map.panTo(latLng);
     }
   };
 
   elevationMouseLeave = () => {
-    if (this.elevationCurrentPoint) {
-      this.elevationCurrentPoint.remove();
-    }
+    this.elevationCurrentPoint = removeFromMap(this.elevationCurrentPoint, this.map);
   };
 
   addElevation = (stageId, minimal) => {

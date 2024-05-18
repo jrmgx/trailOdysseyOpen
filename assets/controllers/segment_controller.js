@@ -6,7 +6,7 @@ import 'leaflet-routing-machine';
 import 'leaflet-lasso';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
-import { addLatLonToUrl } from '../helpers';
+import { addLatLonToUrl, removeFromMap } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 import markerCircleFakeIconUrl from '../images/marker-circle-fake.png';
 
@@ -140,12 +140,11 @@ export default class extends Controller {
     this.actionNewItineraryActive = 0;
 
     if (this.routingControl && !preserveRouting) {
-      this.routingControl.remove();
-      this.routingControl = null;
+      this.routingControl = removeFromMap(this.routingControl, this.map());
     }
 
     for (const m of this.actionNewItineraryMarkers) {
-      m.remove();
+      removeFromMap(m, this.map());
     }
     this.actionNewItineraryMarkers = [];
 
@@ -279,8 +278,7 @@ export default class extends Controller {
     this.editModeFor = id;
     this.editPoints = points;
 
-    this.segments[id].remove();
-    this.segments[id] = null;
+    removeFromMap(this.segments[id], this.map());
     delete this.segments[id];
 
     this.updateSegmentPointsDraw();
@@ -309,7 +307,7 @@ export default class extends Controller {
     }).addTo(this.map());
     polyline.segmentId = id;
     if (this.segments[id]) {
-      this.segments[id].remove();
+      removeFromMap(this.segments[id], this.map());
     }
     this.segments[id] = polyline;
   };
@@ -328,7 +326,7 @@ export default class extends Controller {
     this.editPoints = this.editPoints.filter((point) => !point.deleted);
 
     if (this.editPolylineLayerGroup) {
-      this.editPolylineLayerGroup.remove();
+      removeFromMap(this.editPolylineLayerGroup, this.map());
     }
     this.editPolylineLayerGroup = L.featureGroup();
 
@@ -364,7 +362,7 @@ export default class extends Controller {
     this.editModeFor = null;
 
     if (this.editPolylineLayerGroup) {
-      this.editPolylineLayerGroup.remove();
+      removeFromMap(this.editPolylineLayerGroup, this.map());
     }
     this.editPolylineLayerGroup = null;
   };
@@ -470,7 +468,7 @@ export default class extends Controller {
       editGhostMarker.on('dragend', () => {
         point.lat = editGhostMarker.getLatLng().lat;
         point.lon = editGhostMarker.getLatLng().lng;
-        editGhostMarker.remove();
+        removeFromMap(editGhostMarker, this.map);
         this.updateSegmentPointsDraw();
       });
       editGhostMarker.addTo(this.editPolylineLayerGroup);

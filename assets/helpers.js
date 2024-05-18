@@ -46,3 +46,12 @@ export const curve = (startPoint, endPoint, pathOptions) => {
   // noinspection JSUnresolvedFunction
   return L.curve(['M', latlng1, 'Q', midpointLatLng, latlng2], pathOptions);
 };
+
+export const removeFromMap = (toRemove, map) => {
+  if (!toRemove) {
+    return null;
+  }
+  map.removeLayer(toRemove);
+  toRemove.remove();
+  return null;
+};

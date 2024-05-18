@@ -5,7 +5,7 @@ import '@elfalem/leaflet-curve';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
 import {
-  curve, iconSymbol, addLatLonToUrl,
+  curve, iconSymbol, addLatLonToUrl, removeFromMap,
 } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
@@ -203,7 +203,7 @@ export default class extends Controller {
     if (!line) {
       return;
     }
-    line.remove();
+    removeFromMap(line, this.map());
     this.addRouting(id, startLat, startLon, finishLat, finishLon, distance, mode, el, points);
     mapCommonController.removeOffline(id);
   };
@@ -219,18 +219,13 @@ export default class extends Controller {
 
   removeAllStageRoutingExtra = () => {
     for (const index in this.stages) {
-      let stage = this.stages[index];
-      stage.remove();
-      stage = null;
+      removeFromMap(this.stages[index], this.map());
     }
     for (const index in this.routings) {
-      let routing = this.routings[index];
-      routing.remove();
-      routing = null;
+      removeFromMap(this.routings[index], this.map());
     }
-    for (let extra of this.extras) {
-      extra.remove();
-      extra = null;
+    for (const extra of this.extras) {
+      removeFromMap(extra, this.map());
     }
   };
 
@@ -262,9 +257,7 @@ export default class extends Controller {
 
   removeAllInterests = () => {
     for (const index in this.interests) {
-      let interest = this.interests[index];
-      interest.remove();
-      interest = null;
+      removeFromMap(this.interests[index], this.map());
     }
   };
 
