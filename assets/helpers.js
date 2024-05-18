@@ -55,6 +55,3 @@ export const removeFromMap = (toRemove, map) => {
   toRemove.remove();
   return null;
 };
-
-// BUG add new stage to the map / add new diary on the map
-// TODO on touch screen update live elevation/map on mouse use shift
