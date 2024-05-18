@@ -9,7 +9,7 @@ import { LatLng } from 'leaflet/src/geo';
 import 'leaflet-geometryutil';
 import '@elfalem/leaflet-curve';
 import '../js/leaflet-double-touch-drag-zoom';
-import { markerDefaultIcon } from '../helpers';
+import { markerDefaultIcon, removeFromMap } from '../helpers';
 // import './TileLayer.GeoJSON';
 
 export default class extends Controller {
@@ -174,8 +174,7 @@ export default class extends Controller {
 
   removeAllElements = () => {
     for (let marker of this.elements) {
-      marker.remove();
-      marker = null;
+      marker = removeFromMap(marker, this.map);
     }
   };
 
@@ -468,9 +467,7 @@ export default class extends Controller {
   };
 
   elevationMouseLeave = () => {
-    if (this.elevationCurrentPoint) {
-      this.elevationCurrentPoint.remove();
-    }
+    this.elevationCurrentPoint = removeFromMap(this.elevationCurrentPoint, this.map);
   };
 
   addElevation = (stageId, minimal) => {

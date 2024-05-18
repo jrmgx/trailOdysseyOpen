@@ -4,9 +4,7 @@ import L from 'leaflet';
 import '@elfalem/leaflet-curve';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
-import {
-  iconSymbol, addLatLonToUrl,
-} from '../helpers';
+import { iconSymbol, addLatLonToUrl, removeFromMap } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
 export default class extends Controller {
@@ -106,9 +104,7 @@ export default class extends Controller {
 
   removeAllDiaryEntries = () => {
     for (const index in this.diaryEntries) {
-      let diaryEntry = this.diaryEntries[index];
-      diaryEntry.remove();
-      diaryEntry = null;
+      removeFromMap(this.diaryEntries[index], this.map());
     }
   };
 

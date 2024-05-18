@@ -46,3 +46,15 @@ export const curve = (startPoint, endPoint, pathOptions) => {
   // noinspection JSUnresolvedFunction
   return L.curve(['M', latlng1, 'Q', midpointLatLng, latlng2], pathOptions);
 };
+
+export const removeFromMap = (toRemove, map) => {
+  if (!toRemove) {
+    return null;
+  }
+  map.removeLayer(toRemove);
+  toRemove.remove();
+  return null;
+};
+
+// BUG add new stage to the map / add new diary on the map
+// TODO on touch screen update live elevation/map on mouse use shift
