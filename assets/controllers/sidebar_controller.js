@@ -61,6 +61,9 @@ export default class extends Controller {
     }
   };
 
+  /**
+   * @param withScrollDown can be a boolean or a Stimulus event
+   */
   switchToSidebarAction = (withScrollDown) => {
     this.switchToMapTarget.classList.remove('hide');
     this.switchToSidebarTarget.classList.add('hide');
@@ -82,9 +85,12 @@ export default class extends Controller {
       control.classList.add('hide-mobile');
     }
 
-    if (withScrollDown === true) {
-      const sidebarBottomEndElement = document.getElementById('sidebar-bottom-end');
-      sidebarBottomEndElement.scrollIntoView({ behavior: 'instant' });
+    if (withScrollDown === true || (withScrollDown.params && withScrollDown.params.scroll)) {
+      // We wait a bit because we may have also asked to switch tab and it needs to be done first
+      setTimeout(() => {
+        const sidebarBottomEndElement = document.getElementById('sidebar-bottom-end');
+        sidebarBottomEndElement.scrollIntoView({ behavior: 'instant' });
+      }, 100);
     }
   };
 

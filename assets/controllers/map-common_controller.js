@@ -161,11 +161,14 @@ export default class extends Controller {
 
   // Marker related
 
-  addElement = (lat, lon, popup) => {
+  addElement = (lat, lon, popup, openPopup) => {
     const element = L.marker([parseFloat(lat), parseFloat(lon)], { icon: markerDefaultIcon })
       .bindPopup(popup)
       .addTo(this.map);
     this.elements.push(element);
+    if (openPopup) {
+      setTimeout(() => element.openPopup(), 300);
+    }
     return element;
   };
 

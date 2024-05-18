@@ -41,8 +41,11 @@
                         <strong>{{ element.name }}</strong>
                         {{ description }}
                         <a data-action="click->sidebar#switchToSidebarAction click->plan#tabSwitchAction"
-                        {# TODO here the switchToSidebarAction won't scroll to the end of the sidebar #}
+                        {# BUG: https://github.com/hotwired/stimulus/issues/766 #}
                             data-plan-tab-param="interests"
+                            data-plan-scroll-param="true"
+                            data-sidebar-tab-param="interests"
+                            data-sidebar-scroll-param="true"
                             data-turbo-frame="interest-new"
                             href="{{ path('interest_new', {
                                 lat: element.point.lat,
@@ -55,7 +58,7 @@
                         </a>
                         {% endif %}
                     </span>{% endautoescape %}`,
-                );
+                {% if element.error %}true{% endif %});
             }, {{ loop.index }});
         {% else %}
             alert('{{ 'alert.no_results'|trans }}');
