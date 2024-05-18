@@ -3,10 +3,9 @@
 import * as Turbo from '@hotwired/turbo';
 import L from 'leaflet';
 import '@elfalem/leaflet-curve';
-import 'leaflet-compass';
 import { Controller } from '@hotwired/stimulus';
 import {
-  iconSymbol, iconLive, curve, addLatLonToUrl,
+  iconSymbol, curve, addLatLonToUrl, iconGpsPoint, iconGpsCompass, removeFromMap,
 } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
@@ -34,10 +33,12 @@ export default class extends Controller {
     this.extras = [];
     this.cache = {};
     this.liveMarker = null;
+    this.compassMarker = null;
     this.firstLocation = true;
     this.activeStage = null;
     this.currentLat = null;
     this.currentLng = null;
+    this.compassWillStopHandler = null;
 
     // Move back button to zoom control (not ideal but acceptable)
     const topLeft = document.querySelector('.leaflet-control-zoom.leaflet-bar.leaflet-control');
@@ -45,13 +46,6 @@ export default class extends Controller {
       topLeft.appendChild(this.backButtonTarget);
     }
     this.backButtonTarget.classList.remove('hide');
-
-    const compass = new L.Control.Compass({ autoActive: false, showDigit: false });
-    compass.addTo(this.map());
-    const control = document.querySelector('.leaflet-control.leaflet-compass');
-    control.remove();
-    document.querySelector('.map-button-container').appendChild(control);
-    control.classList.add('with-box-shadow-radius');
 
     // document.addEventListener('turbo:frame-load', this.turboFrameLoadEventHandler);
     // Because this event does not work on iOS
@@ -80,6 +74,7 @@ export default class extends Controller {
 
   disconnect() {
     this.mapLocationRemoveHandler();
+    this.compassOff();
     this.map().stopLocate();
     // document.removeEventListener('turbo:frame-load', this.turboFrameLoadEventHandler);
   }
@@ -103,13 +98,13 @@ export default class extends Controller {
     this.firstLocation = true;
 
     if (this.liveMarker) {
-      this.liveMarker.remove();
+      this.liveMarker = removeFromMap(this.firstLocation, this.map());
     }
   };
 
   mapLocationErrorHandler = (e) => {
     // eslint-disable-next-line no-console
-    console.log(e);
+    console.error(e);
     // window.alert(e.message);
   };
 
@@ -119,10 +114,12 @@ export default class extends Controller {
     this.currentLng = e.latlng.lng;
 
     if (this.liveMarker) {
-      this.liveMarker.remove();
+      this.liveMarker.setLatLng(e.latlng);
+    } else {
+      this.liveMarker = L.marker([e.latlng.lat, e.latlng.lng], { icon: iconGpsPoint })
+        .on('click', this.compassOn)
+        .addTo(this.map());
     }
-    this.liveMarker = L.marker([e.latlng.lat, e.latlng.lng], { icon: iconLive })
-      .addTo(this.map());
 
     if (!mapCommonController.findPathCloseToPoint(e.latlng)) {
       // return false; // Failed
@@ -214,7 +211,128 @@ export default class extends Controller {
 
   // Event based
 
+  // Compass
+
+  compassOn = () => {
+    window.addEventListener('compassneedscalibration', () => {
+      // eslint-disable-next-line no-alert
+      alert('Your compass needs calibrating!');
+    });
+
+    if (
+      typeof (DeviceOrientationEvent) !== 'undefined'
+        && typeof (DeviceOrientationEvent.requestPermission) === 'function'
+    ) {
+      /* iPhoneOS, must ask interactively */
+      DeviceOrientationEvent.requestPermission().then((permission) => {
+        if (permission !== 'granted') {
+          // eslint-disable-next-line no-console
+          console.error(`Compass permission != granted: ${permission}`);
+          return;
+        }
+        this.compassActivate();
+      }, (reason) => {
+        // eslint-disable-next-line no-console
+        console.error(`Error activating compass: ${reason}`);
+      });
+    } else {
+      this.compassActivate();
+    }
+  };
+
+  compassActivate = () => {
+    window.addEventListener('deviceorientation', this.compassHandler);
+    if (this.compassMarker) {
+      this.compassMarker.setLatLng(L.latLng(this.currentLat, this.currentLng));
+    } else {
+      this.compassMarker = L.marker([this.currentLat, this.currentLng], { icon: iconGpsCompass })
+        .addTo(this.map());
+    }
+
+    // Compass will auto stop after a bit to preserve battery life
+    if (this.compassWillStopHandler) {
+      clearTimeout(this.compassWillStopHandler);
+    }
+    this.compassWillStopHandler = setTimeout(this.compassOff, 60 * 1000);
+  };
+
+  compassHandler = (e) => {
+    let angle;
+    // CSS rotate is clockwise and the image of the compass points up by default
+    if (e.webkitCompassHeading) {
+      // https://developer.apple.com/documentation/webkitjs/deviceorientationevent/1804777-webkitcompassheading
+      // Direction values are measured in degrees starting at due north
+      // and continuing clockwise around the compass.
+      // Thus, north is 0 degrees, east is 90 degrees, south is 180 degrees, and so on.
+      // A negative value indicates an invalid direction.
+      // => No correction needed
+      angle = e.webkitCompassHeading;
+    } else if (e.alpha) {
+      // https://developer.mozilla.org/en-US/docs/Web/API/Window/deviceorientation_event#event_properties
+      // A number representing the motion of the device around the z axis,
+      // express in degrees with values ranging from 0 (inclusive) to 360 (exclusive).
+      // -or- The alpha read-only property of the DeviceOrientationEvent interface returns
+      // the rotation of the device around the Z axis; that is, the number of degrees
+      // by which the device is being twisted around the center of the screen.
+      // https://developer.mozilla.org/en-US/docs/Web/API/Device_orientation_events/Orientation_and_motion_data_explained#alpha
+      // The alpha angle is 0° when top of the device is pointed directly toward
+      // the Earth's north pole, and increases as the device is rotated counterclockwise.
+      // As such, 90° corresponds with pointing west, 180° with south, and 270° with east.
+      // => Correction, basically invert the rotation direction
+      angle = 360 - e.alpha;
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Orientation angle not found', e);
+    }
+
+    angle = Math.round(angle);
+
+    // Min angle deviation before rotate
+    if (angle % 2 === 0) {
+      this.compassSetAngle(angle);
+    }
+  };
+
+  compassSetAngle = (angle) => {
+    if (!this.compassMarker) {
+      return;
+    }
+
+    this.compassMarker.setLatLng(new L.LatLng(this.currentLat, this.currentLng));
+
+    // Accessing private property
+    // eslint-disable-next-line no-underscore-dangle
+    const iconImgEl = this.compassMarker._icon;
+    // CSS rotate is clockwise and the image of the compass points up by default
+    iconImgEl.style.zIndex = '200'; // Marker default is 333
+    iconImgEl.style.transformOrigin = 'center';
+    iconImgEl.style.transform = this.transformRotate(iconImgEl.style.transform, angle);
+  };
+
+  compassOff = () => {
+    window.removeEventListener('deviceorientation', this.compassHandler);
+    if (this.compassMarker) {
+      this.compassMarker = removeFromMap(this.compassMarker, this.map());
+    }
+    this.compassWillStopHandler = null;
+  };
+
   // Helpers
+
+  /**
+   * Given a transform CSS value, update only the rotation part of it.
+   */
+  transformRotate = (transform, angle) => {
+    const r = `rotate(${angle}deg)`;
+    if (transform.length === 0) {
+      return r;
+    }
+
+    const parts = transform.split(' ').filter((p) => !p.startsWith('rotate'));
+    parts.push(r);
+
+    return parts.join(' ');
+  };
 
   preventWarnings = () => {
     // Targets
