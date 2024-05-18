@@ -55,7 +55,7 @@
                         </a>
                         {% endif %}
                     </span>{% endautoescape %}`,
-                );
+                {% if element.error %}true{% endif %});
             }, {{ loop.index }});
         {% else %}
             alert('{{ 'alert.no_results'|trans }}');
