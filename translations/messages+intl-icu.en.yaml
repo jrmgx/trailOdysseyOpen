@@ -34,13 +34,13 @@ action:
     help: Switch to map ➞ 
   itinerary: Itinerary
   add_points: Add Points
-  draw_new_segment: New segment
-  import_gpx: Import GPX
-  add_a_new_stage_from_the_map: Add a new stage from the map
-  search_to_create_a_new_stage: Search to create a new stage
-  add_a_new_interest_on_the_map: Add a new interest on the map
-  search_to_create_a_new_interest: Search to create a new interest
-  upload_a_photo: Upload a Photo
+  draw_new_segment: New
+  import_gpx: GPX
+  add_a_new_stage_from_the_map: New Stage
+  search_to_create_a_new_stage: Search Stage
+  add_a_new_interest_on_the_map: New Interest
+  search_to_create_a_new_interest: Search
+  upload_a_photo: Photo
   add: Add
   save_changes: Save Changes
   export_trail: Export Trail
@@ -79,13 +79,14 @@ action:
     make_public: 'Make Public'
     path: 'Path'
     make_private: 'Make Private'
-  add_a_new_diary_entry_on_the_map: 'Add a new diary entry on the map'
+  add_a_new_diary_entry_on_the_map: New
   add_tiles: 'Add Tiles'
   delete_trail: Delete Trail
   add_those_tiles: 'Add those Tiles'
   duplicate_trail: 'Duplicate Trail'
   add_again_to_bag: '+'
   import_bag: 'Import Bag'
+  search_to_create_a_new_diary: Search
 label:
   search_for_an_address: 'Search for an address:'
   email: Email

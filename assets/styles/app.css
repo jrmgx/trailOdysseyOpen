@@ -18,6 +18,16 @@ iframe {
     border: 0;
 }
 
+.col-sticky-bottom {
+    position: sticky;
+    bottom: 0;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
 .sidebar {
     position: fixed;
     top: 0;
