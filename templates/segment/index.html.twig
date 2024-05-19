@@ -89,22 +89,25 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <div class="sidebar-mappable-new">
+                    <div class="col-12 col-sticky-bottom bg-white">
                         <turbo-frame id="segment-new">
                             <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
-                                <a class="btn btn-primary"
+                                <a class="btn btn-outline-primary btn-block"
+                                   style="width: 33%;"
                                    data-action="click->segment#newSegmentDrawAction:prevent"
                                    href="#"
                                 >
                                     {{ 'action.draw_new_segment'|trans }}
                                 </a>
-                                <a class="btn btn-primary"
+                                <a class="btn btn-outline-primary btn-block"
+                                   style="width: 33%;"
                                    data-action="click->segment#itineraryStartStopAction"
                                    href="{{ path('segment_new_itinerary', { trip: trip.id }) }}"
                                 >
                                     {{ 'action.itinerary'|trans }}
                                 </a>
-                                <a class="btn btn-primary"
+                                <a class="btn btn-outline-primary btn-block"
+                                   style="width: 33%;"
                                    data-turbo-frame="_top"
                                    href="{{ path('gpx_new', { trip: trip.id, onBoarding: false }) }}"
                                 >

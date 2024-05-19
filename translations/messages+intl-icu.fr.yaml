@@ -26,6 +26,7 @@ action:
   clear: Effacer
   split: Couper
   update: M.à.j.
+  search_to_create_a_new_diary: Chercher
   show_trip_information:
     title: Voir les informations de la rando
   toggle_visibility:
@@ -35,13 +36,13 @@ action:
     help: Vue carte ➞ 
   itinerary: Itinéraire
   add_points: Ajouter des points
-  draw_new_segment: Nouveau segment
-  import_gpx: Importer un GPX
-  add_a_new_stage_from_the_map: Ajouter une étape depuis la carte
-  search_to_create_a_new_stage: Chercher pour créer une étape
-  add_a_new_interest_on_the_map: Ajouter un point d'intérêt sur la carte
-  search_to_create_a_new_interest: Chercher pour créer un point d'intérêt
-  upload_a_photo: Ajouter une photo
+  draw_new_segment: Nouveau
+  import_gpx: GPX
+  add_a_new_stage_from_the_map: Ajouter étape
+  search_to_create_a_new_stage: Chercher
+  add_a_new_interest_on_the_map: Ajouter intérêt
+  search_to_create_a_new_interest: Chercher
+  upload_a_photo: Ajouter photo
   add: Ajouter
   save_changes: Sauvegarder
   export_trail: Exporter la rando
