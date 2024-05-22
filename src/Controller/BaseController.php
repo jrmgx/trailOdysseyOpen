@@ -39,22 +39,25 @@ abstract class BaseController extends AbstractController
 
     protected function getUrls(Trip $trip): string
     {
-        $params = ['lat' => '_LAT_', 'lon' => '_LON_', 'trip' => $trip->getId()];
+        $latLon = ['lat' => '_LAT_', 'lon' => '_LON_'];
+        $tripId = ['trip' => $trip->getId()];
+        $id0 = ['id' => 0];
 
         return (string) json_encode([
-            'segmentNew' => $this->generateUrl('segment_new', $params),
-            'segmentSplit' => $this->generateUrl('segment_split', $params + ['id' => 0]),
-            'stageNew' => $this->generateUrl('stage_new', $params),
-            'stageMove' => $this->generateUrl('stage_move', $params + ['id' => 0]),
-            'interestNew' => $this->generateUrl('interest_new', $params),
-            'interestMove' => $this->generateUrl('interest_move', $params + ['id' => 0]),
-            'diaryEntryNew' => $this->generateUrl('diaryEntry_new', $params),
-            'diaryEntryMove' => $this->generateUrl('diaryEntry_move', $params + ['id' => 0]),
-            'diaryUpdateProgress' => $this->generateUrl('diaryEntry_update_progress', $params),
-            'photoNew' => $this->generateUrl('photo_new', $params),
-            'geoElements' => $this->generateUrl('geo_elements', $params),
-            'mapOption' => $this->generateUrl('trip_edit_map_option', ['trip' => $trip->getId()]),
-            'liveShowStage' => $this->generateUrl('live_show_stage', ['trip' => $trip->getId(), 'stage' => 0]),
+            'segmentNew' => $this->generateUrl('segment_new', $tripId + $latLon),
+            'segmentNewItinerary' => $this->generateUrl('segment_new_itinerary', $tripId),
+            'segmentSplit' => $this->generateUrl('segment_split', $tripId + $latLon + $id0),
+            'stageNew' => $this->generateUrl('stage_new', $tripId + $latLon),
+            'stageMove' => $this->generateUrl('stage_move', $tripId + $latLon + $id0),
+            'interestNew' => $this->generateUrl('interest_new', $tripId + $latLon),
+            'interestMove' => $this->generateUrl('interest_move', $tripId + $latLon + $id0),
+            'diaryEntryNew' => $this->generateUrl('diaryEntry_new', $tripId + $latLon),
+            'diaryEntryMove' => $this->generateUrl('diaryEntry_move', $tripId + $latLon + $id0),
+            'diaryUpdateProgress' => $this->generateUrl('diaryEntry_update_progress', $tripId + $latLon),
+            'photoNew' => $this->generateUrl('photo_new', $tripId + $latLon),
+            'geoElements' => $this->generateUrl('geo_elements', $tripId + $latLon),
+            'mapOption' => $this->generateUrl('trip_edit_map_option', $tripId),
+            'liveShowStage' => $this->generateUrl('live_show_stage', $tripId + ['stage' => 0]),
         ]);
     }
 }

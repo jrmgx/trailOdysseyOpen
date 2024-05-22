@@ -3,6 +3,7 @@
     <h1 class="fs-4 flex-grow-1">{{ header_title }}</h1>
     {% if header_back_title is defined %}
     <a class="btn btn-sm {{ header_column ? 'btn-outline-secondary' : 'btn-secondary' }}"
+       data-turbo-frame="_top"
        href="{{ header_back_href }}">{{ header_back_title }}</a>
     {% endif %}
 </div>

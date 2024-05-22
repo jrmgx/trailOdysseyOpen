@@ -119,23 +119,14 @@
             {{ form_end(formTilesList) }}
         {% endif %}
 
-        <div class="row mt-5" data-turbo-frame="_top">
-            <div class="col-6">
-                <button onclick="document.getElementById('trip-edit-form').requestSubmit();"
-                        class="btn btn-primary">
-                    {{ 'action.save_changes'|trans }}
-                </button>
-            </div>
-            <div class="col-6 text-end">
-
-
-                <div class="btn-group" role="group" aria-label="More Actions">
-                    <div class="btn-group" role="group">
+        <div class="row mt-5 sticky-bottom-action" data-turbo-frame="_top">
+            <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
+                <div class="btn-group btn-block" role="group">
+                    <div class="btn-group" role="group" style="width: 100%">
                         <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            More Actions
+                            {{ 'action.more_actions'|trans }}
                         </button>
                         <ul class="dropdown-menu">
-                            {#                            <li><a class="dropdown-item" href="#">Dropdown link</a></li>#}
                             <li>
                                 <form method="post"
                                       data-turbo-frame="_top"
@@ -190,6 +181,11 @@
                         </ul>
                     </div>
                 </div>
+                <button onclick="document.getElementById('trip-edit-form').requestSubmit();"
+                        class="btn btn-primary btn-block"
+                >
+                    {{ 'action.save_changes'|trans }}
+                </button>
             </div>
         </div>
     </turbo-frame>

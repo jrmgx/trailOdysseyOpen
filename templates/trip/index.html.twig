@@ -40,12 +40,12 @@
             </div>
         </div>
     {% endfor %}
-    <div class="row my-3">
+    <div class="row my-3 sticky-bottom-action">
         <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
-            <a class="btn btn-primary" href="{{ path('trip_new') }}">{{ 'action.new_trip'|trans }}</a>
-        </div>
-        <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
-            <a class="btn btn-secondary" href="{{ path('user_edit') }}">Preferences</a>
+            <a class="btn btn-outline-secondary btn-block"
+               href="{{ path('user_edit') }}">{{ 'action.preferences'|trans }}</a>
+            <a class="btn btn-outline-primary btn-block"
+               href="{{ path('trip_new') }}">{{ 'action.new_trip'|trans }}</a>
         </div>
     </div>
 {% endblock %}

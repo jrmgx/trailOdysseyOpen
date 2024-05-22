@@ -18,9 +18,18 @@ iframe {
     border: 0;
 }
 
-.col-sticky-bottom {
+.sticky-bottom-action {
     position: sticky;
     bottom: 0;
+    background: white;
+    border-top: solid 1px #D2D2D2;
+}
+
+.sticky-bottom-sidebar {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: solid 1px #D2D2D2;
 }
 
 .btn-block {

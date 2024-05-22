@@ -118,20 +118,25 @@
                     {% if bag.weight %}<small>(incl. bag {{ bag.weight }}gr)</small>{% endif %}
                 </div>
             </div>
+            {% if not loop.last %}
             <hr class="mb-3">
+            {% endif %}
         {% else %}
             <div class="row my-3">
                 <div class="col-12">
                     {{ 'info.no_bag_found_create_one_to_start'|trans|raw }}
                 </div>
             </div>
-            <hr class="mb-3">
         {% endfor %}
-        <div class="row">
+        <div class="row my-3 sticky-bottom-action">
             <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
-                <a class="btn btn-primary" href="{{ path('bag_new', { trip: trip.id }) }}">{{ 'action.new_bag'|trans }}</a>
-                <a class="btn btn-primary" href="{{ path('gear_new', { trip: trip.id }) }}">{{ 'action.new_gear'|trans }}</a> {# TODO redirect here then #}
-                <a class="btn btn-primary" href="{{ path('bag_import', { trip: trip.id }) }}">{{ 'action.import_bag'|trans }}</a>
+                <a class="btn btn-outline-primary btn-block"
+                   href="{{ path('bag_new', { trip: trip.id }) }}">{{ 'action.new_bag'|trans }}</a>
+                <a class="btn btn-outline-primary btn-block"
+                   style="padding: 0.375rem"
+                   href="{{ path('gear_new', { trip: trip.id }) }}">{{ 'action.new_gear'|trans }}</a> {# TODO redirect here then #}
+                <a class="btn btn-outline-primary btn-block"
+                   href="{{ path('bag_import', { trip: trip.id }) }}">{{ 'action.import_bag'|trans }}</a>
             </div>
         </div>
     </div>

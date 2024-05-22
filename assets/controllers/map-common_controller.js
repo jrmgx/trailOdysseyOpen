@@ -126,15 +126,21 @@ export default class extends Controller {
 
   newPinAction = (e) => {
     const { type, on, off } = e.params || {};
+    const thatButton = e.target.closest('.btn');
+    const otherButtons = Array.from(thatButton.parentElement.children).filter(
+      (btn) => btn !== thatButton,
+    );
     if (this.actionPinActiveFor) {
-      e.target.closest('.btn').innerHTML = on;
+      thatButton.innerHTML = on;
+      otherButtons.forEach((btn) => btn.classList.remove('hide'));
       this.stopPinAction();
       return;
     }
     this.actionPinActiveFor = type;
     document.body.style.cursor = 'crosshair';
     this.mapTarget.style.cursor = 'crosshair';
-    e.target.closest('.btn').innerHTML = off;
+    thatButton.innerHTML = off;
+    otherButtons.forEach((btn) => btn.classList.add('hide'));
     sidebarController.switchToMapAction();
   };
 

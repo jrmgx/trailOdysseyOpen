@@ -116,11 +116,10 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <div class="col-12 col-sticky-bottom bg-white">
+                    <div class="col-12 sticky-bottom-sidebar">
                         <turbo-frame id="stage-new">
                             <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
                                 <a class="btn btn-outline-primary btn-block"
-                                   style="width: 50%;"
                                    data-action="click->map-common#newPinAction"
                                    data-map-common-type-param="stage"
                                    data-map-common-on-param="{{ 'action.add_a_new_stage_from_the_map'|trans }}"
@@ -129,7 +128,6 @@
                                     {{ 'action.add_a_new_stage_from_the_map'|trans }}
                                 </a>
                                 <a class="btn btn-outline-primary btn-block"
-                                   style="width: 50%;"
                                    href="{{ path('geo_search', { trip: trip.id, type: 'stage' }) }}"
                                 >
                                     {{ 'action.search_to_create_a_new_stage'|trans }}
@@ -159,11 +157,10 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <div class="col-12 col-sticky-bottom bg-white">
+                    <div class="col-12 sticky-bottom-sidebar">
                         <turbo-frame id="interest-new">
                             <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
                                 <a class="btn btn-outline-primary btn-block"
-                                   style="width: 50%;"
                                    data-action="click->map-common#newPinAction"
                                    data-map-common-type-param="interest"
                                    data-map-common-on-param="{{ 'action.add_a_new_interest_on_the_map'|trans }}"
@@ -172,7 +169,6 @@
                                     {{ 'action.add_a_new_interest_on_the_map'|trans }}
                                 </a>
                                 <a class="btn btn-outline-primary btn-block"
-                                   style="width: 50%;"
                                    href="{{ path('geo_search', { trip: trip.id, type: 'interest' }) }}"
                                 >
                                     {{ 'action.search_to_create_a_new_interest'|trans }}
