@@ -88,15 +88,20 @@ export default class extends Controller {
     this.segmentMultipleDeleteFormTarget.submit();
   };
 
-  sidebarSegmentClickAction = () => {
-    // const { id } = e.params;
+  sidebarSegmentClickAction = (e) => {
+    const { id } = e.params;
     sidebarController.switchToMapAction();
-    // const marker = this.segments[id];
-    // this.map().fitBounds(marker.getBounds());
+    const marker = this.segments[id];
+    if (e.shiftKey) {
+      this.map().fitBounds(marker.getBounds());
+    } else {
+      this.map().setView(marker.getBounds().getCenter());
+    }
+    marker.bindTooltip('Active').openTooltip();
+    setTimeout(() => marker.closeTooltip(), 2000);
   };
 
   sidebarEditSegmentClickAction = (e) => {
-    // const { id } = e.params;
     this.sidebarSegmentClickAction(e);
     this.hideEditButtons();
   };
@@ -304,6 +309,7 @@ export default class extends Controller {
       sidebar.scrollTo({ top: element.offsetTop });
       element.querySelector('.card').classList.add('text-bg-info');
       setTimeout(() => element.querySelector('.card').classList.remove('text-bg-info'), 2000);
+      this.sidebarSegmentClickAction({ params: { id } });
     }).addTo(this.map());
     polyline.segmentId = id;
     if (this.segments[id]) {
