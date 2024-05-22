@@ -1,5 +1,5 @@
 <turbo-frame id="diaryEntry-new">
-    <div class="p-3">
+    <div class="p-3 clearfix">
         {{ form_start(form, { attr: {
             'data-turbo-frame': 'sidebar-diaryEntries'
         }}) }}
@@ -10,7 +10,7 @@
             <button class="btn btn-primary">{{ 'action.send'|trans }}</button>
         </div>
         {{ form_end(form) }}
-        <a class="btn btn-outline-secondary"
+        <a class="btn btn-outline-secondary float-end"
            href="{{ path('diaryEntry_show', { trip: trip.id }) }}">Cancel</a>
     </div>
 </turbo-frame>

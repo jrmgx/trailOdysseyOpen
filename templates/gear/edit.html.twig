@@ -7,21 +7,29 @@
             header_back_title: 'action.back'|trans,
             header_back_href: path('gear_index'),
         }) }}
+        <form method="post"
+              id="form-delete"
+              action="{{ path('gear_delete', { id: gear.id }) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ gear.id) }}">
+        </form>
         <div class="col-12">
             {{ form_start(form) }}
             {{ form_row(form.name) }}
             {{ form_row(form.description) }}
             {{ form_row(form.weight) }}
-            <button class="btn btn-primary">{{ 'action.edit.title'|trans }}</button>
+            <div class="d-flex justify-content-around align-items-stretch py-3 gap-3">
+                <button type="button"
+                        onclick="
+                            confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`) ?
+                                document.getElementById('form-delete').submit() : 0
+                        "
+                        class="btn btn-block btn-outline-danger"
+                >{{ 'action.delete'|trans }}</button>
+                <button class="btn btn-block btn-primary">{{ 'action.edit.title'|trans }}</button>
+            </div>
             {{ form_end(form) }}
         </div>
         <div class="col-12">
-            <form method="post"
-                  class=""
-                  action="{{ path('gear_delete', { id: gear.id }) }}">
-                <button class="btn btn-outline-danger">{{ 'action.delete'|trans }}</button>
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ gear.id) }}">
-            </form>
         </div>
     </div>
 {% endblock %}

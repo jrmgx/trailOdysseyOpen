@@ -74,11 +74,10 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <div class="col-12 col-sticky-bottom bg-white">
+                    <div class="col-12 sticky-bottom-sidebar">
                         <turbo-frame id="diaryEntry-new">
                             <div class="d-flex justify-content-around align-items-stretch p-3 gap-3">
                                 <a class="btn btn-outline-primary btn-block"
-                                   style="width: 33%;"
                                    data-action="click->map-common#newPinAction"
                                    data-map-common-type-param="diaryEntry"
                                    data-map-common-on-param="{{ 'action.add_a_new_diary_entry_on_the_map'|trans }}"
@@ -87,13 +86,11 @@
                                     {{ 'action.add_a_new_diary_entry_on_the_map'|trans }}
                                 </a>
                                 <a class="btn btn-outline-primary btn-block"
-                                   style="width: 33%;"
                                    href="{{ path('geo_search', { trip: trip.id, type: 'diaryEntry' }) }}"
                                 >
                                     {{ 'action.search_to_create_a_new_diary'|trans }}
                                 </a>
                                 <a class="btn btn-outline-primary btn-block"
-                                   style="width: 33%;"
                                    data-action="click->diary#newPhotoAction"
                                 >
                                     {{ 'action.upload_a_photo'|trans }}

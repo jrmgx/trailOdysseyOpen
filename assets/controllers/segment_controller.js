@@ -128,7 +128,14 @@ export default class extends Controller {
   };
 
   itineraryStartStopAction = (e) => {
+    const { on, off } = e.params || {};
+    const thatButton = e.target.closest('.btn');
+    const otherButtons = Array.from(thatButton.parentElement.children).filter(
+      (btn) => btn !== thatButton,
+    );
     if (this.actionNewItineraryActive > 0) {
+      thatButton.innerHTML = on;
+      otherButtons.forEach((btn) => btn.classList.remove('hide'));
       this.itineraryStopAction(e);
       return;
     }
@@ -137,7 +144,8 @@ export default class extends Controller {
 
     document.body.style.cursor = 'crosshair';
     this.mapTarget.style.cursor = 'crosshair';
-    e.target.innerHTML = `${this.translationsValue.clickMapToAddStartFinish}<br>${this.translationsValue.orHereToCancel}`;
+    thatButton.innerHTML = off;
+    otherButtons.forEach((btn) => btn.classList.add('hide'));
     sidebarController.switchToMapAction();
   };
 
@@ -155,7 +163,6 @@ export default class extends Controller {
 
     document.body.style.cursor = 'default';
     this.mapTarget.style.cursor = 'grab';
-    // TODO repopulate button e.target.innerHTML = 'Add Points';
   };
 
   mapClickAction = (e) => {
@@ -194,57 +201,64 @@ export default class extends Controller {
       L.marker(e.latlng, { icon: this.markerCircleFakeIcon }).addTo(this.map()),
     );
 
-    if (this.actionNewItineraryActive === 0) {
-      this.routingControl = L.Routing.control({
-        waypoints: [
-          this.actionNewItineraryMarkers[0].getLatLng(),
-          this.actionNewItineraryMarkers[1].getLatLng(),
-        ],
-        router: this.router,
-        lineOptions: { styles: [{ color: 'red', weight: 5 }] },
-        createMarker: (i, point, n) => {
-          const marker = L.marker(point.latLng, {
-            draggable: true,
-            icon: this.markerCircleFakeIcon,
-          });
-
-          if (i === 0 || i === n - 1) {
-            return marker;
-          }
-
-          const divElement = document.createElement('div');
-          divElement.classList.add('segment-marker');
-
-          const deleteElement = document.createElement('a');
-          deleteElement.innerHTML = this.translationsValue.deleteThisPoint;
-          deleteElement.addEventListener('click', () => {
-            this.routingControl.spliceWaypoints(i, 1);
-          });
-
-          divElement.appendChild(deleteElement);
-          marker.bindPopup(divElement);
-
-          return marker;
-        },
-
-      }).on('routeselected', (routeselectedEvent) => { // or routesfound?
-        const { route } = routeselectedEvent;
-        this.editPoints = route.coordinates.map(
-          (latLng) => ({ lat: latLng.lat, lon: latLng.lng, el: null }),
-        );
-
-        let name = this.translationsValue.newSegment;
-        if (route.name) {
-          const nameParts = route.name.split(',');
-          if (nameParts.length > 1) {
-            name = `${nameParts[0].trim()} to ${nameParts[nameParts.length - 1].trim()}`;
-          }
-        }
-        this.updateSegmentPointsForm(name);
-      }).addTo(this.map());
-
-      this.itineraryStopAction(true);
+    if (this.actionNewItineraryActive === 1) {
+      Turbo.visit(this.urlsValue.segmentNewItinerary, { frame: 'segment-new' });
+      return;
     }
+
+    if (this.actionNewItineraryActive !== 0) {
+      return;
+    }
+
+    this.routingControl = L.Routing.control({
+      waypoints: [
+        this.actionNewItineraryMarkers[0].getLatLng(),
+        this.actionNewItineraryMarkers[1].getLatLng(),
+      ],
+      router: this.router,
+      lineOptions: { styles: [{ color: 'red', weight: 5 }] },
+      createMarker: (i, point, n) => {
+        const marker = L.marker(point.latLng, {
+          draggable: true,
+          icon: this.markerCircleFakeIcon,
+        });
+
+        if (i === 0 || i === n - 1) {
+          return marker;
+        }
+
+        const divElement = document.createElement('div');
+        divElement.classList.add('segment-marker');
+
+        const deleteElement = document.createElement('a');
+        deleteElement.innerHTML = this.translationsValue.deleteThisPoint;
+        deleteElement.addEventListener('click', () => {
+          this.routingControl.spliceWaypoints(i, 1);
+        });
+
+        divElement.appendChild(deleteElement);
+        marker.bindPopup(divElement);
+
+        return marker;
+      },
+
+    }).on('routeselected', (routeselectedEvent) => { // or routesfound?
+      const { route } = routeselectedEvent;
+      this.editPoints = route.coordinates.map(
+        (latLng) => ({ lat: latLng.lat, lon: latLng.lng, el: null }),
+      );
+
+      let name = this.translationsValue.newSegment;
+      if (route.name) {
+        const nameParts = route.name.split(',');
+        if (nameParts.length > 1) {
+          name = `${nameParts[0].trim()} to ${nameParts[nameParts.length - 1].trim()}`;
+        }
+      }
+      this.updateSegmentPointsForm(name);
+    }).addTo(this.map());
+
+    this.itineraryStopAction(true);
   };
 
   newSegmentDrawAction = () => {
@@ -534,6 +548,7 @@ export default class extends Controller {
     this.urlsValue = {
       segmentNew: null,
       segmentSplit: null,
+      segmentNewItinerary: null,
     };
     this.translationsValue = {
       areYouSureSegmentDeleteMulti: null,
