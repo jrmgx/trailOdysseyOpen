@@ -30,6 +30,7 @@ export default class extends Controller {
 
   connect = () => {
     this.stages = {};
+    this.interests = {};
     this.extras = [];
     this.cache = {};
     this.liveMarker = null;
@@ -68,6 +69,7 @@ export default class extends Controller {
       getActiveStage: this.getActiveStage,
       addStage: this.addStage,
       addExtra: this.addExtra,
+      addInterest: this.addInterest,
       startLiveTracking: this.startLiveTracking,
     };
   };
@@ -207,6 +209,15 @@ export default class extends Controller {
     this.extras.push(curve(startPoint, endPoint, { color: 'black', weight: 2 })
       .bindPopup(routingPopupContent)
       .addTo(this.map()));
+  };
+
+  addInterest = (id, lat, lon, symbol, popup) => {
+    this.interests[id] = L.marker([parseFloat(lat), parseFloat(lon)], {
+      icon: iconSymbol(symbol),
+      draggable: false,
+    })
+        .bindPopup(popup)
+        .addTo(this.map());
   };
 
   // Event based
