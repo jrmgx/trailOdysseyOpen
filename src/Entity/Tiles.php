@@ -17,6 +17,7 @@ class Tiles
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['leaflet'])]
     private ?int $id = null;
 
     #[Assert\NotBlank]
@@ -89,6 +90,7 @@ class Tiles
         return $this;
     }
 
+    #[Groups(['leaflet'])]
     public function getUrl(): string
     {
         return $this->url;
