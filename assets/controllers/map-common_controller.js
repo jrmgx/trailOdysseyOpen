@@ -45,16 +45,18 @@ export default class extends Controller {
 
     // Init map
 
+    this.proxyLayers = {};
     const baseLayers = {};
     const overlayLayers = {};
     // const geoJsonLayers = {};
     const firstLayer = [];
 
     for (const tiles of this.tilesValue) {
-      const currentLayer = L.tileLayer(tiles.proxyUrl, {
-        maxZoom: 19,
+      const tilesUrl = this.isLive ? tiles.proxyUrl : tiles.url;
+      const currentLayer = L.tileLayer(tilesUrl, {
         attribution: tiles.description || '',
       });
+      currentLayer.id = tiles.id;
       if (tiles.geoJson) {
         // var currentLayer = new L.TileLayer.GeoJSON(tiles.proxyUrl);
         // geoJsonLayers[tiles.name] = currentLayer;
@@ -67,6 +69,9 @@ export default class extends Controller {
           firstLayer.push(currentLayer);
         }
         baseLayers[tiles.name] = currentLayer;
+        if (!this.isLive) {
+          this.proxyLayers[tiles.id] = L.tileLayer(tiles.proxyUrl);
+        }
       }
     }
 
@@ -408,16 +413,18 @@ export default class extends Controller {
 
   gatherTileUrls = (points) => {
     const tileSize = 256; // Leaflet default tile size
-    let activeTileLayer = null;
+    let proxyTileLayer = null;
     this.map.eachLayer((layer) => {
       if (layer instanceof L.TileLayer) {
-        activeTileLayer = layer;
+        proxyTileLayer = this.proxyLayers[layer.id];
       }
     });
+    if (proxyTileLayer === null) {
+      return [];
+    }
     const urls = [];
     const minZoom = Math.max(this.map.getMinZoom(), 12);
     const maxZoom = this.map.getMaxZoom() - 1;
-    const currentZoom = this.map.getZoom();
     const adjacent = [
       [-1, +1], [+0, +1], [+1, +1],
       [-1, +0], [+0, +0], [+1, +0],
@@ -428,8 +435,9 @@ export default class extends Controller {
         const projection = this.map.project(pt, zoom).divideBy(tileSize).floor();
         for (const a of adjacent) {
           const pr = projection.add(new Point(a[0], a[1]));
-          let tileUrl = activeTileLayer.getTileUrl(pr);
-          tileUrl = tileUrl.replace(new RegExp(`/${currentZoom}$`), `/${zoom}`);
+          let tileUrl = proxyTileLayer.getTileUrl(pr);
+          // Zoom is not defined because that tileLayer is not on screen so we fake it
+          tileUrl = tileUrl.replace('/NaN', `/${zoom}`);
           urls.push(tileUrl);
         }
       }

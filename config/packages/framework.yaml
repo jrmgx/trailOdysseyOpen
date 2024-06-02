@@ -27,6 +27,10 @@ framework:
 
     ide: '%env(SYMFONY_FRAMEWORK_IDE)%'
 
+when@prod:
+    framework:
+        http_cache: true
+
 when@test:
     framework:
         test: true

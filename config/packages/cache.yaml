@@ -3,10 +3,6 @@ framework:
         app: cache.adapter.redis
         default_redis_provider: '%env(REDIS_HOST_DSN)%'
         directory: '%kernel.cache_dir%/tiles' # TODO in reality this does not do the thing we want
-        pools:
-            tilesCache:
-                adapters: [ cache.adapter.filesystem ]
-                default_lifetime: 24 hours
 
 when@test:
     framework:
