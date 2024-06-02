@@ -26,6 +26,7 @@ class TilesType extends AbstractType
                 'required' => false,
             ])
             ->add('public', options: ['label' => 'form.label.public'])
+            ->add('useProxy', options: ['label' => 'form.label.use_proxy'])
             ->add('geoJson', options: ['label' => 'form.label.geo_json'])
             ->add('geoJsonHtml', TextareaType::class, [
                 'label' => 'form.label.geo_json_html',

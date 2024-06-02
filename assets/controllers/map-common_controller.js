@@ -52,7 +52,7 @@ export default class extends Controller {
     const firstLayer = [];
 
     for (const tiles of this.tilesValue) {
-      const tilesUrl = this.isLive ? tiles.proxyUrl : tiles.url;
+      const tilesUrl = this.isLive || tiles.useProxy ? tiles.proxyUrl : tiles.url;
       const currentLayer = L.tileLayer(tilesUrl, {
         attribution: tiles.description || '',
       });

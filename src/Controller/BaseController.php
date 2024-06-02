@@ -26,7 +26,7 @@ abstract class BaseController extends AbstractController
     protected function getTiles(Trip $trip, bool $publicOnly = false): string
     {
         if ($publicOnly) {
-            $tiles = $trip->getTiles()->filter(fn (Tiles $tiles) => $tiles->isPublic())->toArray();
+            $tiles = $trip->getTiles()->filter(fn (Tiles $tiles) => $tiles->getPublic())->toArray();
             if (0 === \count($tiles)) {
                 $tiles = [$trip->getTiles()->first()];
             }

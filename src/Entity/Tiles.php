@@ -44,6 +44,10 @@ class Tiles
 
     #[ORM\Column]
     #[Groups(['leaflet'])]
+    private bool $useProxy = false;
+
+    #[ORM\Column]
+    #[Groups(['leaflet'])]
     private bool $geoJson = false;
 
     #[ORM\Column]
@@ -163,7 +167,7 @@ class Tiles
         return $this;
     }
 
-    public function isPublic(): bool
+    public function getPublic(): bool
     {
         return $this->public;
     }
@@ -171,6 +175,18 @@ class Tiles
     public function setPublic(bool $public): self
     {
         $this->public = $public;
+
+        return $this;
+    }
+
+    public function getUseProxy(): bool
+    {
+        return $this->useProxy;
+    }
+
+    public function setUseProxy(bool $useProxy): static
+    {
+        $this->useProxy = $useProxy;
 
         return $this;
     }

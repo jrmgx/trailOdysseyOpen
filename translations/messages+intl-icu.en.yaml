@@ -194,6 +194,7 @@ form:
     url: URL
     overlay: Overlay?
     public: Public?
+    use_proxy: Force proxy? (advanced)
     geo_json: Geo JSON?
     geo_json_html: Geo JSON HTML Binding (advanced)
     tiles: Tiles
