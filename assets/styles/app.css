@@ -32,6 +32,13 @@ iframe {
     border-top: solid 1px #D2D2D2;
 }
 
+.sticky-top-tabs {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+}
+
 .btn-block {
     display: block;
     width: 100%;
