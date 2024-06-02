@@ -31,6 +31,16 @@ liveController.addExtra(
 
 mapCommonController.refreshPlan();
 
+{% for interest in interests %}
+liveController.addInterest(
+    {{ interest.id }},
+    '{{ interest.point.lat }}',
+    '{{ interest.point.lon }}',
+    '{{ interest.symbol }}',
+    `{{ include('common/_mappable_popup.html.twig', { object_name: 'interest', mappable: interest }) }}`
+);
+{% endfor %}
+
 if (typeof liveShowJsReady !== 'undefined') { liveShowJsReady(); }
 
 {{ stimulus_js_load_end(first_load is defined and first_load) }}
