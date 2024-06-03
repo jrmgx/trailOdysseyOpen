@@ -222,9 +222,22 @@ class TripController extends BaseController
         $tripCopy->setMapZoom($trip->getMapZoom());
         $tripCopy->updatedNow();
 
-        $this->addDefaultTiles($tripCopy);
-
         $this->entityManager->persist($tripCopy);
+
+        foreach ($trip->getTiles() as $tile) {
+            $tileCopy = new Tiles();
+            $tileCopy->setName($tile->getName());
+            $tileCopy->setUrl($tile->getUrl());
+            $tileCopy->setPosition($tile->getPosition());
+            $tileCopy->setDescription($tile->getDescription());
+            $tileCopy->setOverlay($tile->getOverlay());
+            $tileCopy->setPublic($tile->getPublic());
+            $tileCopy->setUseProxy($tile->getUseProxy());
+            $tileCopy->setGeoJson($tile->getGeoJson());
+            $tileCopy->setGeoJsonHtml($tile->getGeoJsonHtml());
+
+            $tripCopy->addTile($tileCopy);
+        }
 
         foreach ($trip->getSegments() as $segment) {
             $segmentCopy = new Segment();
