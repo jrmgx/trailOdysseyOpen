@@ -19,7 +19,7 @@ class TripService
     }
 
     /**
-     * @return array{0: array<Stage|Routing>, 1: array<Stage>, 2: array<Routing>, 3: array<Extra>, 4: int}
+     * @return array{0: array<Stage|Routing>, 1: array<Stage>, 2: array<Routing>, 3: array<Extra>}
      */
     public function calculateResults(Trip $trip): array
     {
@@ -31,7 +31,6 @@ class TripService
         $routings = [];
 
         $currentStage = $this->stageRepository->findFirstStage($trip);
-        $totalDistance = 0;
         $number = 0;
         while ($currentStage) {
             $currentStage->setSymbol($number > 0 ? (string) $number : '📍');
@@ -42,7 +41,6 @@ class TripService
             $routingOut = $currentStage->getRoutingOut();
 
             if ($routingOut) {
-                $totalDistance += $routingOut->getDistance() ?? 0;
                 $results[] = $routingOut;
                 $routings[] = $routingOut;
                 $currentStage = $routingOut->getFinishStage();
@@ -57,7 +55,7 @@ class TripService
             fn (Stage $stage) => $this->getExtra($stage), $stages)
         );
 
-        return [$results, $stages, $routings, $extras, $totalDistance];
+        return [$results, $stages, $routings, $extras];
     }
 
     /**
@@ -71,7 +69,6 @@ class TripService
         $currentStage = $this->stageRepository->findFirstStage($trip);
         while ($currentStage) {
             $routingOut = $currentStage->getRoutingOut();
-
             if ($routingOut) {
                 $routings[] = $routingOut;
                 $currentStage = $routingOut->getFinishStage();
@@ -83,21 +80,28 @@ class TripService
         return $routings;
     }
 
-    public function calculateTotalDistance(Trip $trip): int
+    /**
+     * @return array{0: int, 1: int, 2: int}
+     */
+    public function calculateSums(Trip $trip): array
     {
         $currentStage = $this->stageRepository->findFirstStage($trip);
-        $totalDistance = 0;
+        $distance = 0;
+        $elevationPositive = 0;
+        $elevationNegative = 0;
         while ($currentStage) {
             $routingOut = $currentStage->getRoutingOut();
             if ($routingOut) {
-                $totalDistance += $routingOut->getDistance() ?? 0;
+                $distance += $routingOut->getDistance() ?? 0;
+                $elevationPositive += $routingOut->getElevationPositive() ?? 0;
+                $elevationNegative += $routingOut->getElevationNegative() ?? 0;
                 $currentStage = $routingOut->getFinishStage();
             } else {
                 $currentStage = null;
             }
         }
 
-        return $totalDistance;
+        return [$distance, $elevationPositive, $elevationNegative];
     }
 
     /**

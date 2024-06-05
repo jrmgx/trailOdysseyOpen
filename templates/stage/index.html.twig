@@ -71,7 +71,12 @@
                 <div class="col-12">
                     <div class="mb-3">
                         <div>{{ trip.description }}</div>
-                        <div data-plan-target="totalDistance" class="trip-total">{{ total_distance|to_km }}&nbsp;km</div>
+                        <div data-plan-target="totalDistance" class="trip-total">
+                            {{ sum_distance|to_km }}&nbsp;km
+                            {% if sum_positive > 0 %}
+                                with +{{ sum_positive }}m / -{{ sum_negative }}m
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -139,7 +144,12 @@
                     <script>
                         {{ include('stage/index.js.twig') }}
                         if (typeof planController !== 'undefined') {
-                          planController.updateDistance('{{ total_distance|to_km }}');
+                          planController.updateDistance(`
+                            {{ sum_distance|to_km }}&nbsp;km
+                            {% if sum_positive > 0 %}
+                            with +{{ sum_positive }}m / -{{ sum_negative }}m
+                            {% endif %}
+                          `);
                         }
                     </script>
                 </turbo-frame>

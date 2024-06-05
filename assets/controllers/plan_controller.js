@@ -264,7 +264,7 @@ export default class extends Controller {
   // Event based
 
   updateDistance = (distance) => {
-    this.totalDistanceTarget.innerHTML = `${distance}&nbsp;km`;
+    this.totalDistanceTarget.innerHTML = distance;
   };
 
   // Helpers

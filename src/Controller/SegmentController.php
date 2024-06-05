@@ -10,7 +10,6 @@ use App\Form\TripMapOptionType;
 use App\Model\Point;
 use App\Repository\SegmentRepository;
 use App\Security\Voter\UserVoter;
-use App\Service\TripService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\Form\FormError;
@@ -30,7 +29,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 class SegmentController extends BaseController
 {
     public function __construct(
-        private readonly TripService $tripService,
         private readonly SegmentRepository $segmentRepository,
         private readonly EntityManagerInterface $entityManager,
         SerializerInterface $serializer
@@ -45,7 +43,6 @@ class SegmentController extends BaseController
     {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);
 
-        $totalDistance = $this->tripService->calculateTotalDistance($trip);
         $saveMapOptionForm = $this->createForm(TripMapOptionType::class, $trip, [
             'action' => $this->generateUrl('trip_edit_map_option', ['trip' => $trip->getId()]),
             'csrf_protection' => false,
@@ -60,7 +57,6 @@ class SegmentController extends BaseController
             'save_map_option_form' => $saveMapOptionForm,
             'segment_multiple_delete_form' => $segmentMultipleDeleteForm,
             'trip' => $trip,
-            'total_distance' => $totalDistance,
             'segments' => $trip->getSegments(),
         ];
     }

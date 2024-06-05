@@ -32,7 +32,8 @@ class StageController extends MappableController
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);
 
         $interests = $this->interestRepository->findByTrip($trip);
-        [$results, $stages, $routings, $extras, $totalDistance] = $this->tripService->calculateResults($trip);
+        [$results, $stages, $routings, $extras] = $this->tripService->calculateResults($trip);
+        [$sumDistance, $sumPositive, $sumNegative] = $this->tripService->calculateSums($trip);
         $saveMapOptionForm = $this->createForm(TripMapOptionType::class, $trip, [
             'action' => $this->generateUrl('trip_edit_map_option', ['trip' => $trip->getId()]),
             'csrf_protection' => false,
@@ -49,7 +50,9 @@ class StageController extends MappableController
             'routings' => $routings,
             'extras' => $extras,
             'interests' => $interests,
-            'total_distance' => $totalDistance,
+            'sum_distance' => $sumDistance,
+            'sum_positive' => $sumPositive,
+            'sum_negative' => $sumNegative,
             'tab' => $request->query->get('tab', 'stages'),
             'segments' => $trip->getSegments(),
         ];

@@ -37,7 +37,7 @@ class LiveController extends MappableController
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $stage);
 
         $interests = $this->interestRepository->findByTrip($trip);
-        [$results, $stages, $routings, $extras, $totalDistance] = $this->tripService->calculateResults($trip);
+        [$results, $stages, $routings, $extras] = $this->tripService->calculateResults($trip);
 
         return [
             'urls' => $this->getUrls($trip),
@@ -50,7 +50,6 @@ class LiveController extends MappableController
             'routings' => $routings,
             'extras' => $extras,
             'interests' => $interests,
-            'total_distance' => $totalDistance,
             'segments' => $trip->getSegments(),
         ];
     }
