@@ -41,15 +41,12 @@ class PublicController extends BaseController
 
         $diaryEntries = $this->diaryEntryRepository->findByTrip($trip);
         $routings = $this->tripService->calculateRoutings($trip);
-        $totalDistance = 0;
-        foreach ($routings as $routing) {
-            $totalDistance += $routing->getDistance() ?? 0;
-        }
+        // TODO/BUG: routing/distance should only count the progress part of the trip!?
+        [$sumDistance, $sumPositive, $sumNegative] = $this->tripService->calculateSums($trip);
 
         // Bags
         $user = $trip->getUser();
         $bags = $this->bagRepository->findBagsForTripAndUser($trip, $user);
-        // $gears = $this->gearRepository->findGearsForUserAndTripWithBagInfo($user);
 
         return [
             'public' => true,
@@ -59,7 +56,9 @@ class PublicController extends BaseController
             'trip' => $trip,
             'diaryEntries' => $diaryEntries,
             'routings' => $routings,
-            'total_distance' => $totalDistance,
+            'sum_distance' => $sumDistance,
+            'sum_positive' => $sumPositive,
+            'sum_negative' => $sumNegative,
             'bags' => $bags,
         ];
     }
