@@ -27,7 +27,8 @@ planController.addRouting(
 );
 mapCommonController.addPathReference(
   {{ routing.pathPoints|json_encode|raw }},
-  {{ routing.startStage.id }}
+  {{ routing.startStage.id }},
+  {{ routing.distance|default('null') }}
 );
 mapCommonController.addElevation({{ routing.startStage.id }}, true);
 {% endfor %}
@@ -56,7 +57,11 @@ planController.addExtra(
 
 {% if first_load is defined and first_load and is_granted('EDIT', trip) %}
 {% for segment in segments %}
-mapCommonController.addPath({{ segment.points|json_encode|raw }});
+mapCommonController.addPath(
+  {{ segment.points|json_encode|raw }},
+  {{ segment.id }},
+  null
+);
 {% endfor %}
 {% endif %}
 

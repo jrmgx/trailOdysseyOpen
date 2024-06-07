@@ -4,7 +4,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script defer data-turbo-track="reload"
             src="{{ path('live_show_js', { trip: trip.id, firstLoad: 1 }) }}">
     </script>
@@ -104,9 +103,9 @@
                             >
                                 {{ currentRouting.distance|to_km }}&nbsp;km
                                 {{ 'routing.elevation'|trans }}
-                                +{{ currentRouting.elevationPositive }}&nbsp;
-                                -{{ currentRouting.elevationNegative }}
-                                — {{ 'routing.progress'|trans }} <span data-map-common-target="progressText">...</span>
+                                +{{ currentRouting.elevationPositive }}m&nbsp;/&nbsp;
+                                -{{ currentRouting.elevationNegative }}m
+                                — {{ 'routing.progress'|trans }} <span data-live-target="progressText">...</span>
                             </button>
                         </div>
                     </div>

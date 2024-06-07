@@ -342,10 +342,19 @@ path.leaflet-interactive {
 
 .live-bar .live-graph {
     height: calc(var(--live-bar-height) - 5.5rem);
+    margin: 0 1rem;
+}
+
+.live-bar .live-graph .u-legend {
+    position: relative;
+    bottom: 2rem;
+    font-size: calc(0.875rem * 0.8); /* same as btn-xs */
+    font-weight: bold;
 }
 
 .sidebar .live-graph {
     height: 60px;
+    margin: 0 0.5rem;
 }
 
 /** Public **/
@@ -501,4 +510,17 @@ path.leaflet-interactive {
         left: 0;
         right: 50svw;
     }
+}
+
+/* uPlot customization */
+.uplot-label-km th {
+    display: none;
+}
+
+.uplot-label-el th {
+    display: none;
+}
+
+.uplot-label-hidden {
+    display: none !important;
 }

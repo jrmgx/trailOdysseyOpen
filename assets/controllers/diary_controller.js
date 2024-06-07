@@ -45,7 +45,7 @@ export default class extends Controller {
     this.myLivePositionTarget.innerHTML = '⏳';
     this.map().on('locationfound', this.mapLocationFoundHandler);
     this.map().on('locationerror', this.mapLocationErrorHandler);
-    this.map().locate({ setView: true, maxZoom: 16 });
+    this.map().locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
   };
 
   diaryEntryClickAction = (e) => {

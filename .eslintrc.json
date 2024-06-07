@@ -15,14 +15,14 @@
         "no-restricted-syntax": "off",
         "guard-for-in": "off",
         "class-methods-use-this": "off",
-        "no-param-reassign": "off"
+        "no-param-reassign": "off",
+        "new-cap": "off"
     },
     "globals": {
         "sidebarController": true,
         "planController": true,
         "segmentController": true,
         "mapCommonController": true,
-        "liveController": true,
-        "ApexCharts": true
+        "liveController": true
     }
 }

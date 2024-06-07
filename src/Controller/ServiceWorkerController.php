@@ -38,7 +38,6 @@ class ServiceWorkerController extends AbstractController
             }
             $resolvedFiles[] = "$this->projectBaseUrl/build/$pathname";
         }
-        $resolvedFiles[] = 'https://cdn.jsdelivr.net/npm/apexcharts';
 
         $response = $this->render('service-worker.js.twig', [
             'files' => $resolvedFiles,
