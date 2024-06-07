@@ -151,7 +151,6 @@ Bag management: Adding items, managing multiple bags, bags within bags and total
 - [wiki.openstreetmap.org/Tag:tourism:camp_site](https://wiki.openstreetmap.org/wiki/Tag:tourism%3Dcamp_site)
 - [thunderforest maps outdoors](https://www.thunderforest.com/maps/outdoors/)
 - [leaflet routing machine](https://github.com/perliedman/leaflet-routing-machine)
-- [apexcharts.com/docs/](https://apexcharts.com/docs/options/chart/events/)
 - [turfjs.org/docs/](https://turfjs.org/docs/)
 - [Leaflet.GeometryUtil](https://makinacorpus.github.io/Leaflet.GeometryUtil/global.html#length)
 - [getbootstrap.com](https://getbootstrap.com/docs/5.3/layout/grid/)

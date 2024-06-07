@@ -11,7 +11,11 @@ publicController.addDiaryEntry(
 
 {% if first_load is defined and first_load and is_granted('EDIT', trip) %}
 {% for routing in routings %}
-mapCommonController.addPath({{ routing.pathPoints|json_encode|raw }});
+mapCommonController.addPath(
+  {{ routing.pathPoints|json_encode|raw }},
+  {{ routing.startStage.id }},
+  {{ routing.distance|default('null') }}
+);
 {% endfor %}
 {% endif %}
 

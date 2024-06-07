@@ -4,7 +4,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script defer data-turbo-track="reload"
             src="{{ path('stage_show_js', { trip: trip.id, firstLoad: 1 }) }}">
     </script>
@@ -74,7 +73,7 @@
                         <div data-plan-target="totalDistance" class="trip-total">
                             {{ sum_distance|to_km }}&nbsp;km
                             {% if sum_positive > 0 %}
-                                with +{{ sum_positive }}m / -{{ sum_negative }}m
+                                {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
                             {% endif %}
                         </div>
                     </div>
@@ -147,7 +146,7 @@
                           planController.updateDistance(`
                             {{ sum_distance|to_km }}&nbsp;km
                             {% if sum_positive > 0 %}
-                            with +{{ sum_positive }}m / -{{ sum_negative }}m
+                                {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
                             {% endif %}
                           `);
                         }

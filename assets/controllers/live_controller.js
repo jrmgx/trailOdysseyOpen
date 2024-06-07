@@ -12,6 +12,7 @@ import '../js/leaflet-double-touch-drag-zoom';
 export default class extends Controller {
   static targets = [
     'backButton',
+    'progressText',
     'liveBar',
     'liveBarContent',
     'liveBarSelect',
@@ -40,6 +41,7 @@ export default class extends Controller {
     this.currentLat = null;
     this.currentLng = null;
     this.compassWillStopHandler = null;
+    this.findPathCloseToPointOnce = false;
 
     // Move back button to zoom control (not ideal but acceptable)
     const topLeft = document.querySelector('.leaflet-control-zoom.leaflet-bar.leaflet-control');
@@ -66,7 +68,6 @@ export default class extends Controller {
     // Export method for external use
     window.liveController = {
       setActiveStage: this.setActiveStage,
-      getActiveStage: this.getActiveStage,
       addStage: this.addStage,
       addExtra: this.addExtra,
       addInterest: this.addInterest,
@@ -100,7 +101,7 @@ export default class extends Controller {
     this.firstLocation = true;
 
     if (this.liveMarker) {
-      this.liveMarker = removeFromMap(this.firstLocation, this.map());
+      this.liveMarker = removeFromMap(this.liveMarker, this.map());
     }
   };
 
@@ -111,7 +112,7 @@ export default class extends Controller {
   };
 
   mapLocationFoundHandler = (e) => {
-    // let radius = e.accuracy;
+    // const radius = e.accuracy;
     this.currentLat = e.latlng.lat;
     this.currentLng = e.latlng.lng;
 
@@ -123,13 +124,50 @@ export default class extends Controller {
         .addTo(this.map());
     }
 
-    if (!mapCommonController.findPathCloseToPoint(e.latlng)) {
-      // return false; // Failed
-    }
+    this.updateLiveElements(e.latlng);
 
     if (this.firstLocation) {
       this.firstLocation = false;
       this.map().locate({ setView: false, watch: true, enableHighAccuracy: true });
+    }
+  };
+
+  updateLiveElements = (latlng) => {
+    const [
+      stageIndex,
+      path,
+      distance,
+      closestToPoint,
+    ] = mapCommonController.findPathCloseToPoint(latlng);
+    if (stageIndex === null) {
+      // eslint-disable-next-line no-console
+      console.error('findPathCloseToPoint / updateLiveElements error');
+      return;
+    }
+
+    // const activeStage = this.getActiveStage();
+    const correctStage = `${this.activeStage}` === `${stageIndex}`;
+    if (!correctStage && !this.findPathCloseToPointOnce) {
+      // eslint-disable-next-line no-alert
+      if (window.confirm('Do you want to update the stage to the current one?')) {
+        this.setActiveStage(stageIndex);
+        Turbo.visit(this.urlsValue.liveShowStage.replace('/0', `/${stageIndex}`), { frame: 'live-stage', action: 'advance' });
+        return;
+      }
+    }
+
+    this.findPathCloseToPointOnce = true;
+
+    if (!correctStage) {
+      return;
+    }
+
+    const percentOfPath = L.GeometryUtil.locateOnLine(this.map(), path, closestToPoint);
+    mapCommonController.updateGraph(percentOfPath);
+
+    if (this.hasProgressTextTarget) {
+      const distanceKm = (distance / 1000) * percentOfPath;
+      this.progressTextTarget.innerText = `${distanceKm.toFixed(2)} km (${Math.round(percentOfPath * 100)}%)`;
     }
   };
 
@@ -155,11 +193,10 @@ export default class extends Controller {
 
   setActiveStage = (stageId) => {
     // Before changing stage we stop any location handler that could be live
-    this.mapLocationRemoveHandler();
+    this.disconnect();
     this.activeStage = stageId;
+    this.firstLocation = true;
   };
-
-  getActiveStage = () => this.activeStage;
 
   // Actions
 
@@ -216,8 +253,8 @@ export default class extends Controller {
       icon: iconSymbol(symbol),
       draggable: false,
     })
-        .bindPopup(popup)
-        .addTo(this.map());
+      .bindPopup(popup)
+      .addTo(this.map());
   };
 
   // Event based
@@ -354,6 +391,8 @@ export default class extends Controller {
     this.backButtonTarget = null;
     this.myLivePositionTarget = null;
     this.diaryEntryNewContainerTarget = null;
+    this.progressTextTarget = null;
+    this.hasProgressTextTarget = null;
     // Values
     this.urlsValue = {
       mapSearch: null,

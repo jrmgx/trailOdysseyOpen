@@ -55,7 +55,7 @@
                             <div class="col-12">
                                 {{ trip.name }} — {{ sum_distance|to_km }}&nbsp;km
                                 {% if sum_positive > 0 %}
-                                    with +{{ sum_positive }}m / -{{ sum_negative }}m
+                                    {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
                                 {% endif %}
                             </div>
                         </h1>

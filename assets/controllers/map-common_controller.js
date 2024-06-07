@@ -1,6 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
 
-import * as Turbo from '@hotwired/turbo';
 import L from 'leaflet';
 import { Controller } from '@hotwired/stimulus';
 import { Point } from 'leaflet/src/geometry';
@@ -9,6 +8,8 @@ import { LatLng } from 'leaflet/src/geo';
 import 'leaflet-geometryutil';
 import '@elfalem/leaflet-curve';
 import '../js/leaflet-double-touch-drag-zoom';
+import uPlot from 'uplot';
+import 'uplot/dist/uPlot.min.css';
 import { markerDefaultIcon, removeFromMap } from '../helpers';
 // import './TileLayer.GeoJSON';
 
@@ -16,7 +17,6 @@ export default class extends Controller {
   static targets = [
     'map',
     'containerProgress',
-    'progressText',
   ];
 
   static values = {
@@ -33,15 +33,17 @@ export default class extends Controller {
     this.elevationCurrentPoint = null;
     this.actionPinActiveFor = null;
     this.elements = [];
-    // Warning: paths are indexed by their start stage id
+    // Warning: paths/pathDistances are indexed by their start stage id
     this.paths = {};
+    this.pathDistances = {}; // Distance in meters
     // Warning: points are indexed by their start stage id
     this.points = {}; // Raw data for each stage
     this.activeChart = null;
+    // % based current x position of the current point for that graph
+    this.activeChartPosition = null;
     this.isPublic = !!this.isPublicValue;
     this.isLive = !!this.isLiveValue;
     this.hasPreciseMouse = matchMedia('(pointer:fine)').matches;
-    this.findPathCloseToPointOnce = false;
 
     // Init map
 
@@ -123,6 +125,7 @@ export default class extends Controller {
       getIsOffline: this.getIsOffline,
       removeOffline: this.removeOffline,
       findPathCloseToPoint: this.findPathCloseToPoint,
+      updateGraph: this.updateGraph,
       map: this.map,
     };
   };
@@ -238,8 +241,9 @@ export default class extends Controller {
 
   // Paths
 
-  addPath = (points, stageId) => {
+  addPath = (points, stageId, distance) => {
     this.points[stageId] = points;
+    this.pathDistances[stageId] = distance;
     const latLon = [];
     for (const p of points) {
       latLon.push([p.lat, p.lon]);
@@ -256,15 +260,16 @@ export default class extends Controller {
     this.pathsLayerGroup.addLayer(polyline);
   };
 
-  addPathReference = (points, stageId) => {
+  addPathReference = (points, stageId, distance) => {
     this.points[stageId] = points;
+    this.pathDistances[stageId] = distance;
   };
 
   findPathCloseToPoint = (point) => {
     let maxDistance = Number.MAX_VALUE;
-    let probablePath = null;
-    let probablePoints = null;
-    let probableStage = null;
+    let foundPath = null;
+    let foundDistance = null;
+    let foundStageIndex = null;
     let closestToPoint = null;
     let index = null;
     for (index in this.paths) {
@@ -274,82 +279,13 @@ export default class extends Controller {
       // eslint-disable-next-line no-continue
       if (distance > maxDistance) continue;
       maxDistance = distance;
-      probablePath = path;
-      probablePoints = this.points[index];
+      foundPath = path;
+      foundDistance = this.pathDistances[index];
       closestToPoint = closest;
-      probableStage = index;
+      foundStageIndex = index;
     }
 
-    if (probablePath === null) {
-      // eslint-disable-next-line no-console
-      console.error('findPathCloseToPoint error');
-      return false;
-    }
-
-    const activeStage = liveController.getActiveStage();
-    const correctStage = `${activeStage}` === `${probableStage}`;
-    if (!correctStage && !this.findPathCloseToPointOnce) {
-      // eslint-disable-next-line no-alert
-      if (window.confirm('Do you want to update the stage to the current one?')) {
-        liveController.setActiveStage(probableStage);
-        Turbo.visit(this.urlsValue.liveShowStage.replace('/0', `/${probableStage}`), { frame: 'live-stage', action: 'advance' });
-        return false;
-      }
-    }
-    this.findPathCloseToPointOnce = true;
-
-    if (!correctStage) {
-      return false;
-    }
-
-    const totalDistance = L.GeometryUtil.length(probablePath);
-    const percentOfPath = L.GeometryUtil.locateOnLine(this.map, probablePath, closestToPoint);
-    // eslint-disable-next-line max-len
-    const fromPercentOfPath = L.GeometryUtil.interpolateOnLine(this.map, probablePath, percentOfPath);
-    const pointDistance = (totalDistance * percentOfPath) / 1000; // in km
-    const predecessor = Math.max(0, fromPercentOfPath.predecessor);
-    const elevation = probablePoints[predecessor].el || 0;
-
-    // Debug
-    // const debug = false;
-    // if (debug) {
-    //   let show = closestToPoint;
-    //   show = fromPercentOfPath.latLng;
-    //   if (this.findPathCloseToPointMarker) {
-    //     this.findPathCloseToPointMarker.remove();
-    //   }
-    //   this.findPathCloseToPointMarker = L.circleMarker(
-    //     [show.lat, show.lng],
-    //     { color: '#F00', radius: 2 },
-    //   ).addTo(this.map);
-    // }
-
-    if (this.activeChart) {
-      this.activeChart.updateOptions({
-        annotations: {
-          points: [{
-            x: pointDistance,
-            y: elevation,
-            marker: {
-              size: 5,
-              fillColor: '#0d6efd',
-              strokeColor: '#0d6efd',
-              strokeWidth: 0,
-            },
-            label: {
-              borderColor: 'black',
-              text: this.formatKm(pointDistance),
-            },
-          }],
-        },
-      });
-    }
-
-    if (this.hasProgressTextTarget) {
-      this.progressTextTarget.innerText = `${Math.round(percentOfPath * 100)}%`;
-    }
-
-    return true;
+    return [foundStageIndex, foundPath, foundDistance, closestToPoint];
   };
 
   refreshPlan = () => {
@@ -453,20 +389,14 @@ export default class extends Controller {
 
   formatVoid = () => '';
 
-  elevationMouseCommon = (event, chartContext, chartOptions) => {
-    const { config } = chartOptions;
-    const { dataPointIndex } = chartOptions;
-    if (!config.series[0].data[dataPointIndex]) {
-      return null;
-    }
-    const point = config.series[0].data[dataPointIndex];
+  elevationMouseCommon = (lat, lng) => {
     if (this.elevationCurrentPoint) {
-      this.elevationCurrentPoint.setLatLng(L.latLng(point.lat, point.lon));
+      this.elevationCurrentPoint.setLatLng(L.latLng(lat, lng));
     } else {
       this.elevationCurrentPoint = L.circleMarker(
-        [point.lat, point.lon],
+        [lat, lng],
         {
-          color: 'red', radius: 8, fill: true, fillColor: 'blue',
+          color: 'red', radius: 8, fill: true, fillColor: 'blue', fillOpacity: 0.5,
         },
       ).addTo(this.map);
     }
@@ -476,18 +406,18 @@ export default class extends Controller {
     }
     // On mobile device the elevationMouseLeave is not always triggered so the red marker would stay
     this.elevationRemovePointHandle = setTimeout(this.elevationMouseLeave, 10 * 1000);
-    return L.latLng(point.lat, point.lon);
+    return L.latLng(lat, lng);
   };
 
-  elevationMouseMove = (event, chartContext, chartOptions) => {
-    const latLng = this.elevationMouseCommon(event, chartContext, chartOptions);
+  elevationMouseMove = (lat, lng, event) => {
+    const latLng = this.elevationMouseCommon(lat, lng);
     if (latLng && (!this.hasPreciseMouse || event.shiftKey)) {
       this.map.panTo(latLng);
     }
   };
 
-  elevationMouseClick = (event, chartContext, chartOptions) => {
-    const latLng = this.elevationMouseCommon(event, chartContext, chartOptions);
+  elevationMouseClick = (lat, lng) => {
+    const latLng = this.elevationMouseCommon(lat, lng);
     if (latLng) {
       this.map.panTo(latLng);
     }
@@ -499,80 +429,109 @@ export default class extends Controller {
 
   addElevation = (stageId, minimal) => {
     const element = document.querySelector(`#stage-elevation-${stageId}`);
-    if (!element) return null;
+    if (!element) return;
     const points = this.points[stageId];
     if (!points) {
       // element.parentNode.remove();
-      return null;
+      return;
     }
     const computedStyle = getComputedStyle(document.querySelector('.live-graph'));
-    const chart = new ApexCharts(element, {
-      series: [{ data: this.elevationPrepareData(stageId) }],
-      colors: ['#0d6efd'],
-      xaxis: {
-        type: 'numeric',
-        labels: { show: false },
-        axisTicks: { show: false },
-        axisBorder: { show: false },
-        tooltip: { formatter: this.formatKm },
-      },
-      yaxis: {
-        labels: { formatter: this.formatMeters },
-      },
-      chart: {
-        parentHeightOffset: 0,
-        toolbar: { show: false },
-        height: computedStyle.getPropertyValue('height'),
-        type: 'line',
-        zoom: { enabled: false },
-        animations: { enabled: false },
-        events: {
-          mouseMove: this.elevationMouseMove,
-          mouseLeave: this.elevationMouseLeave,
-          click: this.elevationMouseClick,
+
+    const axe = {
+      show: false,
+      ticks: { show: false },
+      grid: { show: false },
+    };
+    const opts = {
+      cursor: {
+        y: false,
+        dataIdx: (u, seriesIndex, dataIndex) => {
+          if (seriesIndex !== 0) return dataIndex;
+          const lat = u.data[2][dataIndex];
+          const lng = u.data[3][dataIndex];
+          this.elevationMouseMove(lat, lng, u.cursor.event);
+          return dataIndex;
         },
       },
-      stroke: {
-        curve: 'straight',
-        width: 3,
+      hooks: {
+        ready: [
+          (u) => {
+            u.root.addEventListener('click', () => {
+              const dataIndex = u.cursor.idx;
+              const lat = u.data[2][dataIndex];
+              const lng = u.data[3][dataIndex];
+              this.elevationMouseClick(lat, lng);
+            });
+          },
+        ],
       },
-      tooltip: {
-        enabled: true,
-        x: { show: false },
-        y: {
-          formatter: this.formatMeters,
-          title: { formatter: this.formatVoid },
+      width: parseInt(computedStyle.getPropertyValue('width'), 10),
+      height: parseInt(computedStyle.getPropertyValue('height'), 10),
+      scales: { x: { time: false } },
+      axes: [axe, minimal ? axe : {}, axe, axe],
+      series: [
+        {
+          points: { show: false },
+          label: '-',
+          class: 'uplot-label-km',
+          value: (self, v) => (v ? `${v.toFixed(2)}km` : ''),
         },
-        fixed: {
-          enabled: true,
-          position: 'topLeft',
-          offsetX: 0,
-          offsetY: 0,
+        {
+          points: { show: false },
+          spanGaps: true,
+          label: '-',
+          class: 'uplot-label-el',
+          value: (self, v) => (v ? `${v.toFixed(0)}m` : ''),
+          stroke: 'rgb(13, 110, 253)',
+          width: 2,
+          fill: minimal ? 'rgba(13, 110, 253, 0.3)' : null,
+        }, {
+          show: false,
+          label: '-',
+          class: 'uplot-label-hidden',
+        }, {
+          show: false,
+          label: '-',
+          class: 'uplot-label-hidden',
         },
-      },
-    });
-    chart.render();
-    if (minimal) {
-      chart.updateOptions({
-        chart: {
-          sparkline: { enabled: true },
-          type: 'area',
+      ],
+    };
+
+    if (!minimal) {
+      opts.hooks.draw = [
+        (u) => {
+          if (!this.activeChartPosition) return;
+
+          const dpr = window.devicePixelRatio || 1;
+          const { ctx } = u;
+          const margin = 15 * dpr;
+          const x = this.activeChartPosition * (u.width * dpr);
+
+          ctx.save();
+          ctx.strokeStyle = '#258656';
+          ctx.lineWidth = 2 * dpr;
+          ctx.setLineDash([4 * dpr, 4 * dpr]);
+          ctx.beginPath();
+          ctx.moveTo(x, margin);
+          ctx.lineTo(x, (u.height * dpr) - margin);
+          ctx.stroke();
+          ctx.restore();
         },
-        fill: { opacity: 0.3 },
-        grid: { show: false },
-        yaxis: {
-          labels: { show: false },
-          axisTicks: { show: false },
-          axisBorder: { show: false },
-        },
-        stroke: { width: 2 },
-        tooltip: {
-          fixed: { offsetX: 10 },
-        },
-      });
+      ];
     }
+
+    const data = this.elevationPrepareData(stageId);
+    const chart = new uPlot(opts, data, element);
+
+    if (minimal) return;
+
     this.activeChart = chart;
-    return chart;
+  };
+
+  updateGraph = (position) => {
+    if (!this.activeChart) return;
+    this.activeChartPosition = position;
+    this.activeChart.redraw();
   };
 
   elevationPrepareData = (stageId) => {
@@ -581,14 +540,19 @@ export default class extends Controller {
     const pointsLatLng = points.map((p) => new LatLng(p.lat, p.lon, p.el));
     const accumulatedLengths = L.GeometryUtil.accumulatedLengths(pointsLatLng);
     const max = accumulatedLengths.length;
-    const result = [];
+    const seriesX = [];
+    const seriesAlt = [];
+    const seriesLat = [];
+    const seriesLng = [];
     for (let i = 0; i < max; i += 1) {
       const p = pointsLatLng[i];
-      result.push({
-        x: accumulatedLengths[i] / 1000, y: p.alt, lat: p.lat, lon: p.lng,
-      });
+      seriesX.push(accumulatedLengths[i] / 1000);
+      seriesAlt.push(p.alt);
+      seriesLat.push(p.lat);
+      seriesLng.push(p.lng);
     }
-    return result;
+
+    return [seriesX, seriesAlt, seriesLat, seriesLng];
   };
 
   // Helpers
@@ -596,8 +560,6 @@ export default class extends Controller {
   preventWarnings = () => {
     // Targets
     this.mapTarget = null;
-    this.progressTextTarget = null;
-    this.hasProgressTextTarget = null;
     // Values
     this.cacheNameValue = null;
     this.isPublicValue = null;
