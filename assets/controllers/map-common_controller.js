@@ -521,6 +521,7 @@ export default class extends Controller {
     }
 
     const data = this.elevationPrepareData(stageId);
+    element.innerHTML = '';
     const chart = new uPlot(opts, data, element);
 
     if (minimal) return;
