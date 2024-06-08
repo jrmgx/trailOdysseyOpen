@@ -36,6 +36,21 @@ class TripRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array<int, Trip>
+     */
+    public function findPublicForUser(User $user): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.user = :user')
+            ->setParameter('user', $user)
+            ->andWhere('t.shareKey IS NOT NULL')
+            ->addOrderBy('t.updatedAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findOneByShareKey(string $shareKey): ?Trip
     {
         return $this->createQueryBuilder('t')

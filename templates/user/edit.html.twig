@@ -9,6 +9,7 @@
         }) }}
         <div class="col-12">
             {{ form_start(form) }}
+            {{ form_row(form.nickname) }}
             {{ form_row(form.timezone) }}
             <button class="btn btn-primary btn-block">{{ 'action.update'|trans }}</button>
             {{ form_end(form) }}

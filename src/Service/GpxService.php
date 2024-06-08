@@ -210,10 +210,7 @@ class GpxService
             $link = new Link();
             $link->text = 'Public URL'; // TODO translate
             $link->href = 'https://trailodyssey.net';
-            //            $this->projectBaseUrl .
-            //                $this->urlGenerator->generate('public_show', [
-            //                    'shareKey' => $trip->getShareKey(),
-            //                ]);
+
             $gpx->metadata->links[] = $link;
         }
 

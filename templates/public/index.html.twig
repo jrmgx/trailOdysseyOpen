@@ -1,173 +1,42 @@
-{% extends 'base.html.twig' %}
+{% extends 'home/index.html.twig' %}
 
-{% block title %}{{ trip.name }} - {{ parent() }}{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script defer data-turbo-track="reload"
-            src="{{ path('public_index_js', { trip: trip.shareKey, firstLoad: 1 }) }}">
-    </script>
-    {# Maybe a bit overkill but ... #}
-    <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
-            integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
-            crossorigin="anonymous" async>
-    </script>
-{% endblock %}
-
-{% block body %}
-    <div data-controller="map-common public"
-         data-map-common-options-value="{{ options|e('html_attr') }}"
-         data-map-common-tiles-value="{{ tiles|e('html_attr') }}"
-         data-map-common-urls-value="{{ urls|e('html_attr') }}"
-         data-map-common-cache-name-value="{{ offline_cache_name }}"
-         data-map-common-is-public-value="true"
-    >
-        <div class="map-button-container public-map-button-container"></div>
-        <div class="map public-map" id="map" data-public-target="map"></div>
-        <div class="public-bar" data-public-target="publicBar">
-            <div class="diaryEntryMain" id="diary0">
-                <div class="public-bar-action public-bar-action-close"
-                     data-action="click->public#hidePublicBarClickAction"
-                >
-                    <button class="btn btn-light border-0">
-                        {{ include('common/_icon.html.twig', {
-                            icon_name: 'x-circle-fill',
-                            icon_size: 1,
-                        }) }}
-                    </button>
-                </div>
-                {% if diaryEntries|length > 0 %}
-                <div class="public-bar-action public-bar-action-next"
-                     data-action="click->public#nextDiaryClickAction"
-                     data-public-id-param="0"
-                >
-                    <button class="btn btn-lg btn-light border-0">
-                        {{ include('common/_icon.html.twig', {
-                            icon_name: 'arrow-right-circle-fill',
-                            icon_size: 2,
-                        }) }}
-                    </button>
-                </div>
-                {% endif %}
-                <div class="public-bar-description">
-                    <div class="markdown-container container clearfix">
-                        <h1 class="fs-2 my-3 row">
-                            <div class="col-12">
-                                {{ trip.name }} — {{ sum_distance|to_km }}&nbsp;km
-                                {% if sum_positive > 0 %}
-                                    {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
-                                {% endif %}
-                            </div>
-                        </h1>
-                        {% if trip.description %}
-                            <div class="fs-4 row">
-                                <div class="col-12">
-                                    <hr>
-                                    {{ trip.description }}
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% if bags|length > 0 %}
-                            <hr>
-                            <div class="bags row fs-small" data-masonry='{"percentPosition": true, "transitionDuration": 0}'>
-                                {% for bag in bags|filter((b) => b.totalCheckedWeight > 0 and b.somethingIsChecked) %}
-                                    <div class="col-12 col-md-6">
-                                        <div class="d-flex justify-content-between align-items-start mt-{{ loop.first ? 1 : 2 }} mb-2">
-                                            <div class="flex-grow-1">
-                                                <h2 class="fs-5">{{ bag.name }}</h2>
-                                                <div>{{ bag.description|default('')|markdown_to_html }}</div>
-                                            </div>
-                                        </div>
-                                        <ul class="list-group">
-                                            {% for inBag in bag.inBag %}
-                                                {% set thing = inBag.thing %}
-                                                {% if inBag.checked %}
-                                                    <li class="list-group-item {{ loop.index is even ? 'list-group-item-light' }} clearfix">
-                                                        <label for="gear-in-bag-{{ inBag.id }}" class="form-check-label">
-                                                            <div>
-                                                                {% set checkedWeight = thing.isBag ? inBag.totalCheckedWeight : (inBag.checkedWeight ? inBag.checkedWeight : null) %}
-                                                                {{ thing.name }}
-                                                                {% if inBag.count > 1 and checkedWeight %}
-                                                                    ({{ inBag.count }} = {{ checkedWeight }}gr)
-                                                                {% elseif checkedWeight %}
-                                                                    ({{ checkedWeight }}gr)
-                                                                {% elseif inBag.count > 1 %}
-                                                                    ({{ inBag.count }})
-                                                                {% endif %}
-                                                            </div>
-                                                            {% if thing.description %}<div class="fs-small">{{ thing.description }}</div>{% endif %}
-                                                        </label>
-                                                    </li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ul>
-                                        <small class="mt-2 d-block">
-                                            {{ 'info.total_kg'|trans({ weight: (bag.totalCheckedWeight / 1000) }) }}
-                                            {% if bag.checkedWeight %}<small>(incl. bag {{ bag.checkedWeight }}gr)</small>{% endif %}
-                                        </small>
-                                        <hr>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+{% block main %}
+    <div class="row">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'title.user_trails'|trans({'user': user.nickname})|capitalize,
+        }) }}
+    </div>
+    {% for trip in trips %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-3">
+                    <div class="card-body clearfix">
+                        <h5 class="card-title">{{ trip.name }}</h5>
+                        <p class="card-text">{{ trip.description }}</p>
+                        <div class="d-flex overflow-x-auto">
+                            {%- for picture in trip.pictures -%}
+                                <img src="{{ picture }}" alt=""
+                                    class="d-inline-block me-2 mb-2 rounded-2 border"
+                                >
+                            {%- endfor -%}
+                        </div>
+                        <div class="mt-1 mb-3">
+                            <a href="{{ path('short_show', { user: app.user.nickname, trip: trip.shareKey }) }}"
+                               class="btn btn-primary"
+                               data-turbo="false"
+                            >
+                                {{ 'action.explore'|trans }}
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-            {% for diaryEntry in diaryEntries %}
-                <div class="diaryEntryMain d-none" id="diary{{ diaryEntry.id }}">
-                    <div class="public-bar-action public-bar-action-close"
-                         data-action="click->public#hidePublicBarClickAction"
-                    >
-                        <button class="btn btn-light border-0">
-                            {{ include('common/_icon.html.twig', {
-                                icon_name: 'x-circle-fill',
-                                icon_size: 1,
-                            }) }}
-                        </button>
-                    </div>
-                    <div class="public-bar-action public-bar-action-prev"
-                         data-action="click->public#prevDiaryClickAction"
-                         data-public-id-param="{{ diaryEntry.id }}"
-                    >
-                        <button class="btn btn-lg btn-light border-0">
-                            {{ include('common/_icon.html.twig', {
-                                icon_name: 'arrow-left-circle-fill',
-                                icon_size: 2,
-                            }) }}
-                        </button>
-                    </div>
-                    <div class="public-bar-action public-bar-action-next {{ loop.last ? 'd-none' }}"
-                         data-action="click->public#nextDiaryClickAction"
-                         data-public-id-param="{{ diaryEntry.id }}"
-                    >
-                        <button class="btn btn-lg btn-light border-0">
-                            {{ include('common/_icon.html.twig', {
-                                icon_name: 'arrow-right-circle-fill',
-                                icon_size: 2,
-                            }) }}
-                        </button>
-                    </div>
-                    <div class="public-bar-header"
-                         data-action="click->public#currentDiaryClickAction"
-                         data-public-id-param="{{ diaryEntry.id }}"
-                    >
-                        {{ diaryEntry.symbol }}
-                        {{ diaryEntry.nameWithPointName }}{%- if diaryEntry.arrivingAt is defined -%}
-                            :&nbsp;<span class="fs-small">
-                                {{ diaryEntry.arrivingAt|format_datetime_app('medium') }}
-                            </span>
-                        {%- endif -%}
-                    </div>
-                    <div class="public-bar-description">
-                        {% if diaryEntry.description %}
-                            <div class="markdown-container clearfix">
-                                {{ diaryEntry.description|markdown_to_html }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
         </div>
-        <div class="public-bottom"></div>
-    </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                {{ 'info.no_trip_found'|trans|raw }}
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

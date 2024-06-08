@@ -1,6 +1,8 @@
 form.error.agree_terms: You should agree our terms.
 form.error.please_enter_a_password: Please enter a password.
 form.error.your_password_should_be_at_least: Your password should be at least 6 characters.
+form.error.nickname_exist: There is already an account with this username
+form.error.email_exist: There is already an account with this email
 
 'This value should be false.': 'This value should be false.'
 'This value should be true.': 'This value should be true.'
@@ -136,8 +138,7 @@ Error: Error
 'Please select a valid option.': 'Please select a valid option.'
 'Please select a valid range.': 'Please select a valid range.'
 'Please enter a valid week.': 'Please enter a valid week.'
-'You should agree to our terms.': '__You should agree to our terms.'
-'Please enter a password': '__Please enter a password'
-'Your password should be at least {{ limit }} characters': '__Your password should be at least {{ limit }} characters'
-'There is already an account with this username': '__There is already an account with this username'
-'You are required to have at least one set of Tiles.': '__You are required to have at least one set of Tiles.'
+'You should agree to our terms.': 'You should agree to our terms.'
+'Please enter a password': 'Please enter a password'
+'Your password should be at least {{ limit }} characters': 'Your password should be at least {{ limit }} characters'
+'You are required to have at least one set of Tiles.': 'You are required to have at least one set of Tiles.'

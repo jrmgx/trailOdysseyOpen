@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Helper\CommonHelper;
 use App\Model\Point;
 use App\Repository\TripRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TripRepository::class)]
@@ -31,6 +33,8 @@ class Trip
     private \DateTimeImmutable $updatedAt;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Length(min: 2, max: 80)]
+    #[Assert\Regex('`[a-z0-9_-]+`i')]
     private ?string $shareKey;
 
     #[ORM\ManyToOne(inversedBy: 'trips')]
@@ -72,6 +76,13 @@ class Trip
     /** @var ?array<mixed> */
     #[ORM\Column(nullable: true)]
     private ?array $progressPointStore = null;
+
+    /**
+     * This is virtual field where we add picture URLs when showing public index.
+     *
+     * @var array<int, string>
+     */
+    private array $pictures = [];
 
     public function __construct()
     {
@@ -132,7 +143,7 @@ class Trip
 
     public function setShareKey(?string $shareKey): self
     {
-        $this->shareKey = $shareKey;
+        $this->shareKey = $shareKey ? mb_strtolower($shareKey) : null;
 
         return $this;
     }
@@ -140,7 +151,11 @@ class Trip
     public function startShare(): self
     {
         if (!$this->shareKey) {
-            $this->shareKey = implode('-', mb_str_split(mb_substr(sha1(random_bytes(80)), 0, 12), 4));
+            $shareKey = (new AsciiSlugger())->slug($this->getName());
+            $shareKey = mb_strtolower($shareKey);
+            $shareKey = mb_substr($shareKey, 0, 60);
+            $shareKey = $shareKey . '-' . mb_strtolower(CommonHelper::generateRandomCode(5));
+            $this->shareKey = $shareKey;
         }
 
         return $this;
@@ -358,5 +373,23 @@ class Trip
         }
 
         return new Point($this->progressPointStore[0], $this->progressPointStore[1], $this->progressPointStore[2]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getPictures(): array
+    {
+        return $this->pictures;
+    }
+
+    /**
+     * @param array<int, string> $pictures
+     */
+    public function setPictures(array $pictures): static
+    {
+        $this->pictures = $pictures;
+
+        return $this;
     }
 }
