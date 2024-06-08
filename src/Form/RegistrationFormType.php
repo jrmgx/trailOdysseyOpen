@@ -7,6 +7,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
@@ -20,6 +22,10 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('username', EmailType::class, [
                 'label' => 'form.label.email',
+            ])
+            ->add('nickname', TextType::class, [
+                'label' => 'form.label.nickname',
+                'help' => 'form.help.nickname',
             ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
@@ -39,6 +45,7 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('timezone', TimezoneType::class)
             ->add('agreeTerms', CheckboxType::class, [
                 'label' => 'form.label.agree_terms',
                 'mapped' => false,

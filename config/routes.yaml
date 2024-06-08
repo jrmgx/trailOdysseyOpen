@@ -15,6 +15,10 @@ web_manifest:
     path: /manifest.webmanifest
     controller: App\Controller\ManifestController
 
+short_url:
+    resource: App\Service\ShortUrlController
+    type: attribute
+
 controllers:
     resource:
         path: ../src/Controller/

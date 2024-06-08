@@ -89,6 +89,7 @@ action:
   search_to_create_a_new_diary: Search
   preferences: Settings
   more_actions: More
+  explore: 'Explore'
 label:
   search_for_an_address: 'Search for an address:'
   email: Email
@@ -115,6 +116,7 @@ title:
   support: Support My Work!
   edit_trip: Edit Trail
   your_trails: Your Trips
+  user_trails: "{user}'s Trips"
   new_trip: New Trail
   choose_workflow: Choose a Workflow
   import_file: Import a File
@@ -152,7 +154,8 @@ tab:
   interest: Interest
   paths: Paths
 info:
-  no_trip_found_create_one_to_start: No Trail Found.<br> Create one to Start!
+  no_trip_found_create_one_to_start: No Trip Found.<br> Create one to Start!
+  no_trip_found: No Trip Found.
   segments_are_warming_up: Optimizing segment in the background ...
   segments_are_not_warming_up: ''
   gps_information_not_found_on_this_photo: 'Note: GPS information not found for this photo.'
@@ -198,6 +201,9 @@ form:
     geo_json: Geo JSON?
     geo_json_html: Geo JSON HTML Binding (advanced)
     tiles: Tiles
+    nickname: Username
+  help:
+    nickname: It will be your public URL. It has to be letters and digits only.
   placeholder:
     choose_an_element: Choose an Element
 routing:

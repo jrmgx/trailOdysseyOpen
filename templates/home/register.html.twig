@@ -11,6 +11,8 @@
             {{ form_start(registrationForm) }}
             {{ form_row(registrationForm.username, { attr: { autofocus: 'autofocus' }}) }}
             {{ form_row(registrationForm.plainPassword) }}
+            {{ form_row(registrationForm.nickname) }}
+            {{ form_row(registrationForm.timezone) }}
             {{ form_row(registrationForm.agreeTerms) }}
             <button type="submit" class="btn btn-primary">{{ 'action.register'|trans }}</button>
             {{ form_end(registrationForm) }}

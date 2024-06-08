@@ -12,7 +12,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
+#[UniqueEntity(fields: ['username'], message: 'form.error.email_exist')]
+#[UniqueEntity(fields: ['nickname'], message: 'form.error.nickname_exist')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -24,6 +25,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
     #[Assert\Email]
     private string $username;
+
+    #[ORM\Column(length: 80, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 80)]
+    #[Assert\Regex('`^[a-z0-9_\.-]+$`i')]
+    private string $nickname;
 
     /** @var array<string> */
     #[ORM\Column]
@@ -62,6 +69,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
+        return $this;
+    }
+
+    public function getNickname(): string
+    {
+        return $this->nickname;
+    }
+
+    public function setNickname(string $nickname): self
+    {
+        $this->nickname = mb_strtolower($nickname);
 
         return $this;
     }

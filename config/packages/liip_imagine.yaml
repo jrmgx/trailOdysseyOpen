@@ -9,3 +9,9 @@ liip_imagine:
             filters:
                 auto_rotate: ~
                 thumbnail: { size: [1280, 1280], mode: inset }
+        trip_index_picture:
+            quality: 75
+            filters:
+                auto_rotate: ~
+                relative_resize:
+                    heighten: 128

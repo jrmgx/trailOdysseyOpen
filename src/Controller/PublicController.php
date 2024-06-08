@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Helper\CommonHelper;
 use App\Repository\BagRepository;
 use App\Repository\DiaryEntryRepository;
+use App\Repository\TripRepository;
 use App\Service\TripService;
 use Liip\ImagineBundle\Service\FilterService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -15,27 +16,79 @@ use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/public', name: 'public_')]
 class PublicController extends BaseController
 {
+    private const MAX_PICTURE = 9;
+
     public function __construct(
         private readonly FilterService $filterService,
         private readonly DiaryEntryRepository $diaryEntryRepository,
         private readonly TripService $tripService,
         private readonly BagRepository $bagRepository,
+        private readonly TripRepository $tripRepository,
+        private readonly UrlGeneratorInterface $urlGenerator,
         SerializerInterface $serializer,
     ) {
         parent::__construct($serializer);
     }
 
     /** @return array<mixed> */
-    #[Route('/trip/{trip}', name: 'index', methods: ['GET'])]
+    #[Route('/{user}', name: 'index', methods: ['GET'])]
     #[Template('public/index.html.twig')]
-    public function index(#[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip): array
-    {
-        if (!$trip->isShared()) {
+    public function index(
+        #[MapEntity(mapping: ['user' => 'nickname'])] User $user
+    ): array {
+        $trips = $this->tripRepository->findPublicForUser($user);
+        $userId = $user->getId();
+        // We go through diaries to be sure that the photo is public (no in interest) and used (not removed)
+        foreach ($trips as $trip) {
+            $picturesForTrip = [];
+            $tripId = $trip->getId();
+            $diaries = $trip->getDiaryEntries();
+            foreach ($diaries as $diary) {
+                $matches = [];
+                // ![](/1901/2910/74d4d6de71676855936e312ffd6f1cb75cf8118a.jpg)
+                // https://regex101.com/r/j4DqZT/1
+                preg_match_all(
+                    "`\]\(/$userId/$tripId/([a-z0-9]{40}\.[a-z]{3,5})\)`mi",
+                    $diary->getDescription() ?? '',
+                    $matches
+                );
+                foreach ($matches[1] as $match) {
+                    $picturesForTrip[] = $this->urlGenerator->generate('public_photo_with_filter', [
+                        'trip' => $tripId,
+                        'user' => $userId,
+                        'path' => $match,
+                        'filter' => 'trip_index_picture',
+                    ]);
+                    if (\count($picturesForTrip) >= self::MAX_PICTURE) {
+                        break 2;
+                    }
+                }
+            }
+            $trip->setPictures($picturesForTrip);
+        }
+
+        return [
+            'public' => true,
+            'urls' => (string) json_encode([]),
+            'user' => $user,
+            'trips' => $trips,
+        ];
+    }
+
+    /** @return array<mixed> */
+    #[Route('/{user}/{trip}', name: 'show', methods: ['GET'])]
+    #[Template('public/show.html.twig')]
+    public function show(
+        #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
+        #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip
+    ): array {
+        if (!$trip->isShared() || $trip->getUser() !== $user) {
             throw $this->createNotFoundException();
         }
 
@@ -45,7 +98,6 @@ class PublicController extends BaseController
         [$sumDistance, $sumPositive, $sumNegative] = $this->tripService->calculateSums($trip);
 
         // Bags
-        $user = $trip->getUser();
         $bags = $this->bagRepository->findBagsForTripAndUser($trip, $user);
 
         return [
@@ -53,6 +105,7 @@ class PublicController extends BaseController
             'urls' => (string) json_encode([]),
             'options' => $this->getOptions($trip),
             'tiles' => $this->getTiles($trip, true),
+            'user' => $user,
             'trip' => $trip,
             'diaryEntries' => $diaryEntries,
             'routings' => $routings,
@@ -63,19 +116,21 @@ class PublicController extends BaseController
         ];
     }
 
-    #[Route('/trip/{trip}/js/index.js', name: 'index_js', methods: ['GET'])]
+    #[Route('/{user}/{trip}/js/index.js', name: 'show_js', methods: ['GET'])]
     public function js(
+        #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
         #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip,
         #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false
     ): Response {
-        $response = $this->render('public/index.js.twig', array_merge($this->index($trip), ['first_load' => $firstLoad]));
+        $response = $this->render('public/show.js.twig', array_merge($this->show($user, $trip), ['first_load' => $firstLoad]));
         $response->headers->set('Content-Type', 'text/javascript');
 
         return $response;
     }
 
     #[Route('/photo/{user}/{trip}/{path}', name: 'photo', methods: ['GET'])]
-    public function photo(User $user, Trip $trip, Photo $photo): Response
+    #[Route('/photo/{user}/{trip}/{filter}/{path}', name: 'photo_with_filter', methods: ['GET'])]
+    public function photo(User $user, Trip $trip, Photo $photo, string $filter = 'interest_image'): Response
     {
         CommonHelper::allowMoreResources();
 
@@ -85,7 +140,7 @@ class PublicController extends BaseController
         }
 
         $url = '/uploads/' . $user->getId() . '/' . $photo->getPath();
-        $resolved = $this->filterService->getUrlOfFilteredImage($url, 'interest_image');
+        $resolved = $this->filterService->getUrlOfFilteredImage($url, $filter);
 
         return $this->redirect($resolved);
     }

@@ -21,11 +21,11 @@
                         {% if trip.isShared %}
                             <small>
                                 Trip published at:
-                                <a href="{{ path('public_index', { trip: trip.shareKey }) }}"
+                                <a href="{{ path('short_show', { user: app.user.nickname, trip: trip.shareKey }) }}"
                                    target="_blank"
                                    data-turbo="false"
                                 >
-                                    {{ url('public_index', { trip: trip.shareKey }) }}
+                                    {{ url('short_show', { user: app.user.nickname, trip: trip.shareKey }) }}
                                 </a>
                             </small>
                         {% endif %}
