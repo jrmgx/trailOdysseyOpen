@@ -163,7 +163,7 @@ export default class extends Controller {
     }
 
     const percentOfPath = L.GeometryUtil.locateOnLine(this.map(), path, closestToPoint);
-    mapCommonController.updateGraph(percentOfPath);
+    mapCommonController.updateElevationGraph(percentOfPath);
 
     if (this.hasProgressTextTarget) {
       const distanceKm = (distance / 1000) * percentOfPath;

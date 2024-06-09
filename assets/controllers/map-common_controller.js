@@ -119,14 +119,15 @@ export default class extends Controller {
       addPath: this.addPath,
       addPathReference: this.addPathReference,
       addElevation: this.addElevation,
+      updateElevationGraph: this.updateElevationGraph,
       refreshPlan: this.refreshPlan,
-      mapClickActionDelegate: this.mapClickActionDelegate,
       downloadOfflinePoints: this.downloadOfflinePoints,
       getIsOffline: this.getIsOffline,
       removeOffline: this.removeOffline,
       findPathCloseToPoint: this.findPathCloseToPoint,
-      updateGraph: this.updateGraph,
       map: this.map,
+      fit: this.fit,
+      mapClickActionDelegate: this.mapClickActionDelegate,
     };
   };
 
@@ -164,6 +165,7 @@ export default class extends Controller {
 
   mapClickAction = (e) => {
     sidebarController.searchContainerHide();
+    this.removeAllElements();
 
     if (this.privateMapClickActionDelegate) {
       this.privateMapClickActionDelegate(e, this.actionPinActiveFor);
@@ -172,7 +174,7 @@ export default class extends Controller {
     this.stopPinAction();
   };
 
-  // Marker related
+  // Map related
 
   addElement = (lat, lon, popup, openPopup) => {
     const element = L.marker([parseFloat(lat), parseFloat(lon)], { icon: markerDefaultIcon })
@@ -220,6 +222,11 @@ export default class extends Controller {
       .setStyle({ cursor: 'default' })
       .addTo(this.map);
   };
+
+  fit = (arrayOfPoints) => {
+    const polyline = L.polyline(arrayOfPoints);
+    this.map.fitBounds(polyline.getBounds());
+  }
 
   // Event based
 
@@ -529,7 +536,7 @@ export default class extends Controller {
     this.activeChart = chart;
   };
 
-  updateGraph = (position) => {
+  updateElevationGraph = (position) => {
     if (!this.activeChart) return;
     this.activeChartPosition = position;
     this.activeChart.redraw();
