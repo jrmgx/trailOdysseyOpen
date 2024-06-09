@@ -101,9 +101,6 @@
                     {{ include('common/_save_map_option_form.html.twig') }}
                     <script>
                         {{ include('diaryEntry/index.js.twig') }}
-                        if (typeof mapCommonController !== 'undefined') {
-                          mapCommonController.removeAllElements();
-                        }
                     </script>
                 </turbo-frame>
             </div>

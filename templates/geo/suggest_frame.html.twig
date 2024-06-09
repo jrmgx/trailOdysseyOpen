@@ -3,12 +3,37 @@
         <div class="btn-group-vertical" role="group">
             {% for result in results %}
                 <a class="btn btn-outline-primary text-start"
-                   href="{{ path(type ~ '_new', { lon: result.lon, lat: result.lat, trip: trip.id, name: name }) }}">
-                    {{ result.display_name }}
+                   id="suggest-frame-action-{{ loop.index }}"
+                   href="{{ path(type ~ '_new', { lat: result.lat, lon: result.lon, trip: trip.id, name: name }) }}">
+                    {{ loop.index }} - {{ result.display_name }}
                 </a>
             {% endfor %}
             <a class="btn btn-outline-secondary"
                href="{{ path('stage_show', { trip: trip.id }) }}">Cancel</a>
+            <script>
+                (function () {
+                    mapCommonController.removeAllElements();
+                    let points = [];
+                    {% for result in results %}
+                    mapCommonController.addElement(
+                        {{ result.lat }},
+                        {{ result.lon }},
+                        `{% autoescape %}<span class="element-marker">
+                        <strong>{{ loop.index }} - {{ result.display_name }}</strong>
+                        {# Acceptable hack #}
+                        <a href="#" onclick="
+                            document.getElementById('suggest-frame-action-{{ loop.index }}').click();
+                            return false;
+                        ">
+                            {{ 'action.save'|trans }}
+                        </a>
+                        </span>{% endautoescape %}`
+                    );
+                    points.push([{{ result.lat }}, {{ result.lon }}]);
+                    {% endfor %}
+                    mapCommonController.fit(points);
+                })();
+            </script>
         </div>
     </div>
 </turbo-frame>
