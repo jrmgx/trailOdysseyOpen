@@ -354,6 +354,7 @@ path.leaflet-interactive {
 
 .sidebar .live-graph {
     height: 60px;
+    width: 391px; /* This is the calculated width */
     margin: 0 0.5rem;
 }
 
