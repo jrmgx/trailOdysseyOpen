@@ -33,7 +33,7 @@ class Stage implements MappableInterface
 
     protected ?string $symbol = null;
 
-    protected bool $cascadeTimeChange = false;
+    protected bool $cascadeTimeChange = true;
 
     public function __construct()
     {
