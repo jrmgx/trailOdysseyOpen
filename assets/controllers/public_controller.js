@@ -2,6 +2,7 @@
 
 import L from 'leaflet';
 import '@elfalem/leaflet-curve';
+import 'leaflet.smooth_marker_bouncing';
 import { Controller } from '@hotwired/stimulus';
 import { iconSymbol } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
@@ -97,6 +98,7 @@ export default class extends Controller {
   showOnMap = (id) => {
     const marker = this.diaryEntries.get(`${id}`);
     this.map().flyTo(marker.getLatLng(), this.zoom + 1);
+    marker.bounce();
   };
 
   showOnPublicBar = (id) => {
@@ -114,6 +116,13 @@ export default class extends Controller {
     const marker = L.marker([parseFloat(lat), parseFloat(lon)], {
       icon: iconSymbol(symbol),
       draggable: false,
+    });
+    // https://github.com/hosuaby/Leaflet.SmoothMarkerBouncing
+    marker.setBouncingOptions({
+      contractHeight: 0,
+      shadowAngle: null,
+      elastic: false,
+      exclusive: true,
     });
     marker.on('click', () => this.markerClick(id));
     marker.addTo(this.map());
