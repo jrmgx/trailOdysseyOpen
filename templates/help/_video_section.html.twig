@@ -1,6 +1,8 @@
 <h2 class="title-second" id="{{ id }}">{{ title }}</h2>
+{% if url_iframe is defined and url_iframe %}
 <iframe class="help-iframe" src="{{ url_iframe }}?subtitle=en&title=0&warningTitle=0&peertubeLink=0&p2p=0" allowfullscreen></iframe>
+{% endif %}
 <div class="video-transcript-container" tabindex="0">
-    <a>Click here for raw transcript</a>
+    {# <a>Click here for raw transcript</a>#}
     <p class="video-transcript">{{ transcript }}</p>
 </div>
