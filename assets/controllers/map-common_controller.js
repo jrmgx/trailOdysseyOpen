@@ -226,7 +226,7 @@ export default class extends Controller {
   fit = (arrayOfPoints) => {
     const polyline = L.polyline(arrayOfPoints);
     this.map.fitBounds(polyline.getBounds());
-  }
+  };
 
   // Event based
 
@@ -442,7 +442,12 @@ export default class extends Controller {
       // element.parentNode.remove();
       return;
     }
-    const computedStyle = getComputedStyle(document.querySelector('.live-graph'));
+
+    if (!element.style.width) {
+      const computedStyle = getComputedStyle(document.querySelector('.live-graph'));
+      element.style.width = `${parseInt(computedStyle.getPropertyValue('width'), 10) - 16}px`; // margin * 2
+      element.style.height = `${parseInt(computedStyle.getPropertyValue('height'), 10)}px`;
+    }
 
     const axe = {
       show: false,
@@ -472,8 +477,8 @@ export default class extends Controller {
           },
         ],
       },
-      width: parseInt(computedStyle.getPropertyValue('width'), 10),
-      height: parseInt(computedStyle.getPropertyValue('height'), 10),
+      width: parseInt(element.style.width, 10),
+      height: parseInt(element.style.height, 10),
       scales: { x: { time: false } },
       axes: [axe, minimal ? axe : {}, axe, axe],
       series: [

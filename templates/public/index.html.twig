@@ -21,7 +21,7 @@
                             {%- endfor -%}
                         </div>
                         <div class="mt-1 mb-3">
-                            <a href="{{ path('short_show', { user: app.user.nickname, trip: trip.shareKey }) }}"
+                            <a href="{{ path('short_show', { user: user.nickname, trip: trip.shareKey }) }}"
                                class="btn btn-primary"
                                data-turbo="false"
                             >

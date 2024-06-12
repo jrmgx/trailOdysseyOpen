@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('', name: 'short_')]
 class ShortUrlController extends AbstractController
 {
-    #[Route('/{user}', name: 'index', methods: ['GET'], requirements: ['user' => '^[a-z0-9_\.-]{3,}$'])]
+    #[Route('/{user}', name: 'index', requirements: ['user' => '^[a-z0-9_\.-]{3,}$'], methods: ['GET'])]
     public function index(
         #[MapEntity(mapping: ['user' => 'nickname'])] User $user
     ): Response {
@@ -21,7 +21,7 @@ class ShortUrlController extends AbstractController
         ]);
     }
 
-    #[Route('/{user}/{trip}', name: 'show', methods: ['GET'], requirements: ['user' => '^[a-z0-9_\.-]{3,}$'])]
+    #[Route('/{user}/{trip}', name: 'show', requirements: ['user' => '^[a-z0-9_\.-]{3,}$'], methods: ['GET'])]
     public function show(
         #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
         #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip

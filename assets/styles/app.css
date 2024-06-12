@@ -351,7 +351,8 @@ path.leaflet-interactive {
 
 .live-bar .live-graph {
     height: calc(var(--live-bar-height) - 5.5rem);
-    margin: 0 1rem;
+    margin: 0 1rem 0 0;
+    width: 100%;
 }
 
 .live-bar .live-graph .u-legend {
@@ -363,7 +364,7 @@ path.leaflet-interactive {
 
 .sidebar .live-graph {
     height: 60px;
-    width: 391px; /* This is the calculated width */
+    width: 100%;
     margin: 0 0.5rem;
 }
 
