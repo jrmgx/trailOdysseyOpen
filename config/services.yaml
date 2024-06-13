@@ -5,9 +5,10 @@ parameters:
     locale_default: en
     locale_available: ['en', 'fr']
     locale_requirement: en|fr
-    offline_cache_name: cache-20240607-003
+    offline_cache_name: cache-20240613-004
     instance_open: '%env(bool:INSTANCE_OPEN)%'
     app_env: '%env(APP_ENV)%'
+    google_map_key: '%env(GOOGLE_MAP_KEY)%'
 
 services:
     _defaults:
@@ -20,6 +21,7 @@ services:
             $publicDirectory: '%kernel.project_dir%/public'
             $uploadsDirectory: '%kernel.project_dir%/public/uploads'
             $instanceOpen: '%instance_open%'
+            $withGoogleMap: '@=parameter("google_map_key") !== ""'
             $env: '%app_env%'
 
     App\:
@@ -37,10 +39,6 @@ services:
         arguments:
             $intlExtension: '@twig.extension.intl'
 
-#    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
-#        arguments:
-#            - '%env(resolve:DATABASE_URL)%'
-
     Liip\ImagineBundle\Service\FilterService:
         alias: liip_imagine.service.filter
 
@@ -48,6 +46,10 @@ services:
         arguments:
             $localeAvailable: '%locale_available%'
             $localeRequirement: '%locale_requirement%'
+
+    App\Service\GeoCodingService:
+        arguments:
+            $googleMapKey: '%google_map_key%'
 
 when@dev:
     services:

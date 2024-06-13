@@ -11,6 +11,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GeoCodingService
 {
+    public const PROVIDER_OVERPASS = 'overpass';
+    public const PROVIDER_GOOGLE = 'google';
+
     private const SERVERS = [
         // Too slow 'https://overpass.kumi.systems/api/interpreter',
         'https://overpass-api.de/api/interpreter',
@@ -19,6 +22,7 @@ class GeoCodingService
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
+        private readonly ?string $googleMapKey,
     ) {
     }
 
@@ -94,7 +98,23 @@ class GeoCodingService
     /**
      * @return array<SearchElementResult>
      */
-    public function searchElements(Point $southWest, Point $northEast, string $key, string $value): array
+    public function searchElements(
+        Point $southWest,
+        Point $northEast,
+        string $provider,
+        string $value,
+        string $key = null
+    ): array {
+        return match ($provider) {
+            self::PROVIDER_GOOGLE => $this->searchElementsGoogle($southWest, $northEast, $value),
+            default => $this->searchElementsOverpass($southWest, $northEast, $value, $key ?? ''),
+        };
+    }
+
+    /**
+     * @return array<SearchElementResult>
+     */
+    private function searchElementsOverpass(Point $southWest, Point $northEast, string $value, string $key): array
     {
         $distanceInMeters = GeoHelper::calculateDistance($southWest, $northEast);
         if ($distanceInMeters > 300_000) { // 300 km is too much to ask
@@ -136,8 +156,47 @@ QUERY;
         }
 
         return array_filter(array_map(
-            fn (array $e) => SearchElementResult::fromElementResult($e, $key, $value),
+            fn (array $e) => SearchElementResult::fromElementOverpassResult($e, $key, $value),
             $results['elements']
+        ));
+    }
+
+    /**
+     * @return array<SearchElementResult>
+     */
+    private function searchElementsGoogle(Point $southWest, Point $northEast, string $value): array
+    {
+        $distanceInMeters = GeoHelper::calculateDistance($southWest, $northEast);
+        $point = GeoHelper::midPoint($southWest, $northEast);
+        if ($distanceInMeters > 300_000) { // 300 km is too much to ask
+            return [
+                SearchElementResult::fromError($point, 'The area is too big! Please Zoom in.'),
+            ];
+        }
+
+        $url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+        $params = [
+            'query' => [
+                'key' => $this->googleMapKey,
+                'location' => $point->lat . ',' . $point->lon,
+                'radius' => $distanceInMeters,
+                'keyword' => $value,
+            ],
+        ];
+        $data = $this->httpClient->request('GET', $url, $params)->toArray();
+
+        $results = $data['results'] ?? [];
+        $pageToken = $data['next_page_token'] ?? null;
+
+        if ($pageToken) {
+            $params['query']['pageToken'] = $pageToken;
+            $data = $this->httpClient->request('GET', $url, $params)->toArray();
+            $results = array_merge($results, $data['results'] ?? []);
+        }
+
+        return array_filter(array_map(
+            fn (array $e) => SearchElementResult::fromElementGoogleResult($e),
+            $results
         ));
     }
 }

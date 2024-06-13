@@ -14,7 +14,8 @@ twig:
         dev: dev
         test: test
         instance_open: '%instance_open%'
-        MAPBOX_KEY: '%env(MAPBOX_KEY)%'
+        mapbox_key: '%env(MAPBOX_KEY)%'
+        google_map_key: '%google_map_key%'
 
 when@test:
     twig:

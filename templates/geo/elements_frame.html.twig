@@ -1,15 +1,28 @@
 <turbo-frame id="geo-elements">
+    {% set with_google_map = google_map_key is not empty %}
     <a data-action="click->sidebar#searchContainerAction">🔍</a>
     {{ form_start(form, { attr : {
         'data-turbo-frame': 'geo-elements',
         'class': 'hide',
     }}) }}
-        <div class="input-group position-relative" style="top: -2px">
+        <div class="input-group position-relative input-group-sm" style="top: -2px">
+            {% if with_google_map %}
+                {{ form_widget(form.provider, { attr: {
+                    'data-action': 'change->map-common#updateSearchProvider',
+                    'style': 'flex-grow: 0.3'
+                }}) }}
+                {{ form_widget(form.search, { attr: {
+                    'data-action': 'keyup->map-common#updateSearchBoundingBox',
+                    'class': 'hide provider provider-google'
+                }}) }}
+            {% endif %}
             {{ form_widget(form.element, { attr: {
                 'data-action': 'change->map-common#updateSearchBoundingBox',
-                'class': 'form-select-sm'
+                'class': 'provider provider-overpass'
             }}) }}
-            <button class="btn btn-sm btn-primary">{{ 'action.search.label'|trans }}</button>
+            <button class="btn btn-primary"
+                    data-action="click->map-common#updateSearchBoundingBox"
+            >{{ 'action.search.label'|trans }}</button>
         </div>
         {{ form_widget(form.southWest.lon, { attr: { class: 'hide' }}) }}
         {{ form_widget(form.southWest.lat, { attr: { class: 'hide' }}) }}

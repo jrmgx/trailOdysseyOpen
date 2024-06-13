@@ -230,6 +230,15 @@ export default class extends Controller {
 
   // Event based
 
+  updateSearchProvider = (e) => {
+    const { target } = e;
+    const { form } = target;
+    form.querySelectorAll('.provider').forEach((el) => {
+      el.classList.add('hide');
+    });
+    form.querySelector(`.provider-${target.value}`).classList.remove('hide');
+  };
+
   updateSearchBoundingBox = () => {
     if (!document.querySelector('#geo_element_southWest_lon')) {
       return;

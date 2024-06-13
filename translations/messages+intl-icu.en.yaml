@@ -217,3 +217,6 @@ mappable:
   leaving_at: 'Leaving at: {date}'
 segment:
   generic_title: 'Segment'
+form.label.geocoding_service_provider.overpass: OSM
+form.label.geocoding_service_provider.google: Google
+form.placeholder.search: Search
