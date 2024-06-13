@@ -23,7 +23,7 @@ class SearchElementResult
     /**
      * @param array<mixed> $element
      */
-    public static function fromElementResult(array $element, string $sourceKey, string $sourceValue): ?self
+    public static function fromElementOverpassResult(array $element, string $sourceKey, string $sourceValue): ?self
     {
         if (!isset($element['type']) || ('node' !== $element['type'] && 'way' !== $element['type'])) {
             return null;
@@ -49,6 +49,29 @@ class SearchElementResult
             new Point($lat, $lon),
             $element['tags']['name'] ?? ucfirst(str_replace('_', ' ', $sourceValue)),
             $details,
+        );
+    }
+
+    /**
+     * @param array<mixed> $element
+     */
+    public static function fromElementGoogleResult(array $element): ?self
+    {
+        if (($element['business_status'] ?? null) !== 'OPERATIONAL') {
+            return null;
+        }
+
+        $details = [];
+        $lat = $element['geometry']['location']['lat'];
+        $lon = $element['geometry']['location']['lng'];
+
+        $details['rating'] = ($element['rating'] ?? '??') . '/5';
+        $details['address'] = $element['vicinity'] ?? null;
+
+        return new self(
+            new Point($lat, $lon),
+            $element['name'] ?? 'Unknown Name',
+            array_filter($details),
         );
     }
 }

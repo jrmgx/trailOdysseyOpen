@@ -21,10 +21,15 @@ class GeoController extends AbstractController
 {
     public function __construct(
         private readonly GeoCodingService $geoCodingService,
+        private readonly bool $withGoogleMap,
     ) {
     }
 
-    /** @return array<mixed> */
+    /**
+     * This one is searching for addresses.
+     *
+     * @return array<mixed>
+     */
     #[Route('/search/{type}', name: 'search', methods: ['GET'])]
     #[Template('geo/search_frame.html.twig')]
     public function search(Trip $trip, string $type): array
@@ -67,28 +72,46 @@ class GeoController extends AbstractController
         ];
     }
 
-    /** @return Response|array<mixed> */
+    /**
+     * This one is searching for things/places like water points/restaurants.
+     *
+     * @return Response|array<mixed>
+     */
     #[Route('/elements', name: 'elements', methods: ['GET', 'POST'])]
     #[Template('geo/elements_frame.html.twig')]
     public function elements(Request $request, Trip $trip): array|Response
     {
         $form = $this->createForm(GeoElementType::class, options: [
+            'withGoogleMap' => $this->withGoogleMap,
             'action' => $this->generateUrl('geo_elements', ['trip' => $trip->getId()]),
         ]);
         $form->handleRequest($request);
         $results = null;
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $provider = $form->has('provider') ?
+                $form->get('provider')->getData() : GeoCodingService::PROVIDER_OVERPASS;
+
             /** @var GeoPoint $southWest */
             $southWest = $form->get('southWest')->getData();
             /** @var GeoPoint $northEast */
             $northEast = $form->get('northEast')->getData();
-            $keyValue = explode('=', (string) $form->get('element')->getData());
+
+            $key = null;
+            if (GeoCodingService::PROVIDER_GOOGLE === $provider) {
+                $value = $form->get('search')->getData();
+            } else {
+                $keyValue = explode('=', (string) $form->get('element')->getData());
+                $key = $keyValue[0];
+                $value = $keyValue[1];
+            }
+
             $results = $this->geoCodingService->searchElements(
                 $southWest->toPoint(),
                 $northEast->toPoint(),
-                $keyValue[0],
-                $keyValue[1]
+                $provider,
+                $value,
+                $key
             );
         }
 
