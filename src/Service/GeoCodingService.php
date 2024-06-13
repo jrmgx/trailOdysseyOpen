@@ -166,9 +166,9 @@ QUERY;
      */
     private function searchElementsGoogle(Point $southWest, Point $northEast, string $value): array
     {
-        $distanceInMeters = GeoHelper::calculateDistance($southWest, $northEast);
+        $radius = (GeoHelper::calculateDistance($southWest, $northEast) * \M_SQRTPI) / 4;
         $point = GeoHelper::midPoint($southWest, $northEast);
-        if ($distanceInMeters > 300_000) { // 300 km is too much to ask
+        if ($radius > 300_000) { // 300 km is too much to ask
             return [
                 SearchElementResult::fromError($point, 'The area is too big! Please Zoom in.'),
             ];
@@ -179,7 +179,7 @@ QUERY;
             'query' => [
                 'key' => $this->googleMapKey,
                 'location' => $point->lat . ',' . $point->lon,
-                'radius' => $distanceInMeters,
+                'radius' => $radius,
                 'keyword' => $value,
             ],
         ];

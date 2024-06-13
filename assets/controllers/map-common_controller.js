@@ -17,6 +17,8 @@ export default class extends Controller {
   static targets = [
     'map',
     'containerProgress',
+    'geoElementForm',
+    'providerSelect',
   ];
 
   static values = {
@@ -224,19 +226,20 @@ export default class extends Controller {
   };
 
   fit = (arrayOfPoints) => {
+    if (!arrayOfPoints || arrayOfPoints.length < 2) return;
     const polyline = L.polyline(arrayOfPoints);
     this.map.fitBounds(polyline.getBounds());
   };
 
   // Event based
 
-  updateSearchProvider = (e) => {
-    const { target } = e;
-    const { form } = target;
+  updateSearchProvider = () => {
+    if (!this.hasProviderSelectTarget) return;
+    const form = this.geoElementFormTarget;
     form.querySelectorAll('.provider').forEach((el) => {
       el.classList.add('hide');
     });
-    form.querySelector(`.provider-${target.value}`).classList.remove('hide');
+    form.querySelector(`.provider-${this.providerSelectTarget.value}`).classList.remove('hide');
   };
 
   updateSearchBoundingBox = () => {
@@ -582,6 +585,9 @@ export default class extends Controller {
   preventWarnings = () => {
     // Targets
     this.mapTarget = null;
+    this.geoElementFormTarget = null;
+    this.providerSelectTarget = null;
+    this.hasProviderSelectTarget = null;
     // Values
     this.cacheNameValue = null;
     this.isPublicValue = null;

@@ -1,81 +1,92 @@
 <turbo-frame id="geo-elements">
     {% set with_google_map = google_map_key is not empty %}
-    <a data-action="click->sidebar#searchContainerAction">🔍</a>
+    <a data-action="
+        click->map-common#updateSearchProvider
+        click->sidebar#searchContainerAction
+    ">🔍</a>
     {{ form_start(form, { attr : {
         'data-turbo-frame': 'geo-elements',
         'class': 'hide',
+        'data-map-common-target': 'geoElementForm',
     }}) }}
-        <div class="input-group position-relative input-group-sm" style="top: -2px">
-            {% if with_google_map %}
-                {{ form_widget(form.provider, { attr: {
-                    'data-action': 'change->map-common#updateSearchProvider',
-                    'style': 'flex-grow: 0.3'
-                }}) }}
-                {{ form_widget(form.search, { attr: {
-                    'data-action': 'keyup->map-common#updateSearchBoundingBox',
-                    'class': 'hide provider provider-google'
-                }}) }}
-            {% endif %}
-            {{ form_widget(form.element, { attr: {
-                'data-action': 'change->map-common#updateSearchBoundingBox',
-                'class': 'provider provider-overpass'
+    <div class="input-group position-relative input-group-sm" style="top: -2px">
+        {% if with_google_map %}
+            {{ form_widget(form.provider, { attr: {
+                'data-action': 'change->map-common#updateSearchProvider',
+                'style': 'flex-grow: 0.3',
+                'data-map-common-target': 'providerSelect',
             }}) }}
-            <button class="btn btn-primary"
-                    data-action="click->map-common#updateSearchBoundingBox"
-            >{{ 'action.search.label'|trans }}</button>
-        </div>
-        {{ form_widget(form.southWest.lon, { attr: { class: 'hide' }}) }}
-        {{ form_widget(form.southWest.lat, { attr: { class: 'hide' }}) }}
-        {{ form_widget(form.northEast.lon, { attr: { class: 'hide' }}) }}
-        {{ form_widget(form.northEast.lat, { attr: { class: 'hide' }}) }}
+            {{ form_widget(form.search, { attr: {
+                'data-action': 'keyup->map-common#updateSearchBoundingBox',
+                'class': 'hide provider provider-google'
+            }}) }}
+        {% endif %}
+        {{ form_widget(form.element, { attr: {
+            'data-action': 'change->map-common#updateSearchBoundingBox',
+            'class': 'provider provider-overpass'
+        }}) }}
+        <button class="btn btn-primary"
+                data-action="click->map-common#updateSearchBoundingBox"
+        >{{ 'action.search.label'|trans }}</button>
+    </div>
+    {{ form_widget(form.southWest.lon, { attr: { class: 'hide' }}) }}
+    {{ form_widget(form.southWest.lat, { attr: { class: 'hide' }}) }}
+    {{ form_widget(form.northEast.lon, { attr: { class: 'hide' }}) }}
+    {{ form_widget(form.northEast.lat, { attr: { class: 'hide' }}) }}
     {{ form_end(form) }}
     <script>
-    mapCommonController.removeAllElements();
-    {% if results is not null %}
-        {% for element in results %}
-        {%- set description -%}
-        {%- for k, v in element.details -%}
-        {%- if v matches '{^https?:}' -%}
-            <a href="{{ v }}">{{ k|title }}</a><br>{{ "\n" }}
-        {%- else -%}
-            {{ k|title }}: {{ v }}<br>{{ "\n" }}
-        {%- endif -%}
-        {%- endfor -%}
-        {%- endset -%}
-          {# TODO open the right tab when saving to interest #}
-            setTimeout(() => {
-              mapCommonController.addElement(
-                    {{ element.point.lat }},
-                    {{ element.point.lon }},
-                    `{% autoescape %}<span class="element-marker">
+        (function () {
+            mapCommonController.removeAllElements();
+            let points = [];
+            {% if results is not null %}
+            {% for element in results %}
+            points.push([{{ element.point.lat }}, {{ element.point.lon }}]);
+                {%- set description -%}
+                    {%- for k, v in element.details -%}
+                    {%- if v matches '{^https?:}' -%}
+                        <a href="{{ v }}">{{ k|title }}</a><br>{{ "\n" }}
+                    {%- else -%}
+                        {{ k|title }}: {{ v }}<br>{{ "\n" }}
+                    {%- endif -%}
+                    {%- endfor -%}
+                {%- endset -%}
+                {# We do that to prevent performance issue while adding many element in one draw #}
+                setTimeout(() => {
+                    mapCommonController.addElement(
+                        {{ element.point.lat }},
+                        {{ element.point.lon }},
+                        `{% autoescape %}<span class="element-marker">
                         {% if element.error %}
                             <span class="element-error">{{ element.name }}</span>
                         {% else %}
-                        <strong>{{ element.name }}</strong>
-                        {{ description }}
-                        <a data-action="click->sidebar#switchToSidebarAction click->plan#tabSwitchAction"
-                        {# BUG: https://github.com/hotwired/stimulus/issues/766 #}
-                            data-plan-tab-param="interests"
-                            data-plan-scroll-param="true"
-                            data-sidebar-tab-param="interests"
-                            data-sidebar-scroll-param="true"
-                            data-turbo-frame="interest-new"
-                            href="{{ path('interest_new', {
+                            {# TODO open the right tab when saving to interest #}
+                            <strong>{{ element.name }}</strong>
+                            {{ description }}
+                            <a data-action="click->sidebar#switchToSidebarAction click->plan#tabSwitchAction"
+                            {# BUG: https://github.com/hotwired/stimulus/issues/766 #}
+                                data-plan-tab-param="interests"
+                                data-plan-scroll-param="true"
+                                data-sidebar-tab-param="interests"
+                                data-sidebar-scroll-param="true"
+                                data-turbo-frame="interest-new"
+                                href="{{ path('interest_new', {
                                 lat: element.point.lat,
                                 lon: element.point.lon,
                                 trip: trip.id,
                                 name: element.name,
                                 description: description
                             }) }}">
-                            {{ 'action.save_in_interest'|trans }}
-                        </a>
+                                {{ 'action.save_in_interest'|trans }}
+                            </a>
                         {% endif %}
                     </span>{% endautoescape %}`,
-                {% if element.error %}true{% endif %});
-            }, {{ loop.index }});
-        {% else %}
-            alert('{{ 'alert.no_results'|trans }}');
-        {% endfor %}
-        {% endif %}
+                    {% if element.error %}true{% endif %});
+                }, {{ loop.index }});
+            {% else %}
+                alert('{{ 'alert.no_results'|trans }}');
+            {% endfor %}
+            {% endif %}
+            mapCommonController.fit(points);
+        })();
     </script>
 </turbo-frame>
