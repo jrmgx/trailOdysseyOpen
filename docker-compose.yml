@@ -1,7 +1,7 @@
 networks:
-    traefik_default:
+    traefik_network:
         external: true
-        name: "traefik_default"
+        name: "traefik_network"
 
 volumes:
     trailodyssey-redis-data:
@@ -22,7 +22,7 @@ services:
             - "./docker/php-fpm/usr/local/etc:/usr/local/etc"
             - "./docker/php-fpm/nginx.conf:/etc/nginx/nginx.conf:ro"
         networks:
-            - "traefik_default"
+            - "traefik_network"
         environment:
             - "IN_BUILDER=1"
         labels:
@@ -41,7 +41,7 @@ services:
         volumes:
             - "trailodyssey-mysql-data:/var/lib/mysql"
         networks:
-            - "traefik_default"
+            - "traefik_network"
         environment:
             - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}"
 
@@ -53,4 +53,4 @@ services:
         volumes:
             - "trailodyssey-redis-data:/data"
         networks:
-            - "traefik_default"
+            - "traefik_network"

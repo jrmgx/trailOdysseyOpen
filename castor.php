@@ -383,8 +383,8 @@ function assert_not_in_dev(): void
 function docker_compose(array $subCommand, bool $allowFailure = false): Process
 {
     $command = [
-        'docker-compose',
-        // 'compose',
+        'docker',
+        'compose',
         '-p', variable('app_name'),
         '-f',
         'docker-compose.yml',
