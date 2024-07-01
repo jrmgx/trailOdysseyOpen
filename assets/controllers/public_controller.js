@@ -22,6 +22,7 @@ export default class extends Controller {
 
   connect = () => {
     this.diaryEntries = new Map();
+    this.diaryCurrentIndex = null;
     this.cache = {};
     this.zoom = 10;
 
@@ -32,6 +33,55 @@ export default class extends Controller {
       i.after(w);
       w.append(i);
     }
+
+    window.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.defaultPrevented) {
+          return; // Do nothing if the event was already processed
+        }
+
+        const ar = Array.from(this.diaryEntries.keys());
+        const change = () => {
+          const id = ar[this.diaryCurrentIndex];
+          if (id) {
+            this.showOnPublicBar(id);
+            this.showOnMap(id);
+          }
+        };
+
+        switch (event.key) {
+          case 'ArrowLeft':
+          case 'p':
+            if (this.diaryCurrentIndex !== null) {
+              this.diaryCurrentIndex -= 1;
+              if (this.diaryCurrentIndex < 0) {
+                this.showTitleScreen();
+                break;
+              }
+            }
+            change();
+            break;
+          case 'ArrowRight':
+          case 'n':
+            if (this.diaryCurrentIndex === null) {
+              this.diaryCurrentIndex = 0;
+            } else {
+              this.diaryCurrentIndex += 1;
+              if (this.diaryCurrentIndex > ar.length - 1) {
+                this.diaryCurrentIndex = ar.length - 1;
+              }
+            }
+            change();
+            break;
+          default: break;
+        }
+
+        // Cancel the default action to avoid it being handled twice
+        event.preventDefault();
+      },
+      true,
+    );
 
     // TODO id there is a fragment go to that diary
 
@@ -68,18 +118,23 @@ export default class extends Controller {
     this.showOnMap(id);
   };
 
+  showTitleScreen = () => {
+    this.diaryCurrentIndex = null;
+    this.showOnPublicBar(0);
+    this.fitBounds();
+  };
+
   prevDiaryClickAction = (e) => {
     const { id } = e.params;
     const ar = Array.from(this.diaryEntries.keys());
     const index = ar.findIndex((i) => i === `${id}`);
     if (index === 0) {
-      // Show title screen
-      this.showOnPublicBar(0);
-      this.fitBounds();
+      this.showTitleScreen();
       return;
     }
 
     const prevId = ar[index - 1];
+    this.diaryCurrentIndex = index - 1;
     this.showOnPublicBar(prevId);
     this.showOnMap(prevId);
   };
@@ -89,6 +144,7 @@ export default class extends Controller {
     const ar = Array.from(this.diaryEntries.keys());
     const index = ar.findIndex((i) => i === `${id}`);
     const nextId = ar[index + 1];
+    this.diaryCurrentIndex = index + 1;
     this.showOnPublicBar(nextId);
     this.showOnMap(nextId);
   };
