@@ -146,7 +146,7 @@ class DiaryEntryController extends MappableController
         $routings = $this->tripService->calculateRoutings($trip);
 
         /** @var array<int, Path> $paths */
-        $paths = array_map(fn (Routing $routing) => Path::fromRouting($routing), $routings);
+        $paths = array_filter(array_map(fn (Routing $routing) => Path::fromRouting($routing), $routings));
 
         [$closestPoint] = GeoArithmeticService::findClosestPointOnPaths(
             new Point($lat, $lon, '0'),

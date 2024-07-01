@@ -32,7 +32,12 @@ class Path
 
     public static function fromRouting(Routing $routing): ?self
     {
-        return new self($routing->getPathPoints() ?? [], name: 'Routing#' . $routing->getId());
+        $points = $routing->getPathPoints();
+        if (null === $points || 0 === \count($points)) {
+            return null;
+        }
+
+        return new self($points, name: 'Routing#' . $routing->getId());
     }
 
     public function toSegment(): Segment

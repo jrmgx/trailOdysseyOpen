@@ -261,6 +261,7 @@ export default class extends Controller {
   // Paths
 
   addPath = (points, stageId, distance) => {
+    if (!points) return;
     this.points[stageId] = points;
     this.pathDistances[stageId] = distance;
     const latLon = [];
