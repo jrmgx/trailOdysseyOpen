@@ -145,18 +145,14 @@ export default class extends Controller {
       return;
     }
 
-    // const activeStage = this.getActiveStage();
     const correctStage = `${this.activeStage}` === `${stageIndex}`;
     if (!correctStage && !this.findPathCloseToPointOnce) {
-      // eslint-disable-next-line no-alert
-      if (window.confirm('Do you want to update the stage to the current one?')) {
-        this.setActiveStage(stageIndex);
-        Turbo.visit(
-          Routing.generate('live_show_stage', { id: stageIndex, trip: tripId }),
-          { frame: 'live-stage', action: 'advance' },
-        );
-        return;
-      }
+      this.setActiveStage(stageIndex);
+      Turbo.visit(
+        Routing.generate('live_show_stage', { stage: stageIndex, trip: tripId }),
+        { frame: 'live-stage', action: 'advance' },
+      );
+      return;
     }
 
     this.findPathCloseToPointOnce = true;
@@ -217,7 +213,7 @@ export default class extends Controller {
     const stageId = e.target.value;
     this.setActiveStage(stageId);
     Turbo.visit(
-      Routing.generate('live_show_stage', { id: stageId, trip: tripId }),
+      Routing.generate('live_show_stage', { stage: stageId, trip: tripId }),
       { frame: 'live-stage' },
     );
   };
