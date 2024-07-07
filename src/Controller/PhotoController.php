@@ -36,7 +36,7 @@ class PhotoController extends AbstractController
     }
 
     /** @return Response|array<mixed> */
-    #[Route('/{lat}/{lon}/new', name: 'new', methods: ['GET', 'POST'])]
+    #[Route('/{lat}/{lon}/new', name: 'new', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('photo/new.html.twig')]
     public function new(Request $request, Trip $trip, string $lat, string $lon): Response|array
     {

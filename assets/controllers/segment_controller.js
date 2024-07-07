@@ -6,7 +6,8 @@ import 'leaflet-routing-machine';
 import 'leaflet-lasso';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
-import { addLatLonToUrl, removeFromMap } from '../helpers';
+import Routing from 'fos-router';
+import { removeFromMap } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 import markerCircleFakeIconUrl from '../images/marker-circle-fake.png';
 
@@ -18,7 +19,6 @@ export default class extends Controller {
 
   static values = {
     options: Object,
-    urls: Object,
     tiles: Array,
     translations: Object,
     mapboxKey: String,
@@ -45,10 +45,12 @@ export default class extends Controller {
       popupAnchor: [0, 0],
     });
 
+    // noinspection JSUnresolvedReference
     this.router = L.Routing.mapbox(this.mapboxKeyValue, {
       profile: 'mapbox/walking',
     });
 
+    // noinspection JSUnresolvedReference
     this.lasso = L.lasso(this.map(), {});
     this.map().on('lasso.finished', this.lassoFinishAction);
 
@@ -202,7 +204,10 @@ export default class extends Controller {
     );
 
     if (this.actionNewItineraryActive === 1) {
-      Turbo.visit(this.urlsValue.segmentNewItinerary, { frame: 'segment-new' });
+      Turbo.visit(
+        Routing.generate('segment_new_itinerary', { trip: tripId }),
+        { frame: 'segment-new' },
+      );
       return;
     }
 
@@ -210,6 +215,7 @@ export default class extends Controller {
       return;
     }
 
+    // noinspection JSUnresolvedReference
     this.routingControl = L.Routing.control({
       waypoints: [
         this.actionNewItineraryMarkers[0].getLatLng(),
@@ -265,7 +271,7 @@ export default class extends Controller {
     this.hideEditButtons();
     const center = this.map().getCenter();
     Turbo.visit(
-      addLatLonToUrl(center.lat, center.lng, this.urlsValue.segmentNew),
+      Routing.generate('segment_new', { trip: tripId, lat: center.lat, lon: center.lng }),
       { frame: 'segment-new' },
     );
   };
@@ -463,10 +469,12 @@ export default class extends Controller {
       }
       marker.closePopup();
       const latLng = marker.getLatLng();
-      const url = addLatLonToUrl(latLng.lat, latLng.lng, this.urlsValue.segmentSplit)
-        .replace(/\/0$/, `/${this.editModeFor}`);
-
-      Turbo.visit(url, { frame: 'sidebar-segments' });
+      Turbo.visit(
+        Routing.generate('segment_split', {
+          trip: tripId, id: this.editModeFor, lat: latLng.lat, lon: latLng.lng,
+        }),
+        { frame: 'sidebar-segments' },
+      );
     };
 
     const eventListenerDelete = (_, skipConfirm) => {
@@ -545,11 +553,6 @@ export default class extends Controller {
     this.optionsValue = { center: { lat: null, lon: null } };
     this.tilesValue = null;
     this.mapboxKeyValue = null;
-    this.urlsValue = {
-      segmentNew: null,
-      segmentSplit: null,
-      segmentNewItinerary: null,
-    };
     this.translationsValue = {
       areYouSureSegmentDeleteMulti: null,
       areYouSureSegmentDelete: null,

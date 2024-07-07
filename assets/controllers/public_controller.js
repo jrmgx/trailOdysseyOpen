@@ -15,7 +15,6 @@ export default class extends Controller {
 
   static values = {
     options: Object,
-    urls: Object,
     tiles: Array,
     translations: Object,
   };
@@ -207,7 +206,6 @@ export default class extends Controller {
     this.publicBarTarget = null;
     this.mapTarget = null;
     // Values
-    this.urlsValue = { };
     this.translationsValue = { };
   };
 }

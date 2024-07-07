@@ -38,7 +38,6 @@ class DiaryEntryController extends MappableController
         ]);
 
         return [
-            'urls' => $this->getUrls($trip),
             'options' => $this->getOptions($trip),
             'tiles' => $this->getTiles($trip),
             'save_map_option_form' => $saveMapOptionForm,
@@ -65,7 +64,7 @@ class DiaryEntryController extends MappableController
      *
      * @return Response|array<mixed>
      */
-    #[Route('/new/{lat}/{lon}/entry', name: 'new', methods: ['GET', 'POST'])]
+    #[Route('/new/{lat}/{lon}/entry', name: 'new', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('diaryEntry/new_frame.html.twig')]
     public function new(Request $request, Trip $trip, string $lat, string $lon): array|Response
     {
@@ -103,7 +102,7 @@ class DiaryEntryController extends MappableController
         return $this->commonEdit($request, $trip, $diaryEntry, DiaryEntryType::class, 'diaryEntry', 'diaryEntry_show');
     }
 
-    #[Route('/{id}/move/{lat}/{lon}', name: 'move', methods: ['GET'])] // TODO post
+    #[Route('/{id}/move/{lat}/{lon}', name: 'move', options: ['expose' => true], methods: ['GET'])] // TODO post
     public function move(Trip $trip, DiaryEntry $diaryEntry, string $lat, string $lon): Response
     {
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);
@@ -138,7 +137,7 @@ class DiaryEntryController extends MappableController
         return $this->redirectToRoute('diaryEntry_show', ['trip' => $trip->getId()]);
     }
 
-    #[Route('/progress/{lat}/{lon}', name: 'update_progress', methods: ['GET'])] // TODO POST
+    #[Route('/progress/{lat}/{lon}', name: 'update_progress', options: ['expose' => true], methods: ['GET'])] // TODO POST
     public function progress(Trip $trip, string $lat, string $lon): Response
     {
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);

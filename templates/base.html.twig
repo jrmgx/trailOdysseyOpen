@@ -42,6 +42,9 @@
     </head>
     <body {% block body_attr %}{% endblock %}>
         {% block body %}{% endblock %}
+        <script>
+            var tripId = {{ trip is defined ? trip.id : 0 }};
+        </script>
         {% if app.user and not public %}
         <script>
             function ready(serviceWorkerReady) {

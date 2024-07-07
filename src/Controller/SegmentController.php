@@ -51,7 +51,6 @@ class SegmentController extends BaseController
         $segmentMultipleDeleteForm = $this->createForm(SegmentMultipleDeleteType::class, options: ['trip' => $trip]);
 
         return [
-            'urls' => $this->getUrls($trip),
             'options' => $this->getOptions($trip),
             'tiles' => $this->getTiles($trip),
             'save_map_option_form' => $saveMapOptionForm,
@@ -77,7 +76,7 @@ class SegmentController extends BaseController
     }
 
     /** @return Response|array<mixed> */
-    #[Route('/new/{lat}/{lon}/entry', name: 'new', methods: ['GET', 'POST'])]
+    #[Route('/new/{lat}/{lon}/entry', name: 'new', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('segment/new_frame.html.twig')]
     public function new(Request $request, Trip $trip, string $lat, string $lon): array|Response
     {
@@ -97,7 +96,7 @@ class SegmentController extends BaseController
     }
 
     /** @return Response|array<mixed> */
-    #[Route('/new/itinerary', name: 'new_itinerary', methods: ['GET', 'POST'])]
+    #[Route('/new/itinerary', name: 'new_itinerary', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('segment/new_itinerary_frame.html.twig')]
     public function itinerary(Request $request, Trip $trip): array|Response
     {
@@ -113,7 +112,7 @@ class SegmentController extends BaseController
         ]));
     }
 
-    #[Route('/new/{lat}/{lon}/{id}', name: 'split', methods: ['GET', 'POST'])] // TODO Change to post
+    #[Route('/new/{lat}/{lon}/{id}', name: 'split', options: ['expose' => true], methods: ['GET', 'POST'])] // TODO Change to post
     public function split(Trip $trip, string $lat, string $lon, Segment $segment): Response
     {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);

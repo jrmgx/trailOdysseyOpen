@@ -4,8 +4,9 @@ import * as Turbo from '@hotwired/turbo';
 import L from 'leaflet';
 import '@elfalem/leaflet-curve';
 import { Controller } from '@hotwired/stimulus';
+import Routing from 'fos-router';
 import {
-  iconSymbol, curve, addLatLonToUrl, iconGpsPoint, iconGpsCompass, removeFromMap,
+  iconSymbol, curve, iconGpsPoint, iconGpsCompass, removeFromMap,
 } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
@@ -24,7 +25,6 @@ export default class extends Controller {
 
   static values = {
     options: Object,
-    urls: Object,
     tiles: Array,
     translations: Object,
   };
@@ -151,7 +151,10 @@ export default class extends Controller {
       // eslint-disable-next-line no-alert
       if (window.confirm('Do you want to update the stage to the current one?')) {
         this.setActiveStage(stageIndex);
-        Turbo.visit(this.urlsValue.liveShowStage.replace('/0', `/${stageIndex}`), { frame: 'live-stage', action: 'advance' });
+        Turbo.visit(
+          Routing.generate('live_show_stage', { id: stageIndex, trip: tripId }),
+          { frame: 'live-stage', action: 'advance' },
+        );
         return;
       }
     }
@@ -162,6 +165,7 @@ export default class extends Controller {
       return;
     }
 
+    // noinspection JSUnresolvedReference
     const percentOfPath = L.GeometryUtil.locateOnLine(this.map(), path, closestToPoint);
     mapCommonController.updateElevationGraph(percentOfPath);
 
@@ -176,7 +180,7 @@ export default class extends Controller {
   myLivePositionAction = () => {
     if (!this.currentLat) return;
     Turbo.visit(
-      addLatLonToUrl(this.currentLat, this.currentLng, this.urlsValue.diaryEntryNew),
+      Routing.generate('diaryEntry_new', { lat: this.currentLat, lon: this.currentLng, trip: tripId }),
       { frame: 'diaryEntry-new' },
     );
   };
@@ -212,7 +216,10 @@ export default class extends Controller {
   routingChangedAction = (e) => {
     const stageId = e.target.value;
     this.setActiveStage(stageId);
-    Turbo.visit(this.urlsValue.liveShowStage.replace('/0', `/${stageId}`), { frame: 'live-stage' });
+    Turbo.visit(
+      Routing.generate('live_show_stage', { id: stageId, trip: tripId }),
+      { frame: 'live-stage' },
+    );
   };
 
   collapseAction = () => {
@@ -307,6 +314,7 @@ export default class extends Controller {
   compassHandler = (e) => {
     let angle;
     // CSS rotate is clockwise and the image of the compass points up by default
+    // noinspection JSUnresolvedReference
     if (e.webkitCompassHeading) {
       // https://developer.apple.com/documentation/webkitjs/deviceorientationevent/1804777-webkitcompassheading
       // Direction values are measured in degrees starting at due north
@@ -394,16 +402,6 @@ export default class extends Controller {
     this.progressTextTarget = null;
     this.hasProgressTextTarget = null;
     // Values
-    this.urlsValue = {
-      mapSearch: null,
-      stageNew: null,
-      diaryEntryNew: null,
-      photoNew: null,
-      stageMove: null,
-      diaryEntryMove: null,
-      mapOption: null,
-      liveShowStage: null,
-    };
     this.translationsValue = {
       clickMapToAdd: null,
       orHereToCancel: null,

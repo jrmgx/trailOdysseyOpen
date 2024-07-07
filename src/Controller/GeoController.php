@@ -77,7 +77,7 @@ class GeoController extends AbstractController
      *
      * @return Response|array<mixed>
      */
-    #[Route('/elements', name: 'elements', methods: ['GET', 'POST'])]
+    #[Route('/elements', name: 'elements', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('geo/elements_frame.html.twig')]
     public function elements(Request $request, Trip $trip): array|Response
     {

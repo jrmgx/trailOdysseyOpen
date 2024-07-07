@@ -40,7 +40,6 @@ class StageController extends MappableController
         ]);
 
         return [
-            'urls' => $this->getUrls($trip),
             'options' => $this->getOptions($trip),
             'tiles' => $this->getTiles($trip),
             'save_map_option_form' => $saveMapOptionForm,
@@ -81,7 +80,7 @@ class StageController extends MappableController
      *
      * @return Response|array<mixed>
      */
-    #[Route('/new/{lat}/{lon}/entry', name: 'new', methods: ['GET', 'POST'])]
+    #[Route('/new/{lat}/{lon}/entry', name: 'new', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('stage/new_frame.html.twig')]
     public function new(Request $request, Trip $trip, string $lat, string $lon): array|Response
     {
@@ -200,7 +199,7 @@ class StageController extends MappableController
         return $this->commonEdit($request, $trip, $stage, StageType::class, 'stage', 'stage_show');
     }
 
-    #[Route('/{id}/move/{lat}/{lon}', name: 'move', methods: ['GET', 'POST'])] // TODO post
+    #[Route('/{id}/move/{lat}/{lon}', name: 'move', options: ['expose' => true], methods: ['GET', 'POST'])] // TODO post
     public function move(Trip $trip, Stage $stage, string $lat, string $lon): Response
     {
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);

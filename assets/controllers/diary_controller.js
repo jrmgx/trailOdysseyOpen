@@ -4,7 +4,8 @@ import L from 'leaflet';
 import '@elfalem/leaflet-curve';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
-import { iconSymbol, addLatLonToUrl, removeFromMap } from '../helpers';
+import Routing from 'fos-router';
+import { iconSymbol, removeFromMap } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
 export default class extends Controller {
@@ -14,7 +15,6 @@ export default class extends Controller {
 
   static values = {
     options: Object,
-    urls: Object,
     tiles: Array,
     translations: Object,
   };
@@ -60,14 +60,14 @@ export default class extends Controller {
   newPhotoAction = () => {
     const center = this.map().getCenter();
     Turbo.visit(
-      addLatLonToUrl(center.lat, center.lng, this.urlsValue.photoNew),
+      Routing.generate('photo_new', { lat: center.lat, lon: center.lng, trip: tripId }),
       { frame: 'diaryEntry-new' },
     );
   };
 
   mapClickAction = (e) => {
     Turbo.visit(
-      addLatLonToUrl(e.latlng.lat, e.latlng.lng, this.urlsValue.diaryEntryNew),
+      Routing.generate('diaryEntry_new', { lat: e.latlng.lat, lon: e.latlng.lng, trip: tripId }),
       { frame: 'diaryEntry-new' },
     );
 
@@ -86,7 +86,9 @@ export default class extends Controller {
         const marker = event.target;
         const position = marker.getLatLng();
         Turbo.visit(
-          addLatLonToUrl(position.lat, position.lng, this.urlsValue.diaryEntryMove).replace('/0/', `/${id}/`),
+          Routing.generate('diaryEntry_move', {
+            id, lat: position.lat, lon: position.lng, trip: tripId,
+          }),
           { frame: 'sidebar-diaryEntries' },
         );
       })
@@ -131,7 +133,7 @@ export default class extends Controller {
     const divElement = document.createElement('div');
     divElement.classList.add('d-flex', 'flex-column');
 
-    const marker = mapCommonController.addElement(e.latlng.lat, e.latlng.lng, divElement);
+    const marker = mapCommonController.addElement(e.latlng.lat, e.latlng.lng, divElement, false);
 
     const addDiaryEntry = document.createElement('a');
     addDiaryEntry.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'mb-2');
@@ -167,7 +169,7 @@ export default class extends Controller {
   mapLocationFoundAddDiary = (marker) => {
     const latLng = marker.getLatLng();
     Turbo.visit(
-      addLatLonToUrl(latLng.lat, latLng.lng, this.urlsValue.diaryEntryNew),
+      Routing.generate('diaryEntry_new', { lat: latLng.lat, lon: latLng.lng, trip: tripId }),
       { frame: 'diaryEntry-new' },
     );
 
@@ -178,7 +180,7 @@ export default class extends Controller {
   mapLocationFoundUpdateProgress = (marker) => {
     const latLng = marker.getLatLng();
     Turbo.visit(
-      addLatLonToUrl(latLng.lat, latLng.lng, this.urlsValue.diaryUpdateProgress),
+      Routing.generate('diaryEntry_update_progress', { lat: latLng.lat, lon: latLng.lng, trip: tripId }),
       { frame: 'sidebar-diaryEntries' },
     );
 
@@ -192,16 +194,6 @@ export default class extends Controller {
     // Targets
     this.myLivePositionTarget = null;
     // Values
-    this.urlsValue = {
-      mapSearch: null,
-      stageNew: null,
-      diaryEntryNew: null,
-      photoNew: null,
-      stageMove: null,
-      diaryEntryMove: null,
-      mapOption: null,
-      diaryUpdateProgress: null,
-    };
     this.translationsValue = {
       clickMapToAdd: null,
       orHereToCancel: null,

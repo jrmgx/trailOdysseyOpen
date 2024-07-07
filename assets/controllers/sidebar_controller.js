@@ -2,6 +2,7 @@
 
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
+import Routing from 'fos-router';
 
 export default class extends Controller {
   static targets = [
@@ -16,7 +17,6 @@ export default class extends Controller {
   ];
 
   static values = {
-    urls: Object,
     translations: Object,
   };
 
@@ -132,7 +132,10 @@ export default class extends Controller {
       return;
     }
     this.searchContainerIsVisible = false;
-    Turbo.visit(this.urlsValue.geoElements, { frame: 'geo-elements' });
+    Turbo.visit(
+      Routing.generate('geo_elements', { trip: tripId }),
+      { frame: 'geo-elements' },
+    );
   };
 
   // Event based
@@ -147,7 +150,7 @@ export default class extends Controller {
     const encodedData = new URLSearchParams(formData).toString();
 
     // noinspection JSIgnoredPromiseFromCall
-    fetch(this.urlsValue.mapOption, {
+    fetch(Routing.generate('trip_edit_map_option', { trip: tripId }), {
       method: 'POST',
       body: encodedData,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -176,15 +179,9 @@ export default class extends Controller {
     this.hasMyLivePositionTarget = null;
     this.mapOptionFormTarget = null;
     this.hasMapOptionFormTarget = null;
+    this.hasOfflineButtonTarget = null;
+    this.offlineButtonTarget = null;
     // Values
-    this.urlsValue = {
-      mapSearch: null,
-      stageNew: null,
-      interestNew: null,
-      stageMove: null,
-      interestMove: null,
-      mapOption: null,
-      geoElements: null,
-    };
+    // ...
   };
 }

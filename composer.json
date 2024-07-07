@@ -13,6 +13,7 @@
         "doctrine/doctrine-bundle": "^2.9",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.14",
+        "friendsofsymfony/jsrouting-bundle": "^3.5",
         "graphp/graph": "^1@dev",
         "graphp/graphviz": "^1@dev",
         "league/commonmark": "^2.4",
