@@ -4,8 +4,9 @@ import L from 'leaflet';
 import '@elfalem/leaflet-curve';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
+import Routing from 'fos-router';
 import {
-  curve, iconSymbol, addLatLonToUrl, removeFromMap,
+  curve, iconSymbol, removeFromMap,
 } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
@@ -17,9 +18,7 @@ export default class extends Controller {
     'offlineButton',
   ];
 
-  static values = {
-    urls: Object,
-  };
+  static values = {};
 
   connect = () => {
     this.stages = {};
@@ -133,14 +132,17 @@ export default class extends Controller {
   mapClickAction = (e, actionPinActiveFor) => {
     if (!actionPinActiveFor) return;
 
-    let url = this.urlsValue.stageNew;
-    let frame = 'stage-new';
     if (actionPinActiveFor === 'interest') {
-      url = this.urlsValue.interestNew;
-      frame = 'interest-new';
+      Turbo.visit(
+        Routing.generate('interest_new', { lat: e.latlng.lat, lon: e.latlng.lng, trip: tripId }),
+        { frame: 'interest-new' },
+      );
+    } else {
+      Turbo.visit(
+        Routing.generate('stage_new', { lat: e.latlng.lat, lon: e.latlng.lng, trip: tripId }),
+        { frame: 'stage-new' },
+      );
     }
-
-    Turbo.visit(addLatLonToUrl(e.latlng.lat, e.latlng.lng, url), { frame });
 
     sidebarController.switchToSidebarAction(true);
   };
@@ -157,7 +159,9 @@ export default class extends Controller {
         const marker = event.target;
         const position = marker.getLatLng();
         Turbo.visit(
-          addLatLonToUrl(position.lat, position.lng, this.urlsValue.stageMove).replace('/0/', `/${id}/`),
+          Routing.generate('stage_move', {
+            lat: position.lat, lon: position.lng, id, trip: tripId,
+          }),
           { frame: 'sidebar-stages' },
         );
       })
@@ -239,7 +243,9 @@ export default class extends Controller {
         const marker = event.target;
         const position = marker.getLatLng();
         Turbo.visit(
-          addLatLonToUrl(position.lat, position.lng, this.urlsValue.interestMove).replace('/0/', `/${id}/`),
+          Routing.generate('interest_move', {
+            lat: position.lat, lon: position.lng, id, trip: tripId,
+          }),
           { frame: 'sidebar-interests' },
         );
       })
@@ -273,6 +279,7 @@ export default class extends Controller {
 
   drawBoundingBox = (json) => {
     const data = JSON.parse(json);
+    // noinspection JSUnresolvedReference
     L.polyline([
       [data.minLat, data.minLon],
       [data.maxLat, data.minLon],
@@ -291,14 +298,6 @@ export default class extends Controller {
     this.sidebarStagesTarget = null;
     this.sidebarInterestsTarget = null;
     // Values
-    this.urlsValue = {
-      mapSearch: null,
-      stageNew: null,
-      interestNew: null,
-      photoNew: null,
-      stageMove: null,
-      interestMove: null,
-      mapOption: null,
-    };
+    // ...
   };
 }

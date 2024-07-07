@@ -951,6 +951,11 @@
     "@babel/helper-validator-identifier" "^7.24.5"
     to-fast-properties "^2.0.0"
 
+"@bpnetguy/webpack-inject-plugin@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@bpnetguy/webpack-inject-plugin/-/webpack-inject-plugin-2.0.4.tgz#8d58d507b245c675688a72127018d57d341995fe"
+  integrity sha512-0dNtNKJZLktxpzSJEP9pWYRMkWUh5lb2DjIDn2GXQs4uBLKtVRy+9KqYNLVB4Zr80EwRfANt1+yEwpDPUK2Lxw==
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -3020,6 +3025,11 @@ forwarded@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
+
+fos-router@./vendor/friendsofsymfony/jsrouting-bundle/Resources/:
+  version "2.5.0"
+  dependencies:
+    "@bpnetguy/webpack-inject-plugin" "^2.0.4"
 
 fresh@0.5.2:
   version "0.5.2"

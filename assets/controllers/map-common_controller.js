@@ -23,7 +23,6 @@ export default class extends Controller {
 
   static values = {
     options: Object,
-    urls: Object,
     tiles: Array,
     translations: Object,
     cacheName: String,
@@ -56,6 +55,7 @@ export default class extends Controller {
     const firstLayer = [];
 
     for (const tiles of this.tilesValue) {
+      // noinspection JSUnresolvedReference
       const tilesUrl = this.isLive || tiles.useProxy ? tiles.proxyUrl : tiles.url;
       const currentLayer = L.tileLayer(tilesUrl, {
         attribution: tiles.description || '',
@@ -74,6 +74,7 @@ export default class extends Controller {
         }
         baseLayers[tiles.name] = currentLayer;
         if (!this.isLive) {
+          // noinspection JSUnresolvedReference
           this.proxyLayers[tiles.id] = L.tileLayer(tiles.proxyUrl);
         }
       }
@@ -294,6 +295,7 @@ export default class extends Controller {
     let index = null;
     for (index in this.paths) {
       const path = this.paths[index];
+      // noinspection JSUnresolvedReference
       const closest = L.GeometryUtil.closest(this.map, path, point);
       const { distance } = closest;
       // eslint-disable-next-line no-continue
@@ -564,6 +566,7 @@ export default class extends Controller {
     const points = this.points[stageId];
     if (!points) return [];
     const pointsLatLng = points.map((p) => new LatLng(p.lat, p.lon, p.el));
+    // noinspection JSUnresolvedReference
     const accumulatedLengths = L.GeometryUtil.accumulatedLengths(pointsLatLng);
     const max = accumulatedLengths.length;
     const seriesX = [];
@@ -589,22 +592,12 @@ export default class extends Controller {
     this.geoElementFormTarget = null;
     this.providerSelectTarget = null;
     this.hasProviderSelectTarget = null;
+    this.containerProgressTarget = null;
     // Values
     this.cacheNameValue = null;
     this.isPublicValue = null;
     this.isLiveValue = null;
     this.optionsValue = { center: { lat: null, lon: null } };
-    this.urlsValue = {
-      mapSearch: null,
-      stageNew: null,
-      interestNew: null,
-      photoNew: null,
-      stageMove: null,
-      interestMove: null,
-      diaryEntryNew: null,
-      mapOption: null,
-      liveShowStage: null,
-    };
     this.tilesValue = null;
     this.translationsValue = {
       clickMapToAdd: null,

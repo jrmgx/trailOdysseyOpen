@@ -29,7 +29,7 @@ class LiveController extends MappableController
     }
 
     /** @return array<mixed> */
-    #[Route('/{stage}', name: 'show_stage', methods: ['GET'])]
+    #[Route('/{stage}', name: 'show_stage', options: ['expose' => true], methods: ['GET'])]
     #[Template('live/index.html.twig')]
     public function showStage(Trip $trip, Stage $stage = null): array
     {
@@ -40,7 +40,6 @@ class LiveController extends MappableController
         [$results, $stages, $routings, $extras] = $this->tripService->calculateResults($trip);
 
         return [
-            'urls' => $this->getUrls($trip),
             'options' => $this->getOptions($trip),
             'tiles' => $this->getTiles($trip),
             'trip' => $trip,

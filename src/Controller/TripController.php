@@ -148,7 +148,7 @@ class TripController extends BaseController
     }
 
     /** @return Response|array<mixed> */
-    #[Route('/{trip}/edit/map/option', name: 'edit_map_option', methods: ['POST'])]
+    #[Route('/{trip}/edit/map/option', name: 'edit_map_option', options: ['expose' => true], methods: ['POST'])]
     public function mapOption(Request $request, Trip $trip): Response|array
     {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);

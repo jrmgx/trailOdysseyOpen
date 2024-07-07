@@ -23,6 +23,7 @@
         "planController": true,
         "segmentController": true,
         "mapCommonController": true,
-        "liveController": true
+        "liveController": true,
+        "tripId": true
     }
 }

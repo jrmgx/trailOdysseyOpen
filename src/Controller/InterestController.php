@@ -33,7 +33,7 @@ class InterestController extends MappableController
      *
      * @return Response|array<mixed>
      */
-    #[Route('/new/{lat}/{lon}/entry', name: 'new', methods: ['GET', 'POST'])]
+    #[Route('/new/{lat}/{lon}/entry', name: 'new', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('interest/new_frame.html.twig')]
     public function new(Request $request, Trip $trip, string $lat, string $lon): array|Response
     {
@@ -71,7 +71,7 @@ class InterestController extends MappableController
         return $this->commonEdit($request, $trip, $interest, InterestType::class, 'interest', 'stage_show');
     }
 
-    #[Route('/{id}/move/{lat}/{lon}', name: 'move', methods: ['GET'])] // TODO post
+    #[Route('/{id}/move/{lat}/{lon}', name: 'move', options: ['expose' => true], methods: ['GET'])] // TODO post
     public function move(Trip $trip, Interest $interest, string $lat, string $lon): Response
     {
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);

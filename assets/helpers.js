@@ -15,8 +15,6 @@ export const markerDefaultIcon = L.icon({
   popupAnchor: [0, 0],
 });
 
-export const addLatLonToUrl = (lat, lon, url) => url.replace('_LAT_', lat).replace('_LON_', lon);
-
 export const iconSymbol = (symbol) => L.divIcon({
   html: `<span class="stage-marker"><img alt="" src="${markerIconUrl}${'">%</span>'.replace('%', symbol)}`,
   iconSize: [48, 48],
