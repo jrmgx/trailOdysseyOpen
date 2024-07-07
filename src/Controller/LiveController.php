@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/live', name: 'live_')]
+#[Route('/account/trip/{trip}/live', name: 'live_')]
 class LiveController extends MappableController
 {
     #[Route('', name: 'show', methods: ['GET'])]

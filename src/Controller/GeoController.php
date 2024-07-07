@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/geo', name: 'geo_')]
+#[Route('/account/trip/{trip}/geo', name: 'geo_')]
 class GeoController extends AbstractController
 {
     public function __construct(

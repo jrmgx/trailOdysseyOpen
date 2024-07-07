@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/photo', name: 'photo_')]
+#[Route('/account/trip/{trip}/photo', name: 'photo_')]
 class PhotoController extends AbstractController
 {
     public function __construct(

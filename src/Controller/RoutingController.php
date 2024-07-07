@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/routing', name: 'routing_')]
+#[Route('/account/trip/{trip}/routing', name: 'routing_')]
 class RoutingController extends AbstractController
 {
     public function __construct(

@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/bag', name: 'bag_')]
+#[Route('/account/trip/{trip}/bag', name: 'bag_')]
 class BagController extends AbstractController
 {
     public function __construct(

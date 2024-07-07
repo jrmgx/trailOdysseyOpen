@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ServiceWorkerController extends AbstractController
 {
@@ -17,6 +18,7 @@ class ServiceWorkerController extends AbstractController
     ) {
     }
 
+    #[Route('/service-worker.js', name: 'service_worker', methods: ['GET'])]
     public function __invoke(#[MapQueryParameter] string $cacheName): Response
     {
         $finder = new Finder();

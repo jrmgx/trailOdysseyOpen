@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/user', name: 'user_')]
+#[Route('/account/user', name: 'user_')]
 class UserController extends AbstractController
 {
     public function __construct(
