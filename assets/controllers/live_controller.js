@@ -40,7 +40,6 @@ export default class extends Controller {
     this.activeStage = null;
     this.currentLat = null;
     this.currentLng = null;
-    this.compassWillStopHandler = null;
     this.findPathCloseToPointOnce = false;
 
     // Move back button to zoom control (not ideal but acceptable)
@@ -299,12 +298,6 @@ export default class extends Controller {
       this.compassMarker = L.marker([this.currentLat, this.currentLng], { icon: iconGpsCompass })
         .addTo(this.map());
     }
-
-    // Compass will auto stop after a bit to preserve battery life
-    if (this.compassWillStopHandler) {
-      clearTimeout(this.compassWillStopHandler);
-    }
-    this.compassWillStopHandler = setTimeout(this.compassOff, 60 * 1000);
   };
 
   compassHandler = (e) => {
@@ -366,7 +359,6 @@ export default class extends Controller {
     if (this.compassMarker) {
       this.compassMarker = removeFromMap(this.compassMarker, this.map());
     }
-    this.compassWillStopHandler = null;
   };
 
   // Helpers
