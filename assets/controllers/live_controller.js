@@ -46,6 +46,8 @@ export default class extends Controller {
     const topLeft = document.querySelector('.leaflet-control-zoom.leaflet-bar.leaflet-control');
     if (topLeft) {
       topLeft.appendChild(this.backButtonTarget);
+      document.querySelector('.leaflet-control-zoom-in').style.display = 'none';
+      document.querySelector('.leaflet-control-zoom-out').style.display = 'none';
     }
     this.backButtonTarget.classList.remove('hide');
 
