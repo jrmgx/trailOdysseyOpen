@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/stage', name: 'stage_')]
+#[Route('/account/trip/{trip}/stage', name: 'stage_')]
 class StageController extends MappableController
 {
     /** @return array<mixed> */

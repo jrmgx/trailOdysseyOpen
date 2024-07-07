@@ -21,7 +21,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use ZipStream\ZipStream;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/gpx', name: 'gpx_')]
+#[Route('/account/trip/{trip}/gpx', name: 'gpx_')]
 class GpxController extends AbstractController
 {
     public function __construct(

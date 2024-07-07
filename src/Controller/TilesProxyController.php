@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TilesProxyController extends AbstractController
@@ -17,6 +18,7 @@ class TilesProxyController extends AbstractController
     ) {
     }
 
+    #[Route('/t/p/{id}/{x}/{y}/{z}', name: 'tiles_proxy_get', methods: ['GET'])]
     #[Cache(maxage: 86_400, public: true, mustRevalidate: true)]
     public function __invoke(?Profiler $profiler, Tiles $tiles, string $x, string $y, string $z): Response
     {

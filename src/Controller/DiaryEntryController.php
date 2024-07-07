@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/diary', name: 'diaryEntry_')]
+#[Route('/account/trip/{trip}/diary', name: 'diaryEntry_')]
 class DiaryEntryController extends MappableController
 {
     /** @return array<mixed> */

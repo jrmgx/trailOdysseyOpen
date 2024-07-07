@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/interest', name: 'interest_')]
+#[Route('/account/trip/{trip}/interest', name: 'interest_')]
 class InterestController extends MappableController
 {
     /**

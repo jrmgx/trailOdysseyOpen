@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/trip', name: 'trip_')]
+#[Route('/account/trip', name: 'trip_')]
 class TripController extends BaseController
 {
     public function __construct(

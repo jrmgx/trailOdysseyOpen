@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/gear', name: 'gear_')]
+#[Route('/account/gear', name: 'gear_')]
 class GearController extends AbstractController
 {
     public function __construct(

@@ -42,11 +42,6 @@ services:
     Liip\ImagineBundle\Service\FilterService:
         alias: liip_imagine.service.filter
 
-    App\EventSubscriber\LocaleSubscriber:
-        arguments:
-            $localeAvailable: '%locale_available%'
-            $localeRequirement: '%locale_requirement%'
-
     App\Service\GeoCodingService:
         arguments:
             $googleMapKey: '%google_map_key%'

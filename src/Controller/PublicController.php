@@ -53,6 +53,7 @@ class PublicController extends BaseController
                 $matches = [];
                 // ![](/1901/2910/74d4d6de71676855936e312ffd6f1cb75cf8118a.jpg)
                 // https://regex101.com/r/j4DqZT/1
+                /* @noinspection RegExpRedundantEscape */
                 preg_match_all(
                     "`\]\(/$userId/$tripId/([a-z0-9]{40}\.[a-z]{3,5})\)`mi",
                     $diary->getDescription() ?? '',
@@ -128,8 +129,8 @@ class PublicController extends BaseController
         return $response;
     }
 
-    #[Route('/photo/{user}/{trip}/{path}', name: 'photo', methods: ['GET'])]
-    #[Route('/photo/{user}/{trip}/{filter}/{path}', name: 'photo_with_filter', methods: ['GET'])]
+    #[Route('/{user}/{trip}/photo/{path}', name: 'photo', methods: ['GET'])]
+    #[Route('/{user}/{trip}/photo/{filter}/{path}', name: 'photo_with_filter', methods: ['GET'])]
     public function photo(User $user, Trip $trip, Photo $photo, string $filter = 'interest_image'): Response
     {
         CommonHelper::allowMoreResources();

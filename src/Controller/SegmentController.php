@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * The name was 'segment' but it gets blocked by adBlock (with the .js extension seen later).
  */
 #[IsGranted('ROLE_USER')]
-#[Route('/trip/{trip}/paths', name: 'segment_')]
+#[Route('/account/trip/{trip}/paths', name: 'segment_')]
 class SegmentController extends BaseController
 {
     public function __construct(
