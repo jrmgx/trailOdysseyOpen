@@ -6,7 +6,7 @@ import '@elfalem/leaflet-curve';
 import { Controller } from '@hotwired/stimulus';
 import Routing from 'fos-router';
 import {
-  iconSymbol, curve, iconGpsPoint, iconGpsCompass, removeFromMap,
+  iconSymbol, curve, iconGpsPoint, iconGpsCompass, removeFromMap, debugConsole,
 } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
@@ -87,15 +87,18 @@ export default class extends Controller {
 
   startLiveTracking = () => {
     this.mapLocationAddHandler();
+    debugConsole('map.locate');
     this.map().locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
   };
 
   mapLocationAddHandler = () => {
+    debugConsole('mapLocationAddHandler');
     this.map().on('locationfound', this.mapLocationFoundHandler);
     this.map().on('locationerror', this.mapLocationErrorHandler);
   };
 
   mapLocationRemoveHandler = () => {
+    debugConsole('mapLocationRemoveHandler');
     this.map().off('locationfound', this.mapLocationFoundHandler);
     this.map().off('locationerror', this.mapLocationErrorHandler);
 
@@ -129,6 +132,7 @@ export default class extends Controller {
 
     if (this.firstLocation) {
       this.firstLocation = false;
+      debugConsole('map.locate watch: true');
       this.map().locate({ setView: false, watch: true, enableHighAccuracy: true });
     }
   };
@@ -164,7 +168,7 @@ export default class extends Controller {
 
     // noinspection JSUnresolvedReference
     const percentOfPath = L.GeometryUtil.locateOnLine(this.map(), path, closestToPoint);
-    mapCommonController.updateElevationGraph(percentOfPath);
+    mapCommonController.updateElevationGraph(percentOfPath, distance);
 
     if (this.hasProgressTextTarget) {
       const distanceKm = (distance / 1000) * percentOfPath;

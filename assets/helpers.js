@@ -15,6 +15,14 @@ export const markerDefaultIcon = L.icon({
   popupAnchor: [0, 0],
 });
 
+// eslint-disable-next-line no-unused-vars
+export const debugConsole = (message) => {
+  // const date = new Date();
+  // eslint-disable-next-line max-len
+  // const time = `[${date.toLocaleTimeString()}.${date.getMilliseconds().toString().padStart(3, '0')}] `;
+  // console.log(`%c${time}${message}`, 'color: blue; font-weight: bold;');
+};
+
 export const iconSymbol = (symbol) => L.divIcon({
   html: `<span class="stage-marker"><img alt="" src="${markerIconUrl}${'">%</span>'.replace('%', symbol)}`,
   iconSize: [48, 48],

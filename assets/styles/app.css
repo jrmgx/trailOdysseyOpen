@@ -368,6 +368,13 @@ path.leaflet-interactive {
     margin: 0 0.5rem;
 }
 
+.u-progress {
+    border-right: 2px dotted #258656;
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+}
+
 /** Public **/
 :root {
     --mobile-public-map-height: 28svh;

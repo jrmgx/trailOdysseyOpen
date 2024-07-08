@@ -40,8 +40,6 @@ export default class extends Controller {
     // Warning: points are indexed by their start stage id
     this.points = {}; // Raw data for each stage
     this.activeChart = null;
-    // % based current x position of the current point for that graph
-    this.activeChartPosition = null;
     this.isPublic = !!this.isPublicValue;
     this.isLive = !!this.isLiveValue;
     this.hasPreciseMouse = matchMedia('(pointer:fine)').matches;
@@ -513,39 +511,16 @@ export default class extends Controller {
           width: 2,
           fill: minimal ? 'rgba(13, 110, 253, 0.3)' : null,
         }, {
-          show: false,
+          show: false, // Latitudes
           label: '-',
           class: 'uplot-label-hidden',
         }, {
-          show: false,
+          show: false, // Longitudes
           label: '-',
           class: 'uplot-label-hidden',
         },
       ],
     };
-
-    if (!minimal) {
-      opts.hooks.draw = [
-        (u) => {
-          if (!this.activeChartPosition) return;
-
-          const dpr = window.devicePixelRatio || 1;
-          const { ctx } = u;
-          const margin = 15 * dpr;
-          const x = this.activeChartPosition * (u.width * dpr);
-
-          ctx.save();
-          ctx.strokeStyle = '#258656';
-          ctx.lineWidth = 2 * dpr;
-          ctx.setLineDash([4 * dpr, 4 * dpr]);
-          ctx.beginPath();
-          ctx.moveTo(x, margin);
-          ctx.lineTo(x, (u.height * dpr) - margin);
-          ctx.stroke();
-          ctx.restore();
-        },
-      ];
-    }
 
     const data = this.elevationPrepareData(stageId);
     element.innerHTML = '';
@@ -556,10 +531,21 @@ export default class extends Controller {
     this.activeChart = chart;
   };
 
-  updateElevationGraph = (position) => {
+  updateElevationGraph = (percentage, distance) => {
     if (!this.activeChart) return;
-    this.activeChartPosition = position;
-    this.activeChart.redraw();
+    const px = this.activeChart.valToPos(percentage * (distance / 1000), 'x');
+    const uWrap = document.querySelector('.uplot .u-wrap');
+    const uOver = uWrap.querySelector('.u-over');
+    let uProgress = uWrap.querySelector('.u-progress');
+    if (!uProgress) {
+      uProgress = document.createElement('div');
+      uProgress.classList.add('u-progress');
+      uProgress.style.top = uOver.style.top;
+      uProgress.style.left = uOver.style.left;
+      uProgress.style.height = uOver.style.height;
+      uWrap.appendChild(uProgress);
+    }
+    uProgress.style.width = `${px}px`;
   };
 
   elevationPrepareData = (stageId) => {
@@ -569,6 +555,9 @@ export default class extends Controller {
     // noinspection JSUnresolvedReference
     const accumulatedLengths = L.GeometryUtil.accumulatedLengths(pointsLatLng);
     const max = accumulatedLengths.length;
+    // We update the distance with this calculation instead of the backend info
+    // as this one is used for the graph
+    this.pathDistances[stageId] = accumulatedLengths[max - 1];
     const seriesX = [];
     const seriesAlt = [];
     const seriesLat = [];
