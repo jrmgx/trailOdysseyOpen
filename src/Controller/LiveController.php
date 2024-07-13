@@ -31,7 +31,7 @@ class LiveController extends MappableController
     /** @return array<mixed> */
     #[Route('/{stage}', name: 'show_stage', options: ['expose' => true], methods: ['GET'])]
     #[Template('live/index.html.twig')]
-    public function showStage(Trip $trip, Stage $stage = null): array
+    public function showStage(Trip $trip, ?Stage $stage = null): array
     {
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $stage);

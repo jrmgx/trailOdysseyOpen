@@ -10,7 +10,7 @@ class UTCDateTimeImmutableType extends DateTimeImmutableType
 {
     private static ?\DateTimeZone $utc = null;
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if ($value instanceof \DateTimeImmutable) {
             $value = $value->setTimezone(self::getUtc());
@@ -19,7 +19,7 @@ class UTCDateTimeImmutableType extends DateTimeImmutableType
         return parent::convertToDatabaseValue($value, $platform);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?\DateTimeImmutable
     {
         if (null === $value || $value instanceof \DateTimeImmutable) {
             return $value;
@@ -32,7 +32,7 @@ class UTCDateTimeImmutableType extends DateTimeImmutableType
         );
 
         if (!$converted) {
-            throw ConversionException::conversionFailedFormat($value, self::class, $platform->getDateTimeFormatString());
+            throw new ConversionException('ConversionFailedFormat');
         }
 
         return $converted;

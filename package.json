@@ -7,6 +7,7 @@
         "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
         "@symfony/webpack-encore": "^4.0.0",
         "core-js": "^3.23.0",
+        "fos-router": "./vendor/friendsofsymfony/jsrouting-bundle/Resources/",
         "leaflet": "^1.9.3",
         "leaflet-geometryutil": "^0.10.3",
         "leaflet-gpx": "^1.7.0",
@@ -15,7 +16,6 @@
         "leaflet.smooth_marker_bouncing": "^3.0.3",
         "uplot": "^1.6.30",
         "webpack": "^5.74.0",
-        "fos-router": "./vendor/friendsofsymfony/jsrouting-bundle/Resources/",
         "webpack-cli": "^4.10.0"
     },
     "devDependencies": {

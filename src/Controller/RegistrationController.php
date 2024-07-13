@@ -30,7 +30,7 @@ class RegistrationController extends AbstractController
     /** @return Response|array<mixed>|null */
     #[Route('/register', name: 'register', methods: ['GET', 'POST'])]
     #[Template('home/register.html.twig')]
-    public function register(Request $request): Response|null|array
+    public function register(Request $request): Response|array|null
     {
         if (!$this->instanceOpen) {
             throw $this->createAccessDeniedException($this->translator->trans('info.registration_closed'));

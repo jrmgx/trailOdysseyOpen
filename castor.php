@@ -200,7 +200,7 @@ function load_fixture(#[AsArgument] string $env = 'dev'): void
 }
 
 #[AsTask(description: 'Boot a builder')]
-function builder(#[AsOption] string $user = null): void
+function builder(#[AsOption] ?string $user = null): void
 {
     if (is_builder()) {
         io()->warning('Already in the builder');
@@ -330,7 +330,7 @@ function date_string(): string
     return (new DateTime())->format('Ymd-His');
 }
 
-function run_in_builder(string $runCommand, bool $allowFailure = false, string $user = null): Process
+function run_in_builder(string $runCommand, bool $allowFailure = false, ?string $user = null): Process
 {
     if (is_builder()) {
         return run($runCommand, allowFailure: $allowFailure);
@@ -339,7 +339,7 @@ function run_in_builder(string $runCommand, bool $allowFailure = false, string $
     return docker_exec($runCommand, allowFailure: $allowFailure, user: $user);
 }
 
-function docker_exec(string $runCommand, bool $allowFailure = false, string $service = null, string $user = null): Process
+function docker_exec(string $runCommand, bool $allowFailure = false, ?string $service = null, ?string $user = null): Process
 {
     $user ??= variable('user', '');
     if ($user) {

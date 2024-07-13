@@ -191,7 +191,7 @@ class GpxService
         return $files;
     }
 
-    private function gpx(Trip $trip, string $name = null): GpxFile
+    private function gpx(Trip $trip, ?string $name = null): GpxFile
     {
         $name = $name ? ': ' . $name : '';
 
