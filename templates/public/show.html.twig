@@ -51,15 +51,15 @@
                 <div class="public-bar-description">
                     <div class="markdown-container container clearfix">
                         <h1 class="fs-2 my-3 row">
-                            <div class="col-12">
+                            <span class="col-12">
                                 {{ trip.name }}
-                            </div>
-                            <div class="col-12 fs-small">
+                            </span>
+                            <span class="col-12 fs-small">
                                 {{ sum_distance|to_km }}&nbsp;km
                                 {% if sum_positive > 0 %}
                                     {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
                                 {% endif %}
-                            </div>
+                            </span>
                         </h1>
                         {% if trip.description %}
                             <div class="fs-4 row">

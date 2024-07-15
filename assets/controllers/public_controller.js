@@ -163,6 +163,15 @@ export default class extends Controller {
     }
     const diaryEntry = document.getElementById(`diary${id}`);
     diaryEntry.classList.remove('d-none');
+    const outerContainer = diaryEntry.querySelector('.public-bar-description');
+    const innerContainer = outerContainer.querySelector('.markdown-container');
+    if (!innerContainer.querySelector('img')) {
+      const bodyWidth = document.querySelector('body').clientWidth;
+      const max = Math.min(8, Math.round((0.0055 * bodyWidth) + 0.92));
+      if (this.updateFontSizeToFit(outerContainer, innerContainer, max)) {
+        outerContainer.classList.add('auto-sized');
+      }
+    }
   };
 
   // Marker related
@@ -200,6 +209,24 @@ export default class extends Controller {
   // Event based
 
   // Helpers
+
+  updateFontSizeToFit = (outerContainer, innerContainer, max) => {
+    const outerHeight = outerContainer.clientHeight;
+    let innerHeight = innerContainer.clientHeight;
+    if (innerHeight >= outerHeight) {
+      return false;
+    }
+
+    let fontSize = 1;
+    while (innerHeight < outerHeight) {
+      fontSize += 0.5;
+      innerContainer.style.fontSize = `${fontSize}rem`;
+      innerHeight = innerContainer.clientHeight;
+    }
+    // Keep previous iteration
+    innerContainer.style.fontSize = `${Math.min(max, fontSize - 0.5)}rem`;
+    return true;
+  };
 
   preventWarnings = () => {
     // Targets

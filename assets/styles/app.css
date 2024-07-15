@@ -456,6 +456,7 @@ path.leaflet-interactive {
 
 .public-bar-description .markdown-container {
     padding: 0 3rem;
+    line-height: normal;
 }
 
 .public-bar-description .img-wrapper {
@@ -470,6 +471,19 @@ path.leaflet-interactive {
     max-width: 100%;
     max-height: calc(100svh - var(--mobile-public-map-height) - var(--public-bar-header-height) - 1rem);
 }
+
+.public-bar-description.auto-sized {
+    display: flex;
+    align-items: center;
+}
+
+.public-bar-description.auto-sized .markdown-container {
+    color: #444;
+    padding: 0;
+    font-weight: 500;
+    transform: scale(75%) translateY(-10px);
+}
+
 
 .public-bottom {
     position: fixed;
