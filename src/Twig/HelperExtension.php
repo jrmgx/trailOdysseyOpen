@@ -12,7 +12,23 @@ use Twig\TwigFunction;
 
 class HelperExtension extends AbstractExtension
 {
-    private const COLORS = ['f30000', '000fd1', 'd100b1', 'd19400', '7d7d7d', 'ff81f5', 'fff961', '000000'];
+    private const COLORS = [
+        'f30000',
+        '000fd1',
+        'd100b1',
+        'd19400',
+        '7d7d7d',
+        'ff81f5',
+        'fff961',
+        '000000',
+        '00f300',
+        'd10000',
+        '00d1fd',
+        'b1d100',
+        '00d194',
+        '7d7dff',
+        '81f5ff',
+    ];
 
     public function __construct(
         private readonly IntlExtension $intlExtension,
@@ -67,6 +83,6 @@ class HelperExtension extends AbstractExtension
 
     public function colorFromIndex(int $index): string
     {
-        return self::COLORS[$index % 8];
+        return self::COLORS[$index % count(self::COLORS)];
     }
 }
