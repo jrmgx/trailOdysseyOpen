@@ -83,6 +83,6 @@ class HelperExtension extends AbstractExtension
 
     public function colorFromIndex(int $index): string
     {
-        return self::COLORS[$index % count(self::COLORS)];
+        return self::COLORS[$index % \count(self::COLORS)];
     }
 }

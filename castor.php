@@ -45,6 +45,7 @@ function up(
         $command[] = '--build';
     }
     $command[] = '-d';
+    $command[] = '--wait';
     docker_compose($command);
 }
 
@@ -62,12 +63,6 @@ function build(#[AsOption] bool $noCache = false): void
 function rebuild(): void
 {
     build(noCache: true);
-}
-
-#[AsTask(namespace: 'infra', description: 'Restart the stack')]
-function restart(): void
-{
-    docker_compose(['restart']);
 }
 
 #[AsTask(namespace: 'infra', description: 'Stop the stack', aliases: ['down'])]
@@ -97,7 +92,7 @@ function install(): void
 function make_migration(): void
 {
     assert_not_in_prod();
-    run_in_builder('bin/console doctrine:migrations:diff --from-empty-schema --formatted');
+    run_in_builder('bin/console doctrine:migrations:diff --formatted --allow-empty-diff'); // --from-empty-schema
 }
 
 #[AsTask(namespace: 'prod', description: 'Backup the app')]
@@ -188,7 +183,7 @@ function clear_cache(#[AsArgument] string $env): void
 }
 
 #[AsTask(namespace: 'dev', description: 'Load fixture [drop database]')]
-function load_fixture(#[AsArgument] string $env = 'dev'): void
+function load_fixture(#[AsArgument] string $env): void
 {
     assert_not_in_prod();
 
@@ -221,7 +216,7 @@ function builder(#[AsOption] ?string $user = null): void
     run($docker, tty: true, pty: true, allowFailure: true);
 }
 
-#[AsTask(namespace: 'dev', description: 'A test command')]
+#[AsTask(namespace: 'dev', description: 'Give Symfony version as a test command')]
 function version(): void
 {
     io()->info(is_prod() ? 'prod' : 'dev');
@@ -255,7 +250,7 @@ function js_eslint(): void
     run_in_builder('yarn run eslint');
 }
 
-#[AsTask(namespace: 'dev', description: 'Run scripts that validates code before a commit')]
+#[AsTask(namespace: 'dev', description: 'Run scripts that validates code before a git commit')]
 function pre_commit(): void
 {
     phpcs();
@@ -290,27 +285,6 @@ function tunnel(#[AsOption] string $domain): void
     $appName = variable('app_name');
 
     run("ngrok http --host-header=$appName.test 443 --domain=$domain");
-}
-
-#[AsTask(namespace: 'dev')]
-function ping(#[AsArgument] string $url): bool
-{
-    io()->info("PING: $url");
-
-    $handle = curl_init($url);
-    curl_setopt($handle, \CURLOPT_TIMEOUT, 30);
-    curl_setopt($handle, \CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($handle, \CURLOPT_NOBODY, true);
-    curl_exec($handle);
-
-    $httpCode = curl_getinfo($handle, \CURLINFO_HTTP_CODE);
-
-    curl_close($handle);
-
-    $ok = $httpCode >= 200 && $httpCode < 400;
-    io()->info(($ok ? 'PONG' : 'KO') . ": $httpCode");
-
-    return $ok;
 }
 
 // HELPERS
@@ -373,7 +347,7 @@ function assert_not_in_prod(): void
 function assert_not_in_dev(): void
 {
     if (!is_prod()) {
-        throw new Exception('Can not run this command in production');
+        throw new Exception('Can not run this command in dev');
     }
 }
 

@@ -13,6 +13,9 @@ services:
         image: jrmgx/php-8.2-fpm-nginx:2
         container_name: trailodyssey-php-fpm
         restart: "always"
+        depends_on:
+            database:
+                condition: service_healthy
         volumes:
             - "./:/var/www"
             - "../data:/var/www/var/data"
@@ -38,8 +41,14 @@ services:
         image: mysql:8
         container_name: trailodyssey-mysql
         restart: "always"
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+            interval: 3s
+            timeout: 10s
+            retries: 5
         volumes:
             - "trailodyssey-mysql-data:/var/lib/mysql"
+            - "../mysqld:/var/run/mysqld"
         networks:
             - "traefik_network"
         environment:
