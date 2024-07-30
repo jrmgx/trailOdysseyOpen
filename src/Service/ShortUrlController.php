@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+// TODO move it somewhere else
 #[Route('', name: 'short_')]
 class ShortUrlController extends AbstractController
 {

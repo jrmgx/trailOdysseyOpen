@@ -7,6 +7,7 @@ use Graphp\Graph\Vertex;
 
 /**
  * Adapted from https://medium.com/@miladev95/dijkstras-graph-algorithm-explained-with-php-example-f55beac842a1.
+ * TODO is it really a service? if not, move it to a more appropriate namespace.
  */
 class Dijkstra
 {
