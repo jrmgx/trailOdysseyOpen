@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Helper\GeoHelper;
 use App\Model\Point;
 use App\Repository\RoutingRepository;
+use App\Service\GeoElevationService;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -186,7 +187,7 @@ class Routing
 
             return $this;
         }
-        $data = array_map(fn (Point $point) => [$point->lat, $point->lon, $point->el], $pathPoints);
+        $data = array_map(fn (Point $point) => [$point->lat, $point->lon, GeoElevationService::nonNegative($point->el)], $pathPoints);
         $this->pathPointsStore = json_encode($data);
 
         return $this;

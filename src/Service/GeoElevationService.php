@@ -52,10 +52,26 @@ class GeoElevationService
             for ($i = 0; $i < \count($points); ++$i) {
                 $point = $points[$i];
                 $el = $geonames[$i]['srtm3'] ?? '';
-                $point->el = $el;
+                $point->el = $this->nonNegative($el);
             }
         } catch (\Exception $exception) {
             $this->logger->error('Error: GetElevations ' . $exception->getMessage() . ' Results: ' . json_encode($results));
         }
+    }
+
+    /**
+     * Given a string value representing a float return it if positive, "0" otherwise.
+     */
+    public static function nonNegative(?string $value): ?string
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        if ((float) $value <= 0) {
+            return '0';
+        }
+
+        return $value;
     }
 }
