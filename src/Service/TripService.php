@@ -31,9 +31,9 @@ class TripService
         $routings = [];
 
         $currentStage = $this->stageRepository->findFirstStage($trip);
-        $number = 0;
+        $number = 1;
         while ($currentStage) {
-            $currentStage->setSymbol($number > 0 ? (string) $number : '📍');
+            $currentStage->setSymbol((string) $number);
             ++$number;
 
             $results[] = $currentStage;
