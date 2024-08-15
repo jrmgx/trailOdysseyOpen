@@ -194,6 +194,18 @@ function load_fixture(#[AsArgument] string $env): void
     // run_in_builder("bin/console doctrine:fixtures:load -n --append --env=$env");
 }
 
+#[AsTask(namespace: 'dev', description: 'Clean potential temp files', aliases: ['clean'])]
+function clean(): void
+{
+    assert_not_in_prod();
+    assert_not_in_builder();
+
+    $command = 'rm -rf ../mysqld/*';
+    io()->text("=> Will run: $command");
+
+    run($command);
+}
+
 #[AsTask(description: 'Boot a builder')]
 function builder(#[AsOption] ?string $user = null): void
 {
