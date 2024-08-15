@@ -89,12 +89,10 @@ class StageController extends MappableController
 
         $previousStage = $this->stageRepository->findLastStage($trip);
         if ($previousStage) {
-            $stage->setArrivingAt($previousStage->getLeavingAt()->modify('+ 12 hours'));
-            $stage->setLeavingAt($previousStage->getLeavingAt()->modify('+ 1 day'));
+            $stage->setArrivingAt($previousStage->getArrivingAt()->modify('+ 1 day'));
         } else {
-            $date = (new \DateTimeImmutable())->modify('+ 1 day')->setTime(18, 0);
+            $date = (new \DateTimeImmutable('midnight'))->modify('+ 1 day');
             $stage->setArrivingAt($date);
-            $stage->setLeavingAt($date);
         }
 
         $form = $this->createForm(StageType::class, $stage, [
@@ -156,15 +154,9 @@ class StageController extends MappableController
             $point = GeoHelper::midPoint($previousPoint->toPoint(), $nextPoint->toPoint())->toGeoPoint();
         }
 
-        $midDate = (new \DateTimeImmutable())->setTimestamp(
-            ($startStage->getLeavingAt()->getTimestamp() + $finishStage->getArrivingAt()->getTimestamp()) / 2
-        );
-
         $intermediateStage = new Stage();
         $intermediateStage->setPoint($point);
-        $intermediateStage->setArrivingAt($midDate);
-        $intermediateStage->setLeavingAt($midDate);
-
+        $intermediateStage->setArrivingAt($startStage->getArrivingAt());
         $intermediateStage->setUser($trip->getUser());
         $intermediateStage->setTrip($trip);
 

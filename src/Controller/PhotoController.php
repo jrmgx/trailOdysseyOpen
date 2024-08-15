@@ -119,7 +119,7 @@ class PhotoController extends AbstractController
                 if ($date) {
                     $diaryEntry->setArrivingAt($date);
                 } else {
-                    $diaryEntry->setArrivingAt((new \DateTimeImmutable())->modify('+ 1 days')->setTime(18, 0));
+                    $diaryEntry->setArrivingAt(new \DateTimeImmutable());
                     $description .= \PHP_EOL . $this->translator->trans('info.date_information_not_found_on_this_photo');
                 }
 

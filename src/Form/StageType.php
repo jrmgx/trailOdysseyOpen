@@ -6,8 +6,7 @@ use App\Entity\Stage;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,27 +35,12 @@ class StageType extends AbstractType
             ->add('point', GeoPointType::class, [
                 'label' => 'form.label.internal.point',
             ])
-            // None are required but at least one of them should be defined
-            // @see StageDateConstraintValidator::validate()
-            ->add('arrivingAt', DateTimeType::class, [
+            ->add('arrivingAt', DateType::class, [
                 'label' => 'form.label.arriving_at',
                 'widget' => 'single_text',
                 'html5' => true,
                 'input' => 'datetime_immutable',
-                'required' => false,
-                'view_timezone' => $user->getTimezone(),
-            ])
-            ->add('leavingAt', DateTimeType::class, [
-                'label' => 'form.label.leaving_at',
-                'widget' => 'single_text',
-                'html5' => true,
-                'input' => 'datetime_immutable',
-                'required' => false,
-                'view_timezone' => $user->getTimezone(),
-            ])
-            ->add('cascadeTimeChange', CheckboxType::class, [
-                'label' => 'form.label.cascade_time_change',
-                'required' => false,
+                'view_timezone' => 'UTC',
             ])
         ;
     }

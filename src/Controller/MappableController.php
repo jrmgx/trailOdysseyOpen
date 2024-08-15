@@ -89,9 +89,9 @@ abstract class MappableController extends BaseController
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $mappable);
 
-        $previousLeavingAt = null;
+        $dateOfStageBeforeEdit = null;
         if ($mappable instanceof Stage) {
-            $previousLeavingAt = $mappable->getLeavingAt();
+            $dateOfStageBeforeEdit = $mappable->getArrivingAt();
         }
 
         $form = $this->createForm($formType, $mappable, [
@@ -104,19 +104,15 @@ abstract class MappableController extends BaseController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $trip->updatedNow();
-            $cascadeTimeChange = false;
-            if ($form->has('cascadeTimeChange')) {
-                $cascadeTimeChange = $form->get('cascadeTimeChange')->getData() ?? false;
-            }
+
             $this->entityManager->persist($mappable);
 
-            if ($cascadeTimeChange && $mappable instanceof Stage && $previousLeavingAt) {
-                $leavingAtDiff = $previousLeavingAt->diff($mappable->getLeavingAt());
+            if ($mappable instanceof Stage && $dateOfStageBeforeEdit && $dateOfStageBeforeEdit !== $mappable->getArrivingAt()) {
+                $arrivingAtDiff = $dateOfStageBeforeEdit->diff($mappable->getArrivingAt());
                 $currentStage = $mappable;
                 while ($currentStage->getRoutingOut()) {
                     $currentStage = $currentStage->getRoutingOut()->getFinishStage();
-                    $currentStage->setArrivingAt($currentStage->getArrivingAt()->add($leavingAtDiff));
-                    $currentStage->setLeavingAt($currentStage->getLeavingAt()->add($leavingAtDiff));
+                    $currentStage->setArrivingAt($currentStage->getArrivingAt()->add($arrivingAtDiff)->setTime(0, 0));
                 }
             }
 

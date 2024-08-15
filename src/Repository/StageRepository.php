@@ -27,7 +27,7 @@ class StageRepository extends ServiceEntityRepository
      */
     public function findByTrip(Trip $trip): array
     {
-        return $this->findBy(['trip' => $trip], ['leavingAt' => 'ASC']);
+        return $this->findBy(['trip' => $trip], ['arrivingAt' => 'ASC']);
     }
 
     public function findLastStage(Trip $trip): ?Stage
@@ -37,6 +37,6 @@ class StageRepository extends ServiceEntityRepository
 
     public function findFirstStage(Trip $trip): ?Stage
     {
-        return $this->findOneBy(['trip' => $trip], ['leavingAt' => 'ASC']);
+        return $this->findOneBy(['trip' => $trip], ['arrivingAt' => 'ASC']);
     }
 }

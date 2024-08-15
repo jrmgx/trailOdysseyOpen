@@ -1,6 +1,6 @@
 <turbo-frame id="routing_{{ routing.id }}">
-    <div class="card m-3">
-        <div class="card-header">
+    <div class="card mx-3 border-top-0 rounded-0 rounded-bottom-1">
+        <div class="card-body pt-0">
             <div class="d-flex justify-content-between align-items-center">
                 <span class="flex-grow-1"
                       data-action="click->plan#routingClickAction"
@@ -39,6 +39,12 @@
                     {{ 'routing.live'|trans }}
                 </a>
             </div>
+        </div>
+        <div class="card-footer">
+            <span class="pe-2">🏁</span>
+            <span class="flex-grow-1">
+                <span>{{ routing.finishStage.nameWithPointName }}</span>
+            </span>
         </div>
     </div>
     <script>

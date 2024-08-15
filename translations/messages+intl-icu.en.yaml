@@ -213,8 +213,7 @@ routing:
   live: 'Live'
   progress: 'Progress'
 mappable:
-  arriving_at: 'Arriving at: {date}'
-  leaving_at: 'Leaving at: {date}'
+  arriving_at: 'Date: {date}'
 segment:
   generic_title: 'Segment'
 form.label.geocoding_service_provider.overpass: OSM

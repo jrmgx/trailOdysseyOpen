@@ -103,7 +103,7 @@
                         {% for result in results %}
                             {% if result|is_instanceof('App\\Entity\\Stage') %}
                                 {% set stage = result %}
-                                {{ include('stage/show_frame.html.twig') }}
+                                {{ include('stage/show_frame.html.twig', { last: loop.last }) }}
                             {% elseif result|is_instanceof('App\\Entity\\Routing') %}
                                 {% set routing = result %}
                                 {{ include('routing/show_frame.html.twig') }}

@@ -60,12 +60,14 @@ class HelperExtension extends AbstractExtension
         \DateTimeInterface|string|null $date,
         string $dateFormat = 'full',
         string $timeFormat = 'short',
+        ?string $timezone = null,
     ): string {
         $currentYear = (new \DateTimeImmutable())->format('Y');
         /** @var ?User $user */
         $user = $this->security->getUser();
         $dateTime = $this->intlExtension
-            ->formatDateTime($env, $date, $dateFormat, $timeFormat, timezone: $user?->getTimezone() ?? 'UTC')
+            ->formatDateTime($env, $date, $dateFormat, $timeFormat,
+                timezone: $timezone ?? $user?->getTimezone() ?? 'UTC')
         ;
         /** @var array<string> $parts */
         $parts = explode(" $currentYear ", $dateTime);

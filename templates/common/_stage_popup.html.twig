@@ -1,6 +1,6 @@
 {% if not loop.first %}
     <span class="popup-arriving-at">
-        ➔&nbsp;{{ stage.arrivingAt|format_datetime_app }}
+        ➔&nbsp;{{ stage.arrivingAt|format_date(timezone = 'UTC') }}
     </span>
 {% endif %}
 <span class="popup-name">
@@ -10,8 +10,3 @@
     <span class="popup-extra-distance"> (+{{ stage.extra.distance|to_km }}&nbsp;km)</span>
 {% endif %}
 <div class="markdown-container">{{ stage.description|default|markdown_to_html }}</div>
-{% if not (loop.last and loop.length > 1) %}
-    <span class="popup-leaving-at">
-        ➔&nbsp;{{ stage.leavingAt|format_datetime_app }}
-    </span>
-{% endif %}

@@ -293,7 +293,6 @@ class TripController extends BaseController
             $stageCopy->setUser($user);
             $stageCopy->setDescription($stage->getDescription());
             $stageCopy->setArrivingAt($stage->getArrivingAt());
-            $stageCopy->setLeavingAt($stage->getLeavingAt());
             $stageCopy->setPoint($stage->getPoint());
             $stageCopy->setSymbol($stage->getSymbol());
             $stageCopy->setTimezone($stage->getTimezone());

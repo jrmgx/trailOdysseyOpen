@@ -1,5 +1,6 @@
 {% set object_name_plural = object_name_plural|default(object_name ~ 's') %}
-<div class="card m-3 position-relative">
+{% set extraClass = object_name == 'stage' ? 'mb-0 border-bottom-0 rounded-bottom-0' %}
+<div class="card m-3 position-relative {{ extraClass }}">
     <form method="post"
           style="position: absolute; right: 1rem; bottom: 1rem;"
           action="{{ path(object_name ~ '_delete', { trip: trip.id, id: mappable.id }) }}"

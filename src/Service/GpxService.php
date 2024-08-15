@@ -6,7 +6,6 @@ use App\Entity\GeoPoint;
 use App\Entity\Interest;
 use App\Entity\MappableInterface;
 use App\Entity\Segment;
-use App\Entity\Stage;
 use App\Entity\Trip;
 use App\Model\Point;
 use App\Repository\InterestRepository;
@@ -242,14 +241,8 @@ class GpxService
         $gpxPoint->elevation = (float) $point->el;
         $gpxPoint->name = $mappable->getNameWithPointName();
         // TODO translate + date format
-        $gpxPoint->description = 'Arriving at: ' . $mappable->getArrivingAt()->format('D j M G:i');
-        if ($mappable instanceof Stage) {
-            $gpxPoint->description .= \PHP_EOL .
-                'Leaving at: ' . $mappable->getLeavingAt()->format('D j M G:i')
-            ;
-        } elseif ($mappable instanceof Interest) {
-            $gpxPoint->description .= \PHP_EOL . ($mappable->getDescription() ?? '');
-        }
+        $gpxPoint->description = 'Date: ' . $mappable->getArrivingAt()->format('D j M') . \PHP_EOL
+            . ($mappable->getDescription() ?? '');
 
         return $gpxPoint;
     }

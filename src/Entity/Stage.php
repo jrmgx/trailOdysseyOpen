@@ -2,21 +2,15 @@
 
 namespace App\Entity;
 
-use App\Constraint as AppAssert;
 use App\Repository\StageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Assert\Cascade]
-#[AppAssert\StageDateConstraint]
 #[ORM\Entity(repositoryClass: StageRepository::class)]
 class Stage implements MappableInterface
 {
     use MappableTrait;
-
-    #[ORM\Column]
-    #[Assert\NotBlank]
-    protected \DateTimeImmutable $leavingAt;
 
     #[ORM\Column]
     protected string $timezone = 'UTC';
@@ -33,33 +27,26 @@ class Stage implements MappableInterface
 
     protected ?string $symbol = null;
 
-    protected bool $cascadeTimeChange = true;
-
     public function __construct()
     {
         $this->updatedAt = new \DateTimeImmutable();
+        $this->arrivingAt = new \DateTimeImmutable('midnight');
     }
 
-    public function getCascadeTimeChange(): bool
+    /**
+     * Override so we are sure to have midnight version.
+     */
+    public function getArrivingAt(): \DateTimeImmutable
     {
-        return $this->cascadeTimeChange;
+        return $this->arrivingAt->setTime(0, 0);
     }
 
-    public function setCascadeTimeChange(bool $cascadeTimeChange): self
+    /**
+     * Override so we are sure to have midnight version.
+     */
+    public function setArrivingAt(\DateTimeImmutable $arrivingAt): self
     {
-        $this->cascadeTimeChange = $cascadeTimeChange;
-
-        return $this;
-    }
-
-    public function getLeavingAt(): \DateTimeImmutable
-    {
-        return $this->leavingAt;
-    }
-
-    public function setLeavingAt(\DateTimeImmutable $leavingAt): self
-    {
-        $this->leavingAt = $leavingAt;
+        $this->arrivingAt = $arrivingAt->setTime(0, 0);
 
         return $this;
     }
