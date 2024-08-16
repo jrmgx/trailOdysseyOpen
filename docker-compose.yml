@@ -27,14 +27,14 @@ services:
         networks:
             - "traefik_network"
         environment:
-            - "IN_BUILDER=1"
+            IN_BUILDER: 1
         labels:
             # common
-            - "traefik.enable=true"
-            - "traefik.http.services.trailodyssey-common.loadbalancer.server.port=80"
+            traefik.enable: true
+            traefik.http.services.trailodyssey-common.loadbalancer.server.port: 80
             # trailodyssey.net
-            - "traefik.http.routers.trailodyssey-app.rule=Host(`trailodyssey.net`)"
-            - "traefik.http.routers.trailodyssey-app.service=trailodyssey-common"
+            traefik.http.routers.trailodyssey-app.rule: Host(`trailodyssey.net`)
+            traefik.http.routers.trailodyssey-app.service: trailodyssey-common
 
     # NEVER ADD ports DIRECTIVES IN PROD
     database:
@@ -52,7 +52,7 @@ services:
         networks:
             - "traefik_network"
         environment:
-            - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}"
+            MYSQL_ROOT_PASSWORD:
 
     # NEVER ADD ports DIRECTIVES IN PROD
     redis:

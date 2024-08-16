@@ -1,18 +1,18 @@
 volumes:
-    projets-trailodyssey-builder-root: {}
+    projects-trailodyssey-builder-root: {}
 
 services:
     php-fpm:
         restart: "no"
         volumes:
-            - "projets-trailodyssey-builder-root:/root"
+            - "projects-trailodyssey-builder-root:/root"
         labels:
             # trailodyssey.test
-            - "traefik.http.routers.trailodyssey-test.rule=Host(`trailodyssey.test`)"
-            - "traefik.http.routers.trailodyssey-test.tls=true"
-            - "traefik.http.routers.trailodyssey-test.service=trailodyssey-common"
-            - "traefik.http.routers.trailodyssey-test-unsecure.rule=Host(`trailodyssey.test`)"
-            - "traefik.http.routers.trailodyssey-test-unsecure.service=trailodyssey-common"
+            traefik.http.routers.trailodyssey-test.rule: Host(`trailodyssey.test`)
+            traefik.http.routers.trailodyssey-test.tls: true
+            traefik.http.routers.trailodyssey-test.service: trailodyssey-common
+            traefik.http.routers.trailodyssey-test-unsecure.rule: Host(`trailodyssey.test`)
+            traefik.http.routers.trailodyssey-test-unsecure.service: trailodyssey-common
 
     database:
         restart: "no"
