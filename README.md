@@ -96,6 +96,17 @@ Head up to https://trailodyssey.test and you should have a running instance!
 See `castor` for other commands
 
 
+## User manual
+
+The user manual is a work in progress, still those are hidden features that needs to be explicit:
+
+- Double tap on the eye icon in live mode will center the map on the current position
+- Tap on the GPS point in live mode will start the compass for a minute
+- On desktop, you can hold the _shift_ key while hovering elevation so the map moves at that point
+- On desktop, you can hold the _shift_ key and click on the name of a segment to make it fit the view
+- After a search of any kind, simply click on the map to discard the last results
+
+
 ## Some screens
 
 ![trail_odyssey_screen_public_2.png](./documentation/assets/trail_odyssey_screen_public_2.png)
