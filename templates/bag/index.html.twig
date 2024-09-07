@@ -114,7 +114,11 @@
                     </div>
                 </div>
                 <div class="col-12">
-                    {{ 'info.total_kg'|trans({ weight: (bag.totalWeight / 1000) }) }}
+                    <input type="checkbox" disabled checked class="form-check-input me-1">
+                    {{ 'info.checked_of_total_kg'|trans({
+                        checked_weight: (bag.totalCheckedWeight / 1000),
+                        weight: (bag.totalWeight / 1000),
+                    }) }}
                     {% if bag.weight %}<small>(incl. bag {{ bag.weight }}gr)</small>{% endif %}
                 </div>
             </div>

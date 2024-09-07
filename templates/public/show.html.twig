@@ -88,6 +88,7 @@
                                                         <label for="gear-in-bag-{{ inBag.id }}" class="form-check-label">
                                                             <div>
                                                                 {% set checkedWeight = thing.isBag ? inBag.totalCheckedWeight : (inBag.checkedWeight ? inBag.checkedWeight : null) %}
+                                                                {% if thing.isBag %}🛄{% endif %}
                                                                 {{ thing.name }}
                                                                 {% if inBag.count > 1 and checkedWeight %}
                                                                     ({{ inBag.count }} = {{ checkedWeight }}gr)
