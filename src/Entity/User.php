@@ -40,11 +40,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     /** @var Collection<int, Trip> */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Trip::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Trip::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $trips;
 
     #[ORM\Column(length: 32, options: ['default' => 'UTC'])]
     private string $timezone = 'UTC';
+
+    #[ORM\Column(length: 64, options: ['default' => '{counter}{stage_name}{trip_name}'])]
+    #[Assert\Regex('`^(\{(counter|stage_name|trip_name)\}){3}$`', 'The pattern must only contain {counter}, {stage_name} and {trip_name} in any order')]
+    private string $exportFilenamePattern = '{counter}{stage_name}{trip_name}';
 
     public function __construct()
     {
@@ -187,6 +191,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTimezone(string $timezone): static
     {
         $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    public function getExportFilenamePattern(): string
+    {
+        return $this->exportFilenamePattern;
+    }
+
+    public function setExportFilenamePattern(string $exportFilenamePattern): static
+    {
+        $this->exportFilenamePattern = $exportFilenamePattern;
 
         return $this;
     }

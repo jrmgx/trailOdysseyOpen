@@ -19,6 +19,7 @@ class UserType extends AbstractType
                 'help' => 'form.help.nickname',
             ])
             ->add('timezone', TimezoneType::class)
+            ->add('exportFilenamePattern', TextType::class)
         ;
     }
 

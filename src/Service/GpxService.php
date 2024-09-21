@@ -168,11 +168,15 @@ class GpxService
                 $startStage->getNameWithPointName() .
                 ' to ' . $finishStage->getNameWithPointName()
             );
-            $filename =
-                $tripName . '_' .
-                str_pad((string) $count, 3, '0', \STR_PAD_LEFT) . '_' .
-                mb_substr(mb_strtolower($slugName), 0, 32)
-            ;
+            $filenamePattern = $trip->getUser()->getExportFilenamePattern();
+            $filenamePattern = str_replace('}{', '}_{', $filenamePattern);
+            $filename = str_replace([
+                '{counter}', '{stage_name}', '{trip_name}',
+            ], [
+                str_pad((string) $count, 3, '0', \STR_PAD_LEFT),
+                mb_substr(mb_strtolower($slugName), 0, 32),
+                $tripName,
+            ], $filenamePattern);
 
             $files[$filename] = $local;
         }
