@@ -11,6 +11,7 @@ use App\Form\PhotoFileType;
 use App\Helper\GeoHelper;
 use App\Model\Point;
 use App\Security\Voter\UserVoter;
+use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Attribute\Template;
@@ -60,20 +61,29 @@ class PhotoController extends AbstractController
             $uploadedFiles = $form->get('files')->getData() ?? [];
             foreach ($uploadedFiles as $uploadedFile) {
                 $directory = $this->uploadsDirectory . '/' . $user->getId();
-                $filename = sha1(random_bytes(96)) . '.' . $uploadedFile->guessExtension();
+                $filename = sha1(random_bytes(96));
+                $extension = $uploadedFile->guessExtension();
                 $this->logger->debug("Will upload a new photo: $filename");
                 try {
-                    $uploadedFile->move($directory, $filename);
+                    $uploadedFile->move($directory, "$filename.$extension");
                 } catch (FileException $e) {
-                    $this->logger->error("Error while uploading: $filename", ['exception' => $e]);
+                    $this->logger->error("Error while uploading: $filename.$extension", ['exception' => $e]);
                     continue;
+                }
+
+                $mime = mime_content_type("$directory/$filename.$extension");
+                if ($mime && preg_match('`^image/(heif|heic)(-sequence)?$`', $mime)) {
+                    $this->logger->debug('Converting HEIC file to JPG format');
+                    ImageService::convertHeicToJpg("$directory/$filename.$extension", "$directory/$filename.jpg");
+                    unlink("$directory/$filename.$extension");
+                    $extension = 'jpg';
                 }
 
                 // Create a photo entity for each photo
                 $photo = new Photo();
                 $photo->setUser($trip->getUser());
                 $photo->setTrip($trip);
-                $photo->setPath($filename);
+                $photo->setPath("$filename.$extension");
                 $this->entityManager->persist($photo);
 
                 $diaryEntry = new DiaryEntry();
@@ -88,7 +98,7 @@ class PhotoController extends AbstractController
                 $date = null;
 
                 try {
-                    $exif = exif_read_data($directory . '/' . $filename);
+                    $exif = exif_read_data("$directory/$filename.$extension");
                     if ($exif) {
                         $point = GeoHelper::getPointFromExif($exif);
                         try {
@@ -101,12 +111,12 @@ class PhotoController extends AbstractController
                             }
                         } catch (\Exception $e) {
                             // Date related exception, ignore
-                            $this->logger->warning("Error while reading date in exif: $filename", ['exception' => $e]);
+                            $this->logger->warning("Error while reading date in exif: $filename.$extension", ['exception' => $e]);
                         }
                     }
                 } catch (\Exception $e) {
                     // Exif read data exception, ignore
-                    $this->logger->warning("Error while reading exif: $filename", ['exception' => $e]);
+                    $this->logger->warning("Error while reading exif: $filename.$extension", ['exception' => $e]);
                 }
 
                 if ($point) {
@@ -128,7 +138,7 @@ class PhotoController extends AbstractController
                 $trip->updatedNow();
                 $this->entityManager->persist($diaryEntry);
                 $this->entityManager->flush();
-                $this->logger->debug("Done with file: $filename");
+                $this->logger->debug("Done with file: $filename.$extension");
             }
 
             return $this->redirectToRoute('diaryEntry_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
