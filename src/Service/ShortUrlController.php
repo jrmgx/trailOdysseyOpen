@@ -16,7 +16,7 @@ class ShortUrlController extends AbstractController
 
     #[Route('/{user}', name: 'index', requirements: self::ROUTING_REQUIREMENT, methods: ['GET'], priority: -1)]
     public function index(
-        #[MapEntity(mapping: ['user' => 'nickname'])] User $user
+        #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
     ): Response {
         return $this->redirectToRoute('public_index', [
             'user' => $user->getNickname(),
@@ -26,7 +26,7 @@ class ShortUrlController extends AbstractController
     #[Route('/{user}/{trip}', name: 'show', requirements: self::ROUTING_REQUIREMENT, methods: ['GET'], priority: -1)]
     public function show(
         #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
-        #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip
+        #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip,
     ): Response {
         if (!$trip->isShared() || $trip->getUser() !== $user) {
             throw $this->createNotFoundException();

@@ -56,7 +56,7 @@ class GeoArithmeticService
     public function getPointsFromPointToPoint(
         array $paths,
         Path $startPath, Path $endPath,
-        Point $startPoint, Point $endPoint
+        Point $startPoint, Point $endPoint,
     ): ?array {
         if (!$startPath->equals($endPath)) {
             $paths = $this->findPaths($paths, $startPath, $endPath, $startPoint, $endPoint);

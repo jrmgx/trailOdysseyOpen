@@ -17,7 +17,7 @@ class Path
     public function __construct(
         private array $points,
         private array $children = [],
-        private ?string $name = null // For debug only
+        private ?string $name = null, // For debug only
     ) {
         if (0 === \count($this->points)) {
             throw new \Exception('Path must contain at least one Point.');

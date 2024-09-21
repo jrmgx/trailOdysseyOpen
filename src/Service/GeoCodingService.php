@@ -103,7 +103,7 @@ class GeoCodingService
         Point $northEast,
         string $provider,
         string $value,
-        ?string $key = null
+        ?string $key = null,
     ): array {
         return match ($provider) {
             self::PROVIDER_GOOGLE => $this->searchElementsGoogle($southWest, $northEast, $value),

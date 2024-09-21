@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 class LogoutSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator
+        private UrlGeneratorInterface $urlGenerator,
     ) {
     }
 

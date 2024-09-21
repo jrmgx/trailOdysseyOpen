@@ -56,7 +56,7 @@ class LiveController extends MappableController
     #[Route('/js/live.js', name: 'show_js', methods: ['GET'])]
     public function js(
         Trip $trip,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false,
     ): Response {
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);
 

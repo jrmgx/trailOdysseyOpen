@@ -50,7 +50,7 @@ class DiaryEntryController extends MappableController
     #[Route('/js/diaryEntry.js', name: 'show_js', methods: ['GET'])]
     public function js(
         Trip $trip,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false,
     ): Response {
         $response = $this->render('diaryEntry/index.js.twig', array_merge($this->show($trip), ['first_load' => $firstLoad]));
         $response->headers->set('Content-Type', 'text/javascript');

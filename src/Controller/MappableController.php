@@ -44,7 +44,7 @@ abstract class MappableController extends BaseController
         Trip $trip,
         string $lat,
         string $lon,
-        MappableInterface $mappable
+        MappableInterface $mappable,
     ): MappableInterface {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);
 
@@ -84,7 +84,7 @@ abstract class MappableController extends BaseController
         MappableInterface $mappable,
         string $formType,
         string $objectName,
-        string $routeRedirect
+        string $routeRedirect,
     ): array|Response {
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $trip);
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $mappable);

@@ -31,7 +31,7 @@ class SegmentController extends BaseController
     public function __construct(
         private readonly SegmentRepository $segmentRepository,
         private readonly EntityManagerInterface $entityManager,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
     ) {
         parent::__construct($serializer);
     }
@@ -67,7 +67,7 @@ class SegmentController extends BaseController
     #[Route('/js/paths.js', name: 'show_js', methods: ['GET'])]
     public function js(
         Trip $trip,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false,
     ): Response {
         $response = $this->render('segment/index.js.twig', array_merge($this->show($trip), ['first_load' => $firstLoad]));
         $response->headers->set('Content-Type', 'text/javascript');

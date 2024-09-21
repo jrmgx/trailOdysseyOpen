@@ -40,7 +40,7 @@ class PublicController extends BaseController
     #[Route('/{user}', name: 'index', methods: ['GET'])]
     #[Template('public/index.html.twig')]
     public function index(
-        #[MapEntity(mapping: ['user' => 'nickname'])] User $user
+        #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
     ): array {
         $trips = $this->tripRepository->findPublicForUser($user);
         $userId = $user->getId();
@@ -87,7 +87,7 @@ class PublicController extends BaseController
     #[Template('public/show.html.twig')]
     public function show(
         #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
-        #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip
+        #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip,
     ): array {
         if (!$trip->isShared() || $trip->getUser() !== $user) {
             throw $this->createNotFoundException();
@@ -121,7 +121,7 @@ class PublicController extends BaseController
     public function js(
         #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
         #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $firstLoad = false,
     ): Response {
         $response = $this->render('public/show.js.twig', array_merge($this->show($user, $trip), ['first_load' => $firstLoad]));
         $response->headers->set('Content-Type', 'text/javascript');

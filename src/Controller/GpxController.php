@@ -37,7 +37,7 @@ class GpxController extends AbstractController
     public function new(
         Request $request,
         Trip $trip,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $onBoarding = false
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $onBoarding = false,
     ): Response|array {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);
 

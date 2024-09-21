@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class StageType extends AbstractType
 {
     public function __construct(
-        private readonly Security $security
+        private readonly Security $security,
     ) {
     }
 
