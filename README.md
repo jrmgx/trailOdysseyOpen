@@ -95,6 +95,23 @@ Head up to https://trailodyssey.test and you should have a running instance!
 
 See `castor` for other commands
 
+### Deploy with Coolify
+
+To deploy with Coolify:
+- Create a new project with a MySQL and a Redis resource
+- Then add TrailOdyssey repository as your source
+- Use the Docker Compose build pack 
+- Use `/docker-compose-coolify.yml` for docker compose location
+- Click continue
+- Add your domain
+- Check option: Configuration > General > Build > Preserve Repository During Deployment
+- Add pre and post deploy scripts: 
+  - `castor deploy:pre` with php-fmp as image 
+  - `castor deploy:post ; chown -R www-data ./var` with php-fmp as image 
+- Activate shared network with docker compose: Configuration > Advanced > Network > Connect To Predefined Network
+- Fill up the Environments Variables, including the one from Redis and MySQL resource
+- In Configuration > Storage, switch nginx.conf to file mount
+- Start the deploy
 
 ## User manual
 

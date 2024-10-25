@@ -10,7 +10,7 @@ volumes:
 services:
     # NEVER ADD ports DIRECTIVES IN PROD
     php-fpm:
-        image: jrmgx/php-8.2-fpm-nginx:2
+        build: docker/php-fpm
         container_name: trailodyssey-php-fpm
         restart: "always"
         depends_on:

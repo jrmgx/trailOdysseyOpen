@@ -5,7 +5,7 @@ use Castor\Context;
 
 use function Castor\load_dot_env;
 
-#[AsContext(name: 'dev', default: true)]
+#[AsContext(name: 'dev', default: false)]
 function dev_context(): Context
 {
     $env = load_dot_env();
@@ -22,7 +22,7 @@ function dev_context(): Context
     );
 }
 
-#[AsContext(name: 'prod', default: false)]
+#[AsContext(name: 'prod', default: true)]
 function prod_context(): Context
 {
     $env = load_dot_env();

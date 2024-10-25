@@ -206,6 +206,32 @@ function clean(): void
     run($command);
 }
 
+#[AsTask(namespace: 'deploy', description: 'Pre Deploy Script')]
+function pre(): void
+{
+    assert_not_in_dev();
+    assert_is_in_builder();
+
+    background_scripts_stop();
+
+    io()->success('Pre Deploy success');
+}
+
+#[AsTask(namespace: 'deploy', description: 'Post Deploy Script')]
+function post(): void
+{
+    assert_not_in_dev();
+    assert_is_in_builder();
+
+    install();
+    migrate();
+
+    background_scripts_start();
+    install_cron();
+
+    io()->success('Post Deploy success');
+}
+
 #[AsTask(description: 'Boot a builder')]
 function builder(#[AsOption] ?string $user = null): void
 {
@@ -340,6 +366,13 @@ function docker_exec(string $runCommand, bool $allowFailure = false, ?string $se
     io()->text("=> Will run: $docker");
 
     return run($docker, allowFailure: $allowFailure);
+}
+
+function assert_is_in_builder(): void
+{
+    if (!is_builder()) {
+        throw new Exception('Can not run this command out of the builder');
+    }
 }
 
 function assert_not_in_builder(): void
