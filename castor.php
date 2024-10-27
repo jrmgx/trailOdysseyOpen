@@ -251,7 +251,7 @@ function builder(#[AsOption] ?string $user = null): void
 
     io()->text("=> Will run via $docker");
 
-    run($docker, tty: true, pty: true, allowFailure: true);
+    run($docker, context: context()->withAllowFailure()->withTty()->withPty());
 }
 
 #[AsTask(namespace: 'dev', description: 'Give Symfony version as a test command')]
@@ -345,7 +345,7 @@ function date_string(): string
 function run_in_builder(string $runCommand, bool $allowFailure = false, ?string $user = null): Process
 {
     if (is_builder()) {
-        return run($runCommand, allowFailure: $allowFailure);
+        return run($runCommand, context: context()->withAllowFailure($allowFailure));
     }
 
     return docker_exec($runCommand, allowFailure: $allowFailure, user: $user);
@@ -365,7 +365,7 @@ function docker_exec(string $runCommand, bool $allowFailure = false, ?string $se
 
     io()->text("=> Will run: $docker");
 
-    return run($docker, allowFailure: $allowFailure);
+    return run($docker, context: context()->withAllowFailure($allowFailure));
 }
 
 function assert_is_in_builder(): void
@@ -419,5 +419,5 @@ function docker_compose(array $subCommand, bool $allowFailure = false): Process
 
     io()->text("=> Will run: $fullCommand");
 
-    return run($command, allowFailure: $allowFailure);
+    return run($command, context: context()->withAllowFailure($allowFailure));
 }
