@@ -6,6 +6,7 @@ use App\Entity\DiaryEntry;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -43,6 +44,11 @@ class DiaryEntryType extends AbstractType
                 'html5' => true,
                 'input' => 'datetime_immutable',
                 'view_timezone' => $user->getTimezone(),
+            ])
+            ->add('broadcast', CheckboxType::class, [
+                'label' => 'form.label.broadcast',
+                'required' => false,
+                'mapped' => false,
             ])
         ;
     }

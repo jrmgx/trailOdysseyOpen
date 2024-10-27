@@ -20,6 +20,7 @@
         "graphp/graphviz": "^1@dev",
         "league/commonmark": "^2.4",
         "liip/imagine-bundle": "^2.13",
+        "lrf141/oauth2-mastodon": "^1.0",
         "maennchen/zipstream-php": "^3.1",
         "meyfa/php-svg": "^0.15.1",
         "phpdocumentor/reflection-docblock": "^5.4",
@@ -58,7 +59,8 @@
         "twig/extra-bundle": "^3.10",
         "twig/intl-extra": "^3.10",
         "twig/markdown-extra": "^3.10",
-        "twig/twig": "^3.10"
+        "twig/twig": "^3.10",
+        "vazaha-nl/mastodon-api-client": "dev-main"
     },
     "config": {
         "allow-plugins": {
@@ -116,5 +118,11 @@
         "symfony/stopwatch": "7.1.*",
         "symfony/web-profiler-bundle": "7.1.*",
         "vincentlanglet/twig-cs-fixer": "^2.12"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/jrmgx/mastodon-api-client"
+        }
+    ]
 }

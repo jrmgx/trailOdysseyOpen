@@ -50,6 +50,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Regex('`^(\{(counter|stage_name|trip_name)\}){3}$`', 'The pattern must only contain {counter}, {stage_name} and {trip_name} in any order')]
     private string $exportFilenamePattern = '{counter}{stage_name}{trip_name}';
 
+    /**
+     * Set of mastodon info to connect to the related mastodon app.
+     *
+     * @var ?array{accessToken: string, instanceUrl: string}
+     */
+    #[ORM\Column(nullable: true)]
+    private ?array $mastodonInfo = null;
+
     public function __construct()
     {
         $this->trips = new ArrayCollection();
@@ -205,5 +213,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->exportFilenamePattern = $exportFilenamePattern;
 
         return $this;
+    }
+
+    /**
+     * @return ?array{accessToken: string, instanceUrl: string}
+     */
+    public function getMastodonInfo(): ?array
+    {
+        return $this->mastodonInfo;
+    }
+
+    /**
+     * @param ?array{accessToken: string, instanceUrl: string} $mastodonInfo
+     */
+    public function setMastodonInfo(?array $mastodonInfo): static
+    {
+        $this->mastodonInfo = $mastodonInfo;
+
+        return $this;
+    }
+
+    public function isConnectedToMastodon(): bool
+    {
+        return !empty($this->mastodonInfo);
     }
 }

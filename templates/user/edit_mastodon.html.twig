@@ -1,0 +1,17 @@
+{% extends 'home/index.html.twig' %}
+
+{% block main %}
+    <div class="row" data-turbo="false">
+        {{ include('common/_header_page.html.twig', {
+            header_title: 'Mastodon Connect',
+            header_back_title: 'action.back'|trans,
+            header_back_href: path('user_edit'),
+        }) }}
+        <div class="col-12">
+            {{ form_start(form) }}
+            {{ form_row(form.url) }}
+            <button class="btn btn-primary btn-block">{{ 'action.connect'|trans }}</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

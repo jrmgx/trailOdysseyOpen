@@ -27,12 +27,16 @@
                 form.dataset.turboFrame = 'sidebar-{{ object_name_plural }}';
             });
         </script>
-
     </div>
 </div>
 <div class="card-body">
-    <button class="btn btn-primary" data-role="submit">{{ 'action.save'|trans }}</button>
-    <a class="btn btn-outline-secondary" data-role="cancel" href="{{ path(object_name ~ '_show', { trip: trip.id }) }}">cancel</a>
+    <div>
+        {{ form_row(form.broadcast) }}
+    </div>
+    <div>
+        <button class="btn btn-primary" data-role="submit">{{ 'action.save'|trans }}</button>
+        <a class="btn btn-outline-secondary" data-role="cancel" href="{{ path(object_name ~ '_show', { trip: trip.id }) }}">cancel</a>
+    </div>
 </div>
 
 <div class="d-none">

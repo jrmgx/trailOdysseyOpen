@@ -15,5 +15,17 @@
             <button class="btn btn-primary btn-block">{{ 'action.update'|trans }}</button>
             {{ form_end(form) }}
         </div>
+        <div><hr></div>
+        <div class="col-12">
+            <h2 class="fs-5">{{ 'broadcast.title'|trans }}</h2>
+            <p>{{ 'broadcast.explanation'|trans|raw }}</p>
+            {% if user.isConnectedToMastodon %}
+                <form method="post" id="disconnect_mastodon" action="{{ path('user_disconnect_mastodon') }}"></form>
+                <a class="btn btn-outline-primary" href="{{ path('user_connect_mastodon') }}">Refresh Connection to Mastodon</a>
+                <button form="disconnect_mastodon" class="btn btn-outline-danger">Remove Connection from Mastodon</button>
+            {% else %}
+                <a class="btn btn-outline-primary" href="{{ path('user_connect_mastodon') }}">Connect to Mastodon</a>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

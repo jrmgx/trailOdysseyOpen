@@ -90,6 +90,7 @@ action:
   preferences: Settings
   more_actions: More
   explore: 'Explore'
+  connect: 'Connect'
 label:
   search_for_an_address: 'Search for an address:'
   email: Email
@@ -221,3 +222,9 @@ segment:
 form.label.geocoding_service_provider.overpass: OSM
 form.label.geocoding_service_provider.google: Google
 form.placeholder.search: Search
+form.label.broadcast: Broadcast
+broadcast:
+  title: Broadcasting Updates
+  explanation: 'If you want, you can sent Diary as updates to external services like social networks or even by email.<br>In this section you can configure those services.'
+form.label.mastodon_url: Instance URL
+form.help.mastodon_url: Your instance URL

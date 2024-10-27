@@ -88,6 +88,8 @@ class DiaryEntryController extends MappableController
             $this->entityManager->persist($diaryEntry);
             $this->entityManager->flush();
 
+            $this->commonBroadcast($diaryEntry, $form);
+
             return $this->redirectToRoute('diaryEntry_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
         }
 

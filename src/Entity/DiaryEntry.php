@@ -23,7 +23,14 @@ class DiaryEntry implements MappableInterface
     #[Assert\Length(max: 16)]
     protected ?string $symbol = null;
 
-    // TODO add timezone at some point
+    /**
+     * This is an array that contains all the identifier where the diary has already been sent
+     * So we can update the message if broadcast is asked again.
+     *
+     * @var ?array<string, string>
+     */
+    #[ORM\Column(nullable: true)]
+    private ?array $broadcastIdentifiers = null;
 
     public function __construct()
     {
@@ -47,6 +54,34 @@ class DiaryEntry implements MappableInterface
     public function setType(?string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getBroadcastIdentifiers(): array
+    {
+        return $this->broadcastIdentifiers ?? [];
+    }
+
+    /**
+     * @param array<string, string> $broadcastIdentifiers
+     */
+    public function setBroadcastIdentifiers(array $broadcastIdentifiers): static
+    {
+        $this->broadcastIdentifiers = $broadcastIdentifiers;
+
+        return $this;
+    }
+
+    public function addBroadcastIdentifier(string $provider, string $broadcastIdentifier): static
+    {
+        if (!$this->broadcastIdentifiers) {
+            $this->broadcastIdentifiers = [];
+        }
+        $this->broadcastIdentifiers[$provider] = $broadcastIdentifier;
 
         return $this;
     }

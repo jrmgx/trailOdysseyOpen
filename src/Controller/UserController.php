@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserMastodonType;
 use App\Form\UserType;
+use App\Service\MastodonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +20,7 @@ class UserController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly MastodonService $mastodonService,
     ) {
     }
 
@@ -39,6 +42,59 @@ class UserController extends AbstractController
             return $this->redirectToRoute('user_edit', [], Response::HTTP_SEE_OTHER);
         }
 
-        return compact('form');
+        return compact('form', 'user');
+    }
+
+    /** @return Response|array<mixed> */
+    #[Route('/connect/mastodon', name: 'connect_mastodon', methods: ['GET', 'POST'])]
+    #[Template('user/edit_mastodon.html.twig')]
+    public function connectToMastodon(Request $request): Response|array
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $form = $this->createForm(UserMastodonType::class, [
+            'url' => $user->getMastodonInfo()['instanceUrl'] ?? null,
+        ]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $instanceUrl = $form->get('url')->getData() ?? throw new \Exception('Missing Instance Url.');
+            $oAuthUrl = $this->mastodonService->oAuthInit($instanceUrl);
+
+            return $this->redirect($oAuthUrl);
+        }
+
+        return compact('form', 'user');
+    }
+
+    #[Route('/connect/mastodon/code', name: 'connect_mastodon_code', methods: ['GET'])]
+    public function connectToMastodonCode(Request $request): Response
+    {
+        $token = $this->mastodonService->oAuthHandle($request);
+
+        /** @var User $user */
+        $user = $this->getUser();
+        $user->setMastodonInfo([
+            'accessToken' => $token->getToken(),
+            'instanceUrl' => $request->getSession()->get('instanceUrl'),
+        ]);
+
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('user_edit', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/disconnect/mastodon', name: 'disconnect_mastodon', methods: ['POST'])]
+    public function disconnectFromMastodon(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $user->setMastodonInfo(null);
+
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'Connection Removed!');
+
+        return $this->redirectToRoute('user_edit', [], Response::HTTP_SEE_OTHER);
     }
 }

@@ -2,24 +2,35 @@
 
 namespace App\Controller;
 
+use App\Entity\DiaryEntry;
 use App\Entity\GeoPoint;
 use App\Entity\MappableInterface;
 use App\Entity\Stage;
 use App\Entity\Trip;
+use App\Entity\User;
+use App\Override\LeagueCommonMarkConverterFactory;
 use App\Repository\DiaryEntryRepository;
 use App\Repository\InterestRepository;
 use App\Repository\StageRepository;
 use App\Security\Voter\UserVoter;
 use App\Service\GeoCodingService;
+use App\Service\MastodonService;
 use App\Service\RoutingService;
 use App\Service\TripService;
 use Doctrine\ORM\EntityManagerInterface;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Image;
+use League\CommonMark\Node\Inline\Newline;
+use League\CommonMark\Node\Node;
+use League\CommonMark\Node\NodeIterator;
+use League\CommonMark\Node\StringContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Vazaha\Mastodon\Models\MediaAttachmentModel;
 
 abstract class MappableController extends BaseController
 {
@@ -34,6 +45,9 @@ abstract class MappableController extends BaseController
         protected readonly ValidatorInterface $validator,
         protected readonly LoggerInterface $logger,
         protected readonly MessageBusInterface $messageBus,
+        protected readonly MastodonService $mastodonService,
+        protected readonly LeagueCommonMarkConverterFactory $leagueCommonMarkConverterFactory,
+        protected readonly string $uploadsDirectory,
         SerializerInterface $serializer,
     ) {
         parent::__construct($serializer);
@@ -116,6 +130,10 @@ abstract class MappableController extends BaseController
                 }
             }
 
+            if ($mappable instanceof DiaryEntry) {
+                $this->commonBroadcast($mappable, $form);
+            }
+
             $this->entityManager->flush();
 
             return $this->redirectToRoute($routeRedirect, ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
@@ -126,5 +144,97 @@ abstract class MappableController extends BaseController
             $objectName => $mappable,
             'form' => $form,
         ];
+    }
+
+    protected function commonBroadcast(DiaryEntry $diaryEntry, FormInterface $form): void
+    {
+        // TODO move this to messenger
+        /** @var User $user */
+        $user = $this->getUser();
+        if ($form->has('broadcast') && $form->get('broadcast')->getData()) {
+            // For now we only have Mastodon as a possible broadcast
+            if ($user->isConnectedToMastodon()) {
+                /** @var array<int, MediaAttachmentModel> $media */
+                $media = [];
+                $images = $this->findImages($diaryEntry->getDescription() ?? '');
+                $text = $this->convert($diaryEntry->getDescription() ?? '');
+                foreach ($images as $image) {
+                    $url = $image->getUrl();
+                    $parts = explode('/', $url);
+                    $fileName = end($parts);
+                    $filePath = $this->uploadsDirectory . '/' . $user->getId() . '/' . $fileName;
+                    $media[] = $this->mastodonService->uploadMedia($user, $filePath, $this->getAltText($image));
+                }
+
+                $mastodonUri = $diaryEntry->getBroadcastIdentifiers()['mastodon'] ?? null;
+                if ($mastodonUri) {
+                    $this->mastodonService->editStatus($user, $mastodonUri, $text, $media);
+                } else {
+                    $status = $this->mastodonService->postStatus($user, $text, $media);
+                    $diaryEntry->addBroadcastIdentifier('mastodon', $status->uri);
+                    $this->entityManager->flush();
+                }
+            }
+        }
+    }
+
+    private function convert(string $description): string
+    {
+        // Mastodon supports those HTML tags as a render but not as creation
+        // p, del, pre, blockquote, code, b, strong, u, i, em, ul, ol, li
+        // So we are removing everything
+        $converter = ($this->leagueCommonMarkConverterFactory)();
+
+        return strip_tags(
+            $converter->convert($description)->getContent(),
+            // '<p><del><pre><blockquote><code><b><strong><u><i><em><ul><ol><li>'
+        );
+    }
+
+    /**
+     * @return array<int, Image>
+     */
+    private function findImages(string $description): array
+    {
+        $converter = ($this->leagueCommonMarkConverterFactory)();
+        $rendered = $converter->convert($description);
+        $list = [];
+
+        return $this->findImageNodes($rendered->getDocument(), $list);
+    }
+
+    private function getAltText(Image $node): string
+    {
+        $altText = '';
+
+        foreach ((new NodeIterator($node)) as $n) {
+            if ($n instanceof StringContainerInterface) {
+                $altText .= $n->getLiteral();
+            } elseif ($n instanceof Newline) {
+                $altText .= "\n";
+            }
+        }
+
+        return $altText;
+    }
+
+    /**
+     * @param array<int, Image> $flatList
+     *
+     * @return array<int, Image>
+     */
+    private function findImageNodes(Node $node, array &$flatList = []): array
+    {
+        if ($node instanceof Image) {
+            $flatList[] = $node;
+        }
+
+        $child = $node->firstChild();
+        while (null !== $child) {
+            $this->findImageNodes($child, $flatList);
+            $child = $child->next();
+        }
+
+        return $flatList;
     }
 }

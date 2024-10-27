@@ -113,6 +113,36 @@ To deploy with Coolify:
 - In Configuration > Storage, switch nginx.conf to file mount
 - Start the deploy
 
+### Mastodon app
+
+I you want, you can create a Mastodon app so the user could publish Diary automatically.
+
+You have to go on the Mastodon instance you want to allow, in Settings > Applications and create a new App with those info:
+
+ - Application name: Trail Odyssey
+ - Application website: https://trailodyssey.net
+ - Redirect URI:  
+   urn:ietf:wg:oauth:2.0:oob  
+   https://trailodyssey.net/account/user/connect/mastodon/code
+ - Scopes: profile write 
+
+You should adapt the url so it matches your Trail Odyssey instance.
+
+Then you can do that for multiple Mastodon instances.
+
+In your `env` you would have this kind of entries:
+
+```yaml
+MASTODON_INSTANCES=instance_x.net,instance_y.social
+MASTODON_CLIENT_KEYS=x_key,y_key
+MASTODON_CLIENT_SECRETS=x_secret,y_secret
+
+```
+
+urn:ietf:wg:oauth:2.0:oob
+https://square-lively-labrador.ngrok-free.app/account/user/connect/mastodon/code
+https://trailodyssey.net/account/user/connect/mastodon/code
+
 ## User manual
 
 The user manual is a work in progress, still those are hidden features that needs to be explicit:
