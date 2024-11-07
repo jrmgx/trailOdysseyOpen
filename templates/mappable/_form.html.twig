@@ -30,9 +30,11 @@
     </div>
 </div>
 <div class="card-body">
+    {% if form.broadcast is defined %}
     <div>
         {{ form_row(form.broadcast) }}
     </div>
+    {% endif %}
     <div>
         <button class="btn btn-primary" data-role="submit">{{ 'action.save'|trans }}</button>
         <a class="btn btn-outline-secondary" data-role="cancel" href="{{ path(object_name ~ '_show', { trip: trip.id }) }}">cancel</a>
