@@ -8,7 +8,6 @@ twig:
         project_name: '%project_name%'
         project_base_url: '%project_base_url%'
         public_uploads: /uploads
-        offline_cache_name: '%offline_cache_name%'
         app_env: '%app_env%'
         prod: prod
         dev: dev

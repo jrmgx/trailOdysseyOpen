@@ -20,25 +20,8 @@
                 </a>
             </div>
         </div>
-        <div class="live-graph">
-            <div id="stage-elevation-{{ routing.startStage.id }}"
-                 style="position: relative; top: 0.5rem;"></div>
-        </div>
-        <div class="card-body mt-2">
-            <div class="d-flex justify-content-between">
-                <button class="btn btn-xs btn-outline-secondary"
-                        data-action="click->plan#routingOfflineAction"
-                        data-plan-id-param="{{ routing.id }}"
-                        data-plan-target="offlineButton"
-                >
-                    {{ 'routing.save_offline'|trans }}
-                </button>
-                <a class="btn btn-xs btn-outline-secondary"
-                   data-turbo-frame="_top"
-                   href="{{ path('live_show_stage', { trip: trip.id, stage: routing.startStage.id }) }}">
-                    {{ 'routing.live'|trans }}
-                </a>
-            </div>
+        <div class="live-graph mb-2">
+            <div id="stage-elevation-{{ routing.startStage.id }}"></div>
         </div>
         <div class="card-footer">
             <span class="pe-2">🏁</span>

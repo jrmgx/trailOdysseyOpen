@@ -15,7 +15,6 @@ export default class extends Controller {
     'totalDistance',
     'sidebarStages',
     'sidebarInterests',
-    'offlineButton',
   ];
 
   static values = {};
@@ -25,8 +24,6 @@ export default class extends Controller {
     this.routings = {};
     this.interests = {};
     this.extras = [];
-
-    this.updateOfflineButtonStatus();
 
     // Export method for external use
     window.planController = {
@@ -45,15 +42,6 @@ export default class extends Controller {
     };
 
     window.mapCommonController.mapClickActionDelegate(this.mapClickAction);
-  };
-
-  updateOfflineButtonStatus = () => {
-    for (const offlineButton of this.offlineButtonTargets) {
-      if (mapCommonController.getIsOffline(offlineButton.dataset.planIdParam)) {
-        offlineButton.classList.remove('btn-outline-secondary');
-        offlineButton.classList.add('btn-success');
-      }
-    }
   };
 
   map = () => window.mapCommonController.map;
@@ -109,15 +97,6 @@ export default class extends Controller {
     const line = this.routings[id];
     this.map().fitBounds(line.getBounds());
     // setTimeout(() => line.openPopup(), 300);
-  };
-
-  routingOfflineAction = (e) => {
-    const { id } = e.params;
-    mapCommonController.downloadOfflinePoints(
-      id,
-      this.routings[id].getLatLngs(),
-      this.updateOfflineButtonStatus,
-    );
   };
 
   interestClickAction = (e) => {
@@ -209,7 +188,6 @@ export default class extends Controller {
     }
     removeFromMap(line, this.map());
     this.addRouting(id, startLat, startLon, finishLat, finishLon, distance, mode, el, points);
-    mapCommonController.removeOffline(id);
   };
 
   addExtra = (startLat, startLon, finishLat, finishLon, distance) => {
@@ -293,7 +271,6 @@ export default class extends Controller {
   preventWarnings = () => {
     // Targets
     this.mapTarget = null;
-    this.offlineButtonTargets = null;
     this.totalDistanceTarget = null;
     this.sidebarStagesTarget = null;
     this.sidebarInterestsTarget = null;

@@ -1,6 +1,5 @@
 :root {
     --sidebar-width: 30rem;
-    --live-bar-height: 33svh;
 }
 
 html, body {
@@ -53,18 +52,6 @@ iframe {
     overflow-y: scroll;
 }
 
-.live-bar {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    overflow: hidden;
-    height: var(--live-bar-height);
-    transition: cubic-bezier(0.18, 0.89, 0.32, 1.28) 400ms bottom;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-}
-
 .container-progress {
     bottom: 0;
     left: 0;
@@ -82,10 +69,6 @@ iframe {
     -webkit-user-select: none !important;
     user-select: none !important;
     z-index: -1;
-}
-
-.map.live-map {
-    bottom: -2rem;
 }
 
 .map-button-container {
@@ -144,10 +127,6 @@ iframe {
     transform: rotate(-180deg);
     writing-mode: vertical-rl;
     left: 0.75rem;
-}
-
-.live-back-button {
-    color: #555 !important;
 }
 
 .switch-trip {
@@ -220,11 +199,6 @@ iframe {
         left: var(--sidebar-width);
         bottom: 0;
         right: 0;
-    }
-
-    .map.live-map {
-        left: 0;
-        bottom: -2rem; /* var(--live-bar-height); */
     }
 }
 
@@ -349,19 +323,6 @@ path.leaflet-interactive {
     border-right: 2px blue solid;
 }
 
-.live-bar .live-graph {
-    height: calc(var(--live-bar-height) - 5.5rem);
-    margin: 0 1rem 0 0;
-    width: 100%;
-}
-
-.live-bar .live-graph .u-legend {
-    position: relative;
-    bottom: 2rem;
-    font-size: calc(0.875rem * 0.8); /* same as btn-xs */
-    font-weight: bold;
-}
-
 .sidebar .live-graph {
     height: 60px;
     width: 100%;
@@ -373,6 +334,13 @@ path.leaflet-interactive {
     position: absolute;
     pointer-events: none;
     user-select: none;
+}
+
+.u-legend {
+    text-align: right !important;
+    position: relative !important;
+    top: 0.8rem !important;
+    right: -1rem !important;
 }
 
 /** Public **/

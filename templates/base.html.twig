@@ -31,7 +31,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="theme-color" content="#ffffff">
         <link rel="mask-icon" href="{{ asset('build/images/favicons/safari-pinned-tab.svg') }}" color="#5bbad5">
-        <link rel="manifest" href="{{ path('web_manifest', { url: path(app.current_route, app.current_route_parameters) }) }}">
+        <link rel="manifest" href="{{ path('web_manifest') }}">
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -42,62 +42,6 @@
     </head>
     <body {% block body_attr %}{% endblock %}>
         {% block body %}{% endblock %}
-        <script>
-            var tripId = {{ trip is defined ? trip.id : 0 }};
-        </script>
-        {% if app.user and not public %}
-        <script>
-            function ready(serviceWorkerReady) {
-                serviceWorkerReady.postMessage({fetch: "{{ path('trip_index') }}"});
-                serviceWorkerReady.postMessage({fetch: "{{ path('web_manifest', { url: path(app.current_route, app.current_route_parameters) }) }}"});
-                {# Prepare all the app urls for offline  #}
-                {% if trip is defined %}
-                {% set offlineUrls = [
-                    path('segment_show', { trip: trip.id }),
-                    path('segment_show_js', { trip: trip.id, firstLoad: 1 }),
-                    path('stage_show', { trip: trip.id }),
-                    path('stage_show_js', { trip: trip.id, firstLoad: 1 }),
-                    path('live_show', { trip: trip.id }),
-                    path('live_show_js', { trip: trip.id, firstLoad: 1 }),
-                    path('diaryEntry_show', { trip: trip.id }),
-                    path('diaryEntry_show_js', { trip: trip.id, firstLoad: 1 }),
-                    path('bag_index', { trip: trip.id }),
-                ] %}
-                {% for u in offlineUrls %}
-                serviceWorkerReady.postMessage({fetch: '{{ u }}'});
-                {% endfor %}
-                {% for stage in trip.stages %}
-                {% set url = path('live_show_stage', { trip: trip.id, stage: stage.id }) %}
-                serviceWorkerReady.postMessage({fetch: '{{ url }}'});
-                serviceWorkerReady.postMessage({fetch: "{{ path('web_manifest', { url }) }}"});
-                {% endfor %}
-                {% endif %}
-            }
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('{{ path('service_worker', { cacheName: offline_cache_name }) }}')
-                .then((registration) => {
-
-                    let serviceWorker;
-                    if (registration.installing) {
-                        serviceWorker = registration.installing;
-                    } else if (registration.waiting) {
-                        serviceWorker = registration.waiting;
-                    } else if (registration.active) {
-                        ready(registration.active);
-                    }
-                    if (serviceWorker) {
-                        serviceWorker.addEventListener("statechange", (e) => {
-                            if (e.target.state === 'activated' || e.target.state === 'redundant') {
-                                ready(e.target);
-                            }
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error('SW LOAD ERROR', error);
-                });
-            }
-        </script>
-        {% endif %}
+        <script>var tripId = {{ trip is defined ? trip.id : 0 }};</script>
     </body>
 </html>

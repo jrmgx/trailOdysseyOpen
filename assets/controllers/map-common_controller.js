@@ -2,7 +2,6 @@
 
 import L from 'leaflet';
 import { Controller } from '@hotwired/stimulus';
-import { Point } from 'leaflet/src/geometry';
 import { LatLng } from 'leaflet/src/geo';
 // https://makinacorpus.github.io/Leaflet.GeometryUtil/index.html
 import 'leaflet-geometryutil';
@@ -122,9 +121,6 @@ export default class extends Controller {
       addElevation: this.addElevation,
       updateElevationGraph: this.updateElevationGraph,
       refreshPlan: this.refreshPlan,
-      downloadOfflinePoints: this.downloadOfflinePoints,
-      getIsOffline: this.getIsOffline,
-      removeOffline: this.removeOffline,
       findPathCloseToPoint: this.findPathCloseToPoint,
       map: this.map,
       fit: this.fit,
@@ -310,95 +306,6 @@ export default class extends Controller {
 
   refreshPlan = () => {
     this.pathsLayerGroup.bringToFront();
-  };
-
-  // Offline related
-
-  downloadOfflinePoints = (routingId, latLngs, callback) => {
-    const urls = [...new Set(this.gatherTileUrls(latLngs))];
-    const CACHE_NAME = this.cacheNameValue;
-    const total = urls.length;
-    // eslint-disable-next-line no-alert
-    if (!window.confirm(`This will download ${total} tiles`)) return;
-    const containerProgress = this.containerProgressTarget;
-    containerProgress.classList.remove('hide');
-    const progressBar = this.containerProgressTarget.querySelector('.progress-bar');
-    progressBar.style.width = '0';
-    progressBar.innerText = '0%';
-    (async () => {
-      const cache = await caches.open(CACHE_NAME);
-      let i = 0;
-      for (const u of urls) {
-        i += 1;
-        const current = Math.ceil((i / total) * 100);
-        progressBar.style.width = `${current}%`;
-        progressBar.innerText = `${current}%`;
-        // eslint-disable-next-line no-await-in-loop
-        if (await cache.match(u, { ignoreVary: true })) {
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-        // eslint-disable-next-line no-await-in-loop
-        const responseToCache = await fetch(u);
-        // eslint-disable-next-line no-await-in-loop
-        await cache.put(u, responseToCache);
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => { setTimeout(r, 50); });
-      }
-      this.setIsOffline(routingId);
-      callback();
-      containerProgress.classList.add('hide');
-    })();
-
-    // TODO persist action see https://web.dev/articles/offline-cookbook?hl=en#cache-persistence
-  };
-
-  setIsOffline = (routingId) => {
-    localStorage.setItem(`${this.cacheNameValue}_offline_tiles_${routingId}`, 'true');
-  };
-
-  getIsOffline = (routingId) => localStorage.getItem(`${this.cacheNameValue}_offline_tiles_${routingId}`) !== null;
-
-  // This does not delete the cache, only the flag
-  removeOffline = (routingId) => localStorage.removeItem(`${this.cacheNameValue}_offline_tiles_${routingId}`);
-
-  // This one will delete the cache
-  clearOffline = () => {
-    // TODO
-  };
-
-  gatherTileUrls = (points) => {
-    const tileSize = 256; // Leaflet default tile size
-    let proxyTileLayer = null;
-    this.map.eachLayer((layer) => {
-      if (layer instanceof L.TileLayer) {
-        proxyTileLayer = this.proxyLayers[layer.id];
-      }
-    });
-    if (proxyTileLayer === null) {
-      return [];
-    }
-    const urls = [];
-    const minZoom = Math.max(this.map.getMinZoom(), 12);
-    const maxZoom = this.map.getMaxZoom() - 1;
-    const adjacent = [
-      [-1, +1], [+0, +1], [+1, +1],
-      [-1, +0], [+0, +0], [+1, +0],
-      [-1, -1], [+0, -1], [+1, -1],
-    ];
-    for (const pt of points) {
-      for (let zoom = minZoom; zoom <= maxZoom; zoom += 1) {
-        const projection = this.map.project(pt, zoom).divideBy(tileSize).floor();
-        for (const a of adjacent) {
-          const pr = projection.add(new Point(a[0], a[1]));
-          let tileUrl = proxyTileLayer.getTileUrl(pr);
-          // Zoom is not defined because that tileLayer is not on screen so we fake it
-          tileUrl = tileUrl.replace('/NaN', `/${zoom}`);
-          urls.push(tileUrl);
-        }
-      }
-    }
-    return urls;
   };
 
   // Elevation visualization

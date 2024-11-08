@@ -13,18 +13,12 @@ And what do I mean by that:
 - Planning the hike, namely placing the stages, studying altitudes, looking for points of interest (water or viewpoint for example).
 - Preparing your bag, including weight management.
 - Export of the final GPX to import it into external apps if necessary.
-- Live use during the hike, with offline display of the current stage, GPS for position, elevation, progress in real time.
 - And finally share photos of the itinerary with a public version for your friends.
 
 
 ## Technical choices
 
 Trail Odyssey is developed for mobile first.
-
-It is also a “web app” which includes these features in particular:
-
-- Offline map.
-- Installable on mobile.
 
 More technical details in the form of keywords: PHP, Symfony, Javascript, Turbo, LeafletJS, BoostrapCSS, PWA, Mobile First.
 
@@ -147,8 +141,6 @@ https://trailodyssey.net/account/user/connect/mastodon/code
 
 The user manual is a work in progress, still those are hidden features that needs to be explicit:
 
-- Double tap on the eye icon in live mode will center the map on the current position
-- Tap on the GPS point in live mode will start the compass for a minute
 - On desktop, you can hold the _shift_ key while hovering elevation so the map moves at that point
 - On desktop, you can hold the _shift_ key and click on the name of a segment to make it fit the view
 - After a search of any kind, simply click on the map to discard the last results
@@ -171,10 +163,6 @@ Planning: Display of the different stages, elevation differences, desired dates 
 ![trail_odyssey_screen_path.png](./documentation/assets/trail_odyssey_screen_path.png)
 
 Path: display of paths coming either from multiple GPXs, or from routes traced by hand or via the tool integrated into Trail Odyssey. Desktop version (available in mobile)
-
-![trail_odyssey_screen_live_1.png](./documentation/assets/trail_odyssey_screen_live_1.png)
-
-Live: Display of the current stage with real-time GPS position, elevation and progress in percentage
 
 ![trail_odyssey_screen_home.png](./documentation/assets/trail_odyssey_screen_home.png)
 
@@ -213,7 +201,6 @@ Bag management: Adding items, managing multiple bags, bags within bags and total
 - [Leaflet.GeometryUtil](https://makinacorpus.github.io/Leaflet.GeometryUtil/global.html#length)
 - [getbootstrap.com](https://getbootstrap.com/docs/5.3/layout/grid/)
 - [icons.getbootstrap.com](https://icons.getbootstrap.com/)
-- [Offline](https://github.com/allartk/leaflet.offline)
 
 
 ## Licence

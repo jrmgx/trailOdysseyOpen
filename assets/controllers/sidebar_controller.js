@@ -11,7 +11,6 @@ export default class extends Controller {
     'switchToMap',
     'toggleVisibility',
     'myLivePosition',
-    'offlineButton',
     'searchContainer',
     'mapOptionForm',
   ];
@@ -45,9 +44,6 @@ export default class extends Controller {
     if (this.hasMyLivePositionTarget) {
       this.myLivePositionTarget.classList.remove('hide-mobile');
     }
-    if (this.hasOfflineButtonTarget) {
-      this.offlineButtonTarget.classList.remove('hide-mobile');
-    }
     if (this.hasSearchContainerTarget) {
       this.searchContainerTarget.classList.remove('hide-mobile');
     }
@@ -73,9 +69,6 @@ export default class extends Controller {
     this.toggleVisibilityTarget.classList.add('hide-mobile');
     if (this.hasMyLivePositionTarget) {
       this.myLivePositionTarget.classList.add('hide-mobile');
-    }
-    if (this.hasOfflineButtonTarget) {
-      this.offlineButtonTarget.classList.add('hide-mobile');
     }
     if (this.hasSearchContainerTarget) {
       this.searchContainerTarget.classList.add('hide-mobile');
@@ -179,7 +172,6 @@ export default class extends Controller {
     this.hasMyLivePositionTarget = null;
     this.mapOptionFormTarget = null;
     this.hasMapOptionFormTarget = null;
-    this.hasOfflineButtonTarget = null;
     this.offlineButtonTarget = null;
     // Values
     // ...

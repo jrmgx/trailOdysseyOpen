@@ -7,10 +7,6 @@
        href="{{ path('stage_show', { trip: trip.id }) }}">
         {{ 'action.map.plan'|trans }}
     </a>
-     <a class="btn btn-{{ app.current_route != 'live_show' ? 'outline-' }}primary" data-turbo-frame="_top"
-        href="{{ path('live_show', { trip: trip.id }) }}">
-         {{ 'action.map.live'|trans }}
-     </a>
     <a class="btn btn-{{ app.current_route != 'diaryEntry_show' ? 'outline-' }}primary" data-turbo-frame="_top"
        href="{{ path('diaryEntry_show', { trip: trip.id }) }}">
         {{ 'action.map.diary'|trans }}

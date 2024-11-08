@@ -5,7 +5,6 @@ parameters:
     locale_default: en
     locale_available: ['en', 'fr']
     locale_requirement: en|fr
-    offline_cache_name: cache-20240613-004
     instance_open: '%env(bool:INSTANCE_OPEN)%'
     app_env: '%env(APP_ENV)%'
     google_map_key: '%env(GOOGLE_MAP_KEY)%'

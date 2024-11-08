@@ -72,7 +72,6 @@ action:
   map:
     edit: 'Edit'
     plan: 'Plan'
-    live: 'Live'
     bags: 'Bags'
     diary: 'Diary'
     public: 'Public Link'
@@ -171,7 +170,6 @@ info:
   no_interest_found_create_one_to_start: 'No Point of Interest Found.<br> Create one to Start!'
   no_segment_found_create_one_to_start: 'No Segment Found.<br> Create one to Start!'
   no_diary_found_create_one_to_start: 'No Diary Entry Found.<br> Create one to Start!'
-  downloading_tiles_for_offline_use: 'Downloading tiles for Offline use'
   registration_closed: 'Registration are closed on this instance.'
 form:
   label:
@@ -212,8 +210,6 @@ form:
 routing:
   as_the_crow_fly: (as the crow fly)
   elevation: 'with'
-  save_offline: 'Save Offline'
-  live: 'Live'
   progress: 'Progress'
 mappable:
   arriving_at: 'Date: {date}'
