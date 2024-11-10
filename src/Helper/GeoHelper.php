@@ -237,6 +237,35 @@ class GeoHelper
         // throw new \Exception('Did not find a Point at that distance.');
     }
 
+    /**
+     * @return array{lat: float, lon: float}
+     */
+    public static function xyzToLatLon(float $x, float $y, float $z): array
+    {
+        $n = 2 ** $z;
+        $lon_deg = $x / $n * 360.0 - 180.0;
+        $lat_rad = atan(sinh(\M_PI * (1 - 2 * $y / $n)));
+        $lat_deg = $lat_rad * 180.0 / \M_PI;
+
+        return ['lat' => $lat_deg, 'lon' => $lon_deg];
+    }
+
+    /**
+     * @return array{north: float, west: float, south: float, east: float}
+     */
+    public static function xyzToBoundingBox(float $x, float $y, float $z): array
+    {
+        $topLeft = self::xyzToLatLon($x, $y, $z);
+        $bottomRight = self::xyzToLatLon($x + 1, $y + 1, $z);
+
+        return [
+            'north' => $topLeft['lat'],
+            'west' => $topLeft['lon'],
+            'south' => $bottomRight['lat'],
+            'east' => $bottomRight['lon'],
+        ];
+    }
+
     private static function getGpxPoint(Point $point): GpxPoint
     {
         $gpxPoint = new GpxPoint('');

@@ -146,6 +146,61 @@ The user manual is a work in progress, still those are hidden features that need
 - After a search of any kind, simply click on the map to discard the last results
 
 
+### Geo JSON
+
+#### Retrieving
+
+Geo JSON is a standard format to display information from files on a map. 
+But the standard does not explicit a way to retrieve those files.
+So TrailOdyssey tries its best to get the data, but it may fail sometimes.
+
+#### Styling
+
+Geo JSON is a standard format to display information from files on a map.
+But the standard does not explicit a way to style this data.
+
+TrailOdyssey allows you to add styling information when configuring your Geo JSON source.
+
+You must use a valid JSON with at least one of those two key: `marker` and/or `popup` 
+that will define the content and style of the marker and the popup.
+
+ - The `marker` MUST be a structured json representing an HTML tree that will be your point marker. You can also use `%tag` to use the content on the current feature.
+ - The `popup` MUST be a structured json representing an HTML tree that will be your point popup. You can also use `%tag` to use the content on the current feature.
+
+**example**
+```json
+{
+  "marker": {
+    "el": "div",
+    "style": "width: 100px; background: white; color: black; font-weight: bold; padding: .3rem; text-align: center;",
+    "content": "%properties.city%"
+  },
+  "popup": {
+    "el": "div",
+    "style": "background: yellow;",
+    "class": "small",
+    "children": [
+      {
+        "el": "ul",
+        "children": [
+          {
+            "el": "li",
+            "content": "%properties.city%"
+          },
+          {
+            "el": "li",
+            "content": "%properties.temp% °C"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+So we have multiples ways of doing it and sometime we need a tricks to make it work.
+`bbox={x}/{y}/{z}`
+
 ## Some screens
 
 ![trail_odyssey_screen_public_2.png](./documentation/assets/trail_odyssey_screen_public_2.png)

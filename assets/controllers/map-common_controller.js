@@ -3,14 +3,13 @@
 import L from 'leaflet';
 import { Controller } from '@hotwired/stimulus';
 import { LatLng } from 'leaflet/src/geo';
-// https://makinacorpus.github.io/Leaflet.GeometryUtil/index.html
 import 'leaflet-geometryutil';
 import '@elfalem/leaflet-curve';
 import '../js/leaflet-double-touch-drag-zoom';
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
 import { markerDefaultIcon, removeFromMap } from '../helpers';
-// import './TileLayer.GeoJSON';
+import { flattenJsonDataToDotNotation, jsonToHtml } from '../jsonToHtml';
 
 export default class extends Controller {
   static targets = [
@@ -38,6 +37,8 @@ export default class extends Controller {
     this.pathDistances = {}; // Distance in meters
     // Warning: points are indexed by their start stage id
     this.points = {}; // Raw data for each stage
+    this.activeGeoJson = {}; // Key is the tiles url template
+    this.abortFetch = null;
     this.activeChart = null;
     this.isPublic = !!this.isPublicValue;
     this.isLive = !!this.isLiveValue;
@@ -48,31 +49,40 @@ export default class extends Controller {
     this.proxyLayers = {};
     const baseLayers = {};
     const overlayLayers = {};
-    // const geoJsonLayers = {};
     const firstLayer = [];
 
     for (const tiles of this.tilesValue) {
       // noinspection JSUnresolvedReference
       const tilesUrl = this.isLive || tiles.useProxy ? tiles.proxyUrl : tiles.url;
-      const currentLayer = L.tileLayer(tilesUrl, {
-        attribution: tiles.description || '',
-      });
-      currentLayer.id = tiles.id;
+
       if (tiles.geoJson) {
-        // var currentLayer = new L.TileLayer.GeoJSON(tiles.proxyUrl);
-        // geoJsonLayers[tiles.name] = currentLayer;
-        // baseLayers[tiles.name] = currentLayer;
-        // this.map.addLayer(currentLayer);
-      } else if (tiles.overlay) {
+        const currentLayer = L.geoJSON(null, {
+          onEachFeature: this.onEachFeature.bind(tiles),
+          pointToLayer: this.pointToLayer.bind(tiles),
+        });
+        currentLayer.on('add', () => {
+          this.activateGeoJson(currentLayer, tiles);
+        });
+        currentLayer.on('remove', () => {
+          this.deactivateGeoJson(currentLayer, tiles);
+        });
         overlayLayers[tiles.name] = currentLayer;
       } else {
-        if (firstLayer.length === 0) {
-          firstLayer.push(currentLayer);
-        }
-        baseLayers[tiles.name] = currentLayer;
-        if (!this.isLive) {
-          // noinspection JSUnresolvedReference
-          this.proxyLayers[tiles.id] = L.tileLayer(tiles.proxyUrl);
+        const currentLayer = L.tileLayer(tilesUrl, {
+          attribution: tiles.description || '',
+        });
+        currentLayer.id = tiles.id;
+        if (tiles.overlay) {
+          overlayLayers[tiles.name] = currentLayer;
+        } else {
+          if (firstLayer.length === 0) {
+            firstLayer.push(currentLayer);
+          }
+          baseLayers[tiles.name] = currentLayer;
+          if (!this.isLive) {
+            // noinspection JSUnresolvedReference
+            this.proxyLayers[tiles.id] = L.tileLayer(tiles.proxyUrl);
+          }
         }
       }
     }
@@ -110,6 +120,8 @@ export default class extends Controller {
       this.map.on('zoomend', this.mapZoomMoveEndHandler);
       this.map.on('moveend', this.mapZoomMoveEndHandler);
     }
+
+    this.map.on('moveend', this.fetchGeoJson);
 
     // Export method for external use
     window.mapCommonController = {
@@ -480,7 +492,143 @@ export default class extends Controller {
     return [seriesX, seriesAlt, seriesLat, seriesLng];
   };
 
+  // Geo JSON
+
+  activateGeoJson = (layer, tiles) => {
+    this.activeGeoJson[tiles.url] = [layer, tiles];
+    this.fetchGeoJson();
+  };
+
+  deactivateGeoJson = (layer, tiles) => {
+    delete (this.activeGeoJson[tiles.url]);
+  };
+
+  fetchGeoJson = () => {
+    if (Object.entries(this.activeGeoJson).length <= 0) {
+      return;
+    }
+    const coords = this.getTileCoordinates();
+    if (this.abortFetch) {
+      this.abortFetch.abort(); // Abort previous fetch
+    }
+    this.abortFetch = new AbortController();
+    const { signal } = this.abortFetch;
+    for (const url in this.activeGeoJson) {
+      const [layer, tiles] = this.activeGeoJson[url];
+      layer.clearLayers(); // Clear previous fetch
+      // Bbox
+      if (tiles.proxyUrl.match(/bbox$/)) {
+        const bbox = this.getBoundingBox();
+        const tileUrl = `${tiles.proxyUrl}/${bbox}`;
+
+        fetch(tileUrl, { signal })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.features) {
+              layer.addData(data);
+            }
+          })
+          .catch(() => {
+            // Most likely a request abort
+          });
+      } else {
+        // XYZ
+        for (const { x, y, z } of coords) {
+          const tileUrl = tiles.proxyUrl.replace('{x}', x).replace('{y}', y).replace('{z}', z);
+
+          fetch(tileUrl, { signal })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.features) {
+                layer.addData(data);
+              }
+            })
+            .catch(() => {
+              // Most likely a request abort
+            });
+        }
+      }
+    }
+  };
+
+  // Geo JSON features
+
+  /**
+   * This is not an arrow function so we can bind a new this to it
+   */
+  onEachFeature = function (feature, layer) {
+    const tiles = this;
+    const flat = flattenJsonDataToDotNotation(feature);
+    let popup;
+    const geoJsonHtml = JSON.parse(tiles.geoJsonHtml);
+    if (geoJsonHtml && geoJsonHtml.popup) {
+      popup = jsonToHtml(geoJsonHtml.popup, flat);
+    } else {
+      popup = document.createElement('div');
+      const ul = document.createElement('ul');
+      for (const k in flat) {
+        const v = flat[k];
+        const li = document.createElement('li');
+        li.textContent = `${k}: ${v}`;
+        ul.appendChild(li);
+      }
+      popup.appendChild(ul);
+    }
+    layer.bindPopup(popup);
+  };
+
+  /**
+   * This is not an arrow function so we can bind a new this to it
+   */
+  pointToLayer = function (feature, latlng) {
+    const tiles = this;
+    const flat = flattenJsonDataToDotNotation(feature);
+    const geoJsonHtml = JSON.parse(tiles.geoJsonHtml);
+    if (geoJsonHtml && geoJsonHtml.marker) {
+      const html = jsonToHtml(geoJsonHtml.marker, flat);
+      const icon = L.divIcon({ html });
+      return L.marker(latlng, { icon });
+    }
+    return L.circleMarker(latlng);
+  };
+
   // Helpers
+
+  getBoundingBox = () => {
+    const bounds = this.map.getBounds();
+    const southWest = bounds.getSouthWest();
+    const northEast = bounds.getNorthEast();
+
+    return [
+      southWest.lng.toFixed(6),
+      southWest.lat.toFixed(6),
+      northEast.lng.toFixed(6),
+      northEast.lat.toFixed(6),
+    ].join(',');
+  };
+
+  getTileCoordinates = () => {
+    const z = this.map.getZoom();
+    const pixelBounds = this.map.getPixelBounds();
+    const tileSize = 256; // TODO this.map.getTileSize();
+
+    // Get the tile range
+    const tileBounds = L.bounds(
+      pixelBounds.min.divideBy(tileSize).floor(),
+      pixelBounds.max.divideBy(tileSize).floor(),
+    );
+
+    const tiles = [];
+
+    // Loop through the tile range and store the coordinates
+    for (let { x } = tileBounds.min; x <= tileBounds.max.x; x += 1) {
+      for (let { y } = tileBounds.min; y <= tileBounds.max.y; y += 1) {
+        tiles.push({ x, y, z });
+      }
+    }
+
+    return tiles;
+  };
 
   preventWarnings = () => {
     // Targets

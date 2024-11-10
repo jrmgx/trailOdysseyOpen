@@ -73,23 +73,24 @@ export const flattenJsonDataToDotNotation = (jsonData, currentPrefix, result) =>
  *
  * Example:
  * {
- *   el: 'div',
- *   style: 'background: red;',
- *   class: 'small',
- *   children: [
+ *   "el": "div",
+ *   "style": "background: red;",
+ *   "class": "small",
+ *   "children": [
  *     {
- *       el: 'ul',
- *       children: [
+ *       "el": "ul",
+ *       "children": [
  *         {
- *           el: 'li',
- *           content: '%geometry.coordinates.0%',
- *         }, {
- *           el: 'li',
- *           content: '%geometry.coordinates.1%',
+ *           "el": "li",
+ *           "content": "%geometry.coordinates.0%"
  *         },
- *       ],
- *     },
- *   ],
+ *         {
+ *           "el": "li",
+ *           "content": "%geometry.coordinates.1%"
+ *         }
+ *       ]
+ *     }
+ *   ]
  * }
  * Gives an HTMLElement like this:
  * <div style="background: red;" class="small">
@@ -99,27 +100,29 @@ export const flattenJsonDataToDotNotation = (jsonData, currentPrefix, result) =>
  *   </ul>
  * </div>
  *
- * @TODO this could be generalized but would need a white/blacklist mechanism
+ * @TODO this would need a white/blacklist mechanism
  */
 export const jsonToHtml = (json, flattenJsonDataDottedNotation) => {
   const el = document.createElement(json.el);
-  if (json.style) {
-    el.setAttribute('style', json.style);
-  }
-  // if (json.class) {
-  //   el.setAttribute('class', json.class);
-  // }
-  if (json.content) {
-    if (/^%.*%$/.test(json.content)) {
-      el.textContent = flattenJsonDataDottedNotation[json.content.replace(/(^%|%$)/g, '')] || '';
-    } else {
-      el.textContent = json.content;
+  for (const attributeKey in json) {
+    if (attributeKey !== 'el' && attributeKey !== 'children' && attributeKey !== 'content') {
+      el.setAttribute(attributeKey, json[attributeKey]);
     }
+  }
+
+  if (json.content) {
+    let { content } = json;
+    for (const k in flattenJsonDataDottedNotation) {
+      const v = flattenJsonDataDottedNotation[k];
+      content = content.replace(`%${k}%`, v);
+    }
+    el.textContent = content;
   } else if (json.children) {
     for (const child of json.children) {
       const childEl = jsonToHtml(child, flattenJsonDataDottedNotation);
       el.appendChild(childEl);
     }
   }
+
   return el;
 };

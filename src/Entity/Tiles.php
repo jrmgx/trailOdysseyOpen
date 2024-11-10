@@ -74,7 +74,11 @@ class Tiles
     #[Groups(['leaflet'])]
     public function getProxyUrl(): string
     {
-        return "/t/p/$this->id/{x}/{y}/{z}";
+        if (str_contains($this->url, '{x}')) {
+            return "/t/p/$this->id/{x}/{y}/{z}";
+        }
+
+        return "/t/p/$this->id/bbox";
     }
 
     public function getId(): ?int

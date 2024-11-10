@@ -39,8 +39,7 @@
                         </div>
                     </div>
 
-
-                    <div class="mb-3 col-6 col-sm-4 d-none">
+                    <div class="mb-3 col-6 col-sm-4">
                         <div class="form-check">
                             <input type="checkbox" id="trip_edit_tiles_{{ index }}_geo_json" name="trip_edit[tiles][{{ index }}][geoJson]" {{ geoJson ? 'checked=checked' : '' }} value="1" class="form-check-input"/>
                             <label class="form-check-label required" for="trip_edit_tiles_{{ index }}_geo_json">{{ 'form.label.geo_json'|trans }}</label>
@@ -49,7 +48,10 @@
                 </div>
                 <div class="mb-3 {{ geoJson ? '' : 'd-none' }}" id="trip_edit_tiles_{{ index }}_geo_json_html_container">
                     <label for="trip_edit_tiles_{{ index }}_geo_json_html" class="form-label required">{{ 'form.label.geo_json_html'|trans }}</label>
-                    <textarea id="trip_edit_tiles_{{ index }}_geo_json_html" name="trip_edit[tiles][{{ index }}][geoJsonHtml]" class="form-control">{{ geoJsonHtml }}</textarea>
+                    <textarea id="trip_edit_tiles_{{ index }}_geo_json_html"
+                              name="trip_edit[tiles][{{ index }}][geoJsonHtml]"
+                              style="font-family: monospace"
+                              class="form-control">{{ geoJsonHtml }}</textarea>
                 </div>
                 <script>
                     (function () {
@@ -104,7 +106,28 @@
             >
                 <div data-form-tiles-collection-target="collectionContainer">
                     {% for tiles in form.tiles %}
-                        {{ _self.tiles_form(loop.index0, tiles.position.vars.value, tiles.name.vars.value, tiles.description.vars.value, tiles.url.vars.value, tiles.overlay.vars.checked, tiles.public.vars.checked, tiles.useProxy.vars.checked, tiles.geoJson.vars.checked) }}
+{#                            index: loop.index0,#}
+{#                            position: tiles.position.vars.value,#}
+{#                            name: tiles.name.vars.value,#}
+{#                            description: tiles.description.vars.value,#}
+{#                            url: tiles.url.vars.value,#}
+{#                            overlay: tiles.overlay.vars.checked,#}
+{#                            public: tiles.public.vars.checked,#}
+{#                            useProxy: tiles.useProxy.vars.checked,#}
+{#                            geoJson: tiles.geoJson.vars.checked,#}
+{#                            geoJsonHtml: tiles.geoJsonHtml.vars.value,#}
+                        {{ _self.tiles_form(
+                            loop.index0,
+                            tiles.position.vars.value,
+                            tiles.name.vars.value,
+                            tiles.description.vars.value,
+                            tiles.url.vars.value,
+                            tiles.overlay.vars.checked,
+                            tiles.public.vars.checked,
+                            tiles.useProxy.vars.checked,
+                            tiles.geoJson.vars.checked,
+                            tiles.geoJsonHtml.vars.value,
+                        ) }}
                     {% endfor %}
                 </div>
                 <div class="tiles-form-entry tiles-form-entry-add">
