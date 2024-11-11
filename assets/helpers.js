@@ -50,6 +50,22 @@ export const iconGpsCompass = L.icon({
   popupAnchor: [32, 32],
 });
 
+export const subPolyline = (polyline, pointA, pointB) => {
+  const polylineLatLngs = polyline.getLatLngs();
+
+  let indexA = polylineLatLngs.findIndex((p) => p.lat === pointA.lat && p.lng === pointA.lng);
+  let indexB = polylineLatLngs.findIndex((p) => p.lat === pointB.lat && p.lng === pointB.lng);
+
+  if (indexA === -1 || indexB === -1) {
+    throw new Error('Points not found in the polyline');
+  }
+
+  if (indexA > indexB) {
+    [indexA, indexB] = [indexB, indexA];
+  }
+
+  return polylineLatLngs.slice(indexA, indexB + 1);
+};
 export const curve = (startPoint, endPoint, pathOptions) => {
   // From: https://gist.github.com/ryancatalani/6091e50bf756088bf9bf5de2017b32e6
   const latlng1 = [startPoint.lat, startPoint.lng];

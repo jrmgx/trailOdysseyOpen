@@ -6,7 +6,7 @@ import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
 import Routing from 'fos-router';
 import {
-  curve, iconSymbol, removeFromMap,
+  curve, subPolyline, iconSymbol, markerDefaultIcon, removeFromMap,
 } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
@@ -24,6 +24,7 @@ export default class extends Controller {
     this.routings = {};
     this.interests = {};
     this.extras = [];
+    this.pointOnRouting = null;
 
     // Export method for external use
     window.planController = {
@@ -96,7 +97,6 @@ export default class extends Controller {
     sidebarController.switchToMapAction();
     const line = this.routings[id];
     this.map().fitBounds(line.getBounds());
-    // setTimeout(() => line.openPopup(), 300);
   };
 
   interestClickAction = (e) => {
@@ -109,6 +109,10 @@ export default class extends Controller {
   };
 
   mapClickAction = (e, actionPinActiveFor) => {
+    if (this.pointOnRouting) {
+      this.pointOnRouting = removeFromMap(this.pointOnRouting, this.map());
+    }
+
     if (!actionPinActiveFor) return;
 
     if (actionPinActiveFor === 'interest') {
@@ -158,7 +162,6 @@ export default class extends Controller {
   addRouting = (id, startLat, startLon, finishLat, finishLon, distance, mode, el, points) => {
     const weight = 6;
     const color = 'red';
-    const routingPopupContent = `${distance} km ${mode}<br>${el}`;
     if (points) {
       const latLon = [];
       for (const p of points) {
@@ -168,15 +171,33 @@ export default class extends Controller {
       if (length < 2) {
         return;
       }
-      this.routings[id] = L.polyline(latLon, { interactive: false, color, weight })
+      this.routings[id] = L.polyline(latLon, {
+        interactive: true, color, weight, bubblingMouseEvents: false,
+      })
         .setStyle({ cursor: 'default' })
-        .bindPopup(routingPopupContent)
+        .on('click', (e) => {
+          if (this.pointOnRouting) {
+            const actual = L.GeometryUtil
+              .closest(this.map(), this.routings[id], e.latlng, true);
+            try {
+              const sub = subPolyline(this.routings[id], this.pointOnRouting.getLatLng(), actual);
+              const lengths = L.GeometryUtil.accumulatedLengths(sub);
+              // eslint-disable-next-line no-alert
+              alert(L.GeometryUtil.readableDistance(lengths[lengths.length - 1], 'metric'));
+            } catch {
+              // eslint-disable-next-line no-alert
+              alert('Distance is only possible on the same stage.');
+            }
+          } else {
+            const actual = L.GeometryUtil.closest(this.map(), this.routings[id], e.latlng, true);
+            this.pointOnRouting = L.marker(actual, { icon: markerDefaultIcon }).addTo(this.map());
+          }
+        })
         .addTo(this.map());
     } else {
       const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLon));
       const endPoint = L.latLng(parseFloat(finishLat), parseFloat(finishLon));
       this.routings[id] = curve(startPoint, endPoint, { color: 'black', weight: 2 })
-        .bindPopup(routingPopupContent)
         .addTo(this.map());
     }
   };

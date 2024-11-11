@@ -279,6 +279,7 @@ export default class extends Controller {
       color: 'blue',
       opacity: 0.75,
       weight: 3,
+      interactive: false,
       lineCap: 'round',
       dashArray: '3, 5',
       dashOffset: '0',
