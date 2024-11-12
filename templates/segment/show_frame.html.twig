@@ -14,7 +14,7 @@
                 </div>
                 <div class="flex-grow-1"
                      style="color:#{{ color_from_index(segment.id) }}">
-                    {{ 'segment.generic_title'|trans }}
+                    {{ 'segment.generic_title'|trans }} {% if segment.distance %} — {{ segment.distance|to_km }}&nbsp;km{% endif %}
                 </div>
                 <a class="icon-link link-secondary js-segment-edit-action"
                    data-action="click->segment#sidebarEditSegmentClickAction"

@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use App\Helper\GeoHelper;
 use App\Model\Point;
 use App\Repository\SegmentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SegmentRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Segment
 {
     #[ORM\Id]
@@ -36,9 +38,31 @@ class Segment
     #[ORM\Column]
     private array $boundingBox = ['minLat' => '0', 'maxLat' => '0', 'minLon' => '0', 'maxLon' => '0'];
 
+    #[ORM\Column(nullable: true)]
+    private ?int $distance = null;
+
     public function __construct()
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function getDistance(): ?int
+    {
+        return $this->distance;
+    }
+
+    public function setDistance(?int $distance): self
+    {
+        $this->distance = $distance;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateDistance(): void
+    {
+        $this->setDistance(GeoHelper::calculateDistanceFromPoints($this->getPoints(), withElevation: true));
     }
 
     public function getId(): ?int
