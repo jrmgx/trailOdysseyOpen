@@ -46,6 +46,7 @@ export default class extends Controller {
           if (id) {
             this.showOnPublicBar(id);
             this.showOnMap(id);
+            this.updateDiaryInUrl(id);
           }
         };
 
@@ -82,15 +83,33 @@ export default class extends Controller {
       true,
     );
 
-    // TODO id there is a fragment go to that diary
-
     // Export method for external use
     window.publicController = {
       addDiaryEntry: this.addDiaryEntry,
+      showDiaryFromUrl: this.showDiaryFromUrl,
     };
   };
 
   map = () => window.mapCommonController.map;
+
+  // Init
+
+  showDiaryFromUrl = () => {
+    const url = new URL(document.location);
+    if (url.hash) {
+      const hash = parseInt(url.hash.substring(1), 10);
+      if (hash) {
+        this.showOnMap(hash);
+        this.showOnPublicBar(hash);
+      }
+    }
+  };
+
+  updateDiaryInUrl = (id) => {
+    const url = new URL(document.location);
+    url.hash = `${id}`;
+    document.location = url.toString();
+  };
 
   // Actions
 
@@ -98,6 +117,7 @@ export default class extends Controller {
     this.showPublicBarClickAction();
     this.showOnPublicBar(id);
     this.showOnMap(id);
+    this.updateDiaryInUrl(id);
   };
 
   hidePublicBarClickAction = () => {
@@ -119,11 +139,13 @@ export default class extends Controller {
   currentDiaryClickAction = (e) => {
     const { id } = e.params;
     this.showOnMap(id);
+    this.updateDiaryInUrl(id);
   };
 
   showTitleScreen = () => {
     this.diaryCurrentIndex = null;
     this.showOnPublicBar(0);
+    this.updateDiaryInUrl('');
     this.fitBounds();
   };
 
@@ -140,6 +162,7 @@ export default class extends Controller {
     this.diaryCurrentIndex = index - 1;
     this.showOnPublicBar(prevId);
     this.showOnMap(prevId);
+    this.updateDiaryInUrl(prevId);
   };
 
   nextDiaryClickAction = (e) => {
@@ -150,22 +173,27 @@ export default class extends Controller {
     this.diaryCurrentIndex = index + 1;
     this.showOnPublicBar(nextId);
     this.showOnMap(nextId);
+    this.updateDiaryInUrl(nextId);
   };
 
   // Action methods
 
   showOnMap = (id) => {
-    const marker = this.diaryEntries.get(`${id}`);
+    const marker = this.diaryEntries.get(`${id}`) ?? false;
+    if (!marker) return;
     this.map().flyTo(marker.getLatLng(), this.zoom + 1);
     marker.bounce();
   };
 
   showOnPublicBar = (id) => {
+    const diaryEntry = document.getElementById(`diary${id}`);
+    if (!diaryEntry) {
+      return;
+    }
     const allDiaryEntries = document.querySelectorAll('.diaryEntryMain');
     for (const allDiaryEntry of allDiaryEntries) {
       allDiaryEntry.classList.add('d-none');
     }
-    const diaryEntry = document.getElementById(`diary${id}`);
     diaryEntry.classList.remove('d-none');
     const outerContainer = diaryEntry.querySelector('.public-bar-description');
     const innerContainer = outerContainer.querySelector('.markdown-container');
