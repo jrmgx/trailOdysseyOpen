@@ -127,6 +127,16 @@
                             }) }}
                         </button>
                     </div>
+                    <div class="public-bar-action public-bar-action-home"
+                         data-action="click->public#homePublicBarClickAction"
+                    >
+                        <button class="btn btn-light border-0">
+                            {{ include('common/_icon.html.twig', {
+                                icon_name: 'house-door-fill',
+                                icon_size: 1,
+                            }) }}
+                        </button>
+                    </div>
                     <div class="public-bar-action public-bar-action-prev"
                          data-action="click->public#prevDiaryClickAction"
                          data-public-id-param="{{ diaryEntry.id }}"
@@ -153,6 +163,7 @@
                          data-action="click->public#currentDiaryClickAction"
                          data-public-id-param="{{ diaryEntry.id }}"
                     >
+
                         {{ diaryEntry.symbol }}
                         {{ diaryEntry.nameWithPointName }}{%- if diaryEntry.arrivingAt is defined -%}
                             :&nbsp;<span class="fs-small">

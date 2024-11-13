@@ -106,6 +106,10 @@ export default class extends Controller {
     this.map().invalidateSize();
   };
 
+  homePublicBarClickAction = () => {
+    this.showTitleScreen();
+  };
+
   showPublicBarClickAction = () => {
     this.publicBarTarget.classList.remove('d-none');
     this.mapTarget.classList.remove('map-fullscreen');

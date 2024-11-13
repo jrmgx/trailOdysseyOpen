@@ -387,9 +387,16 @@ path.leaflet-interactive {
     background-color: rgba(255,255,255,0.25);
 }
 
+.public-bar-action-home {
+    top: var(--mobile-public-map-height);
+    left: 0;
+    margin: .25rem;
+}
+
 .public-bar-action-close {
     top: var(--mobile-public-map-height);
     right: 0;
+    margin: .25rem;
 }
 
 .public-bar-action-prev {
@@ -408,8 +415,9 @@ path.leaflet-interactive {
     top: var(--mobile-public-map-height);
     display: flex;
     align-items: center;
-    width: 100%;
+    width: calc(100% - 2rem);
     padding: 1rem;
+    margin-left: 2rem;
 }
 
 .public-bar-description {
@@ -470,6 +478,10 @@ path.leaflet-interactive {
         left: 50svw;
     }
 
+    .map.public-map.map-fullscreen {
+        left: 0;
+    }
+
     .public-bar {
         top: 0;
         right: 50svw;
@@ -479,7 +491,8 @@ path.leaflet-interactive {
 
     .public-bar-header {
         top: 0;
-        width: 50svw;
+        width: calc(50svw - 2rem);
+        margin-left: 2rem;
     }
 
     .public-bar-description {
@@ -492,8 +505,13 @@ path.leaflet-interactive {
         max-height: calc(100svh - var(--public-bar-header-height) - 1rem);
     }
 
+    .public-bar-action-home {
+        top: 0;
+    }
+
     .public-bar-action-close {
-        display: none;
+        top: 0;
+        right: 50svw;
     }
 
     .public-bar-action-prev {
