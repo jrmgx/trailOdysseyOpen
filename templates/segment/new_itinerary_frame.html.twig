@@ -1,6 +1,24 @@
 <turbo-frame id="segment-new">
     {{ form_start(form, { attr: { 'data-turbo-frame': 'sidebar-segments' }}) }}
-    {{ include('segment/_form.html.twig') }}
+    <div class="card m-3">
+        <div class="card-body">
+            {{ form_widget(form.name) }}
+            {{ form_errors(form.name) }}
+            {{ form_errors(form) }}
+            <div class="d-none">
+                {{ form_widget(form.jsonPoints) }}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="d-flex align-items-start">
+                <button class="btn btn-primary me-2">{{ 'action.save'|trans }}</button>
+                <a class="btn btn-outline-secondary"
+                   data-action="click->segment#newSegmentCommonCancelAction"
+                   href="{{ path('segment_show', { trip: trip.id }) }}"
+                >cancel</a>
+            </div>
+        </div>
+    </div>
     {{ form_end(form) }}
     <script>
       if (typeof segmentController !== 'undefined') {

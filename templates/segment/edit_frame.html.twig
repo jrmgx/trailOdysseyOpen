@@ -1,29 +1,41 @@
 <turbo-frame id="segment_{{ segment.id }}">
+    <form method="post" id="delete-form-{{ segment.id }}"
+          action="{{ path('segment_delete', { trip: trip.id, id: segment.id }) }}"
+          data-turbo-frame="sidebar-segments"
+          onsubmit="return confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`);">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ segment.id) }}">
+    </form>
+    {{ form_start(form) }}
     <div class="card m-3">
         <div class="card-body">
-            {{ form_start(form) }}
-            {{ include('segment/_form.html.twig') }}
-            {{ form_end(form) }}
-        </div>
-        <div class="card-body">
-            <a class="btn btn-primary" href="#"
+            {{ form_widget(form.name) }}
+            {{ form_errors(form.name) }}
+            {{ form_errors(form) }}
+            <div class="d-none">
+                {{ form_widget(form.jsonPoints) }}
+            </div>
+            <a class="btn btn-primary mt-2" href="#"
                data-action="click->segment#pointForSegmentStartStopAction:prevent">
                 {{ 'action.add_points'|trans }}
             </a>
         </div>
-        <script>
-    if (typeof segmentController !== 'undefined') {
-      segmentController.editSegment({{segment.id }}, {{ segment.points|json_encode|raw }});
-    }
-    </script>
         <div class="card-body">
-            <form method="post"
-                  action="{{ path('segment_delete', { trip: trip.id, id: segment.id }) }}"
-                  data-turbo-frame="sidebar-segments"
-                  onsubmit="return confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`);">
-                <button class="btn btn-outline-danger">{{ 'action.delete'|trans }}</button>
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ segment.id) }}">
-            </form>
+            <div class="d-flex align-items-start">
+                <button class="btn btn-primary me-2">{{ 'action.save'|trans }}</button>
+                <a class="btn btn-outline-secondary"
+                   data-action="click->segment#newSegmentCommonCancelAction"
+                   href="{{ path('segment_show', { trip: trip.id }) }}"
+                >cancel</a>
+                <button class="ms-auto btn btn-outline-danger" form="delete-form-{{ segment.id }}">
+                    {{ 'action.delete'|trans }}
+                </button>
+            </div>
         </div>
     </div>
+    {{ form_end(form) }}
+    <script>
+        if (typeof segmentController !== 'undefined') {
+            segmentController.editSegment({{segment.id }}, {{ segment.points|json_encode|raw }});
+        }
+    </script>
 </turbo-frame>

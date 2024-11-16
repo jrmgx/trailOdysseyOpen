@@ -95,9 +95,9 @@ export default class extends Controller {
     sidebarController.switchToMapAction();
     const marker = this.segments[id];
     if (e.shiftKey) {
-      this.map().fitBounds(marker.getBounds());
-    } else {
       this.map().setView(marker.getBounds().getCenter());
+    } else {
+      this.map().fitBounds(marker.getBounds());
     }
     marker.bindTooltip('Active').openTooltip();
     setTimeout(() => marker.closeTooltip(), 2000);
