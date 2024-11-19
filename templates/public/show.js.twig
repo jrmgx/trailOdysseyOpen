@@ -9,8 +9,6 @@ publicController.addDiaryEntry(
 );
 publicController.showDiaryFromUrl();
 {% endfor %}
-
-{% if first_load is defined and first_load and is_granted('EDIT', trip) %}
 {% for routing in routings %}
 mapCommonController.addPath(
   {{ routing.pathPoints|json_encode|raw }},
@@ -18,13 +16,13 @@ mapCommonController.addPath(
   {{ routing.distance|default('null') }}
 );
 {% endfor %}
-{% endif %}
-
 {% if trip.progressPoint %}
 mapCommonController.addProgress(
     ['{{ trip.progressPoint.lat }}', '{{ trip.progressPoint.lon }}'],
 {% for routing in routings %}
+{% if routing.pathPoints and routing.pathPoints|length > 1 %}
     {{ routing.pathPoints|json_encode|raw }},
+{% endif %}
 {% endfor %}
 );
 {% endif %}

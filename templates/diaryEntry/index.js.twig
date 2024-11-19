@@ -26,7 +26,9 @@ mapCommonController.addPath(
 mapCommonController.addProgress(
     ['{{ trip.progressPoint.lat }}', '{{ trip.progressPoint.lon }}'],
 {% for routing in routings %}
+{% if routing.pathPoints and routing.pathPoints|length > 1 %}
     {{ routing.pathPoints|json_encode|raw }},
+{% endif %}
 {% endfor %}
 );
 {% endif %}

@@ -42,11 +42,11 @@ class Trip
     private User $user;
 
     /** @var Collection<int, Stage> */
-    #[ORM\OneToMany(mappedBy: 'trip', targetEntity: Stage::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Stage::class, mappedBy: 'trip', orphanRemoval: true)]
     private Collection $stages;
 
     /** @var Collection<int, Routing> */
-    #[ORM\OneToMany(mappedBy: 'trip', targetEntity: Routing::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Routing::class, mappedBy: 'trip', orphanRemoval: true)]
     private Collection $routings;
 
     #[ORM\Embedded]
@@ -57,20 +57,20 @@ class Trip
 
     /** @var Collection<int, Tiles> */
     #[Assert\Count(min: 1, minMessage: 'You are required to have at least one set of Tiles.')]
-    #[ORM\OneToMany(mappedBy: 'trip', targetEntity: Tiles::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Tiles::class, mappedBy: 'trip', cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $tiles;
 
     /** @var Collection<int, Interest> */
-    #[ORM\OneToMany(mappedBy: 'trip', targetEntity: Interest::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Interest::class, mappedBy: 'trip', orphanRemoval: true)]
     private Collection $interests;
 
     /** @var Collection<int, DiaryEntry> */
-    #[ORM\OneToMany(mappedBy: 'trip', targetEntity: DiaryEntry::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: DiaryEntry::class, mappedBy: 'trip', orphanRemoval: true)]
     private Collection $diaryEntries;
 
     /** @var Collection<int, Segment> */
-    #[ORM\OneToMany(mappedBy: 'trip', targetEntity: Segment::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Segment::class, mappedBy: 'trip', orphanRemoval: true)]
     private Collection $segments;
 
     /** @var ?array<mixed> */
