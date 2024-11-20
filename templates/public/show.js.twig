@@ -1,5 +1,6 @@
 {{ stimulus_js_load_start('publicController', first_load is defined and first_load) }}
 
+let points = [];
 {% for diaryEntry in diaryEntries %}
 publicController.addDiaryEntry(
   '{{ diaryEntry.id }}',
@@ -7,9 +8,13 @@ publicController.addDiaryEntry(
   '{{ diaryEntry.point.lon }}',
   '{{ diaryEntry.symbol }}'
 );
+points.push([{{ diaryEntry.point.lat }}, {{ diaryEntry.point.lon }}]);
 publicController.showDiaryFromUrl();
 {% endfor %}
+
 {% for routing in routings %}
+points.push([{{ routing.startStage.point.lat }}, {{ routing.startStage.point.lon }}]);
+points.push([{{ routing.finishStage.point.lat }}, {{ routing.finishStage.point.lon }}]);
 mapCommonController.addPath(
   {{ routing.pathPoints|json_encode|raw }},
   {{ routing.startStage.id }},
@@ -28,5 +33,6 @@ mapCommonController.addProgress(
 {% endif %}
 
 mapCommonController.refreshPlan();
+publicController.fit(points);
 
 {{ stimulus_js_load_end(first_load is defined and first_load) }}

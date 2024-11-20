@@ -24,6 +24,7 @@ export default class extends Controller {
     this.diaryCurrentIndex = null;
     this.cache = {};
     this.zoom = 10;
+    this.fitPolyline = null;
 
     // We add a wrapper to img
     for (const i of this.publicBarTarget.querySelectorAll('img[loading=lazy]')) {
@@ -87,6 +88,7 @@ export default class extends Controller {
     window.publicController = {
       addDiaryEntry: this.addDiaryEntry,
       showDiaryFromUrl: this.showDiaryFromUrl,
+      fit: this.fit,
     };
   };
 
@@ -146,7 +148,7 @@ export default class extends Controller {
     this.diaryCurrentIndex = null;
     this.showOnPublicBar(0);
     this.updateDiaryInUrl('');
-    this.fitBounds();
+    this.fit();
   };
 
   prevDiaryClickAction = (e) => {
@@ -224,17 +226,17 @@ export default class extends Controller {
     marker.addTo(this.map());
 
     this.diaryEntries.set(`${id}`, marker);
-
-    this.fitBounds();
   };
 
-  fitBounds = () => {
-    const latLngs = [];
-    for (const diaryEntry of this.diaryEntries) {
-      latLngs.push(diaryEntry[1].getLatLng());
+  fit = (arrayOfPoints = null) => {
+    if (this.fitPolyline) {
+      this.map().fitBounds(this.fitPolyline.getBounds());
+      return;
     }
 
-    this.map().fitBounds(L.latLngBounds(latLngs));
+    if (!arrayOfPoints || arrayOfPoints.length < 2) return;
+    this.fitPolyline = L.polyline(arrayOfPoints);
+    this.map().fitBounds(this.fitPolyline.getBounds());
     this.zoom = this.map().getZoom();
   };
 
