@@ -557,7 +557,7 @@ export default class extends Controller {
   /**
    * This is not an arrow function so we can bind a new this to it
    */
-  onEachFeature = function (feature, layer) {
+  onEachFeature(feature, layer) {
     const tiles = this;
     const flat = flattenJsonDataToDotNotation(feature);
     let popup;
@@ -576,12 +576,12 @@ export default class extends Controller {
       popup.appendChild(ul);
     }
     layer.bindPopup(popup);
-  };
+  }
 
   /**
    * This is not an arrow function so we can bind a new this to it
    */
-  pointToLayer = function (feature, latlng) {
+  pointToLayer(feature, latlng) {
     const tiles = this;
     const flat = flattenJsonDataToDotNotation(feature);
     const geoJsonHtml = JSON.parse(tiles.geoJsonHtml);
@@ -591,7 +591,7 @@ export default class extends Controller {
       return L.marker(latlng, { icon });
     }
     return L.circleMarker(latlng);
-  };
+  }
 
   // Helpers
 

@@ -147,7 +147,7 @@ export default class extends Controller {
   showTitleScreen = () => {
     this.diaryCurrentIndex = null;
     this.showOnPublicBar(0);
-    this.updateDiaryInUrl('');
+    this.updateDiaryInUrl('#');
     this.fit();
   };
 
@@ -197,6 +197,7 @@ export default class extends Controller {
       allDiaryEntry.classList.add('d-none');
     }
     diaryEntry.classList.remove('d-none');
+    if (id === 0) return;
     const outerContainer = diaryEntry.querySelector('.public-bar-description');
     const innerContainer = outerContainer.querySelector('.markdown-container');
     if (!innerContainer.querySelector('img')) {
@@ -252,7 +253,7 @@ export default class extends Controller {
     }
 
     let fontSize = 1;
-    while (innerHeight < outerHeight) {
+    while (innerHeight < outerHeight && fontSize <= max) {
       fontSize += 0.5;
       innerContainer.style.fontSize = `${fontSize}rem`;
       innerHeight = innerContainer.clientHeight;
