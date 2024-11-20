@@ -11,7 +11,6 @@ publicController.addDiaryEntry(
 points.push([{{ diaryEntry.point.lat|float }}, {{ diaryEntry.point.lon|float }}]);
 publicController.showDiaryFromUrl();
 {% endfor %}
-
 {% for routing in routings %}
 points.push([{{ routing.startStage.point.lat|float }}, {{ routing.startStage.point.lon|float }}]);
 points.push([{{ routing.finishStage.point.lat|float }}, {{ routing.finishStage.point.lon|float }}]);
