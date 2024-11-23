@@ -16,8 +16,8 @@
                     let points = [];
                     {% for result in results %}
                         mapCommonController.addElement(
-                            {{ result.lat }},
-                            {{ result.lon }},
+                            {{ result.lat|float }},
+                            {{ result.lon|float }},
                             `{% autoescape %}<span class="element-marker">
                             <strong>{{ loop.index }} - {{ result.display_name }}</strong>
                             {# Acceptable hack #}
@@ -29,7 +29,7 @@
                             </a>
                             </span>{% endautoescape %}`
                         );
-                        points.push([{{ result.lat }}, {{ result.lon }}]);
+                        points.push([{{ result.lat|float }}, {{ result.lon|float }}]);
                     {% else %}
                         alert('{{ 'alert.no_results'|trans }}');
                     {% endfor %}

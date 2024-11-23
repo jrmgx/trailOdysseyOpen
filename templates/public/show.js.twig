@@ -8,13 +8,13 @@ publicController.addDiaryEntry(
   '{{ diaryEntry.point.lon }}',
   '{{ diaryEntry.symbol }}'
 );
-points.push([{{ diaryEntry.point.lat }}, {{ diaryEntry.point.lon }}]);
+points.push([{{ diaryEntry.point.lat|float }}, {{ diaryEntry.point.lon|float }}]);
 publicController.showDiaryFromUrl();
 {% endfor %}
 
 {% for routing in routings %}
-points.push([{{ routing.startStage.point.lat }}, {{ routing.startStage.point.lon }}]);
-points.push([{{ routing.finishStage.point.lat }}, {{ routing.finishStage.point.lon }}]);
+points.push([{{ routing.startStage.point.lat|float }}, {{ routing.startStage.point.lon|float }}]);
+points.push([{{ routing.finishStage.point.lat|float }}, {{ routing.finishStage.point.lon|float }}]);
 mapCommonController.addPath(
   {{ routing.pathPoints|json_encode|raw }},
   {{ routing.startStage.id }},

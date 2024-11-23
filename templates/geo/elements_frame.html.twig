@@ -40,7 +40,7 @@
             let points = [];
             {% if results is not null %}
             {% for element in results %}
-            points.push([{{ element.point.lat }}, {{ element.point.lon }}]);
+            points.push([{{ element.point.lat|float }}, {{ element.point.lon|float }}]);
                 {%- set description -%}
                     {%- for k, v in element.details -%}
                     {%- if v matches '{^https?:}' -%}
@@ -53,8 +53,8 @@
                 {# We do that to prevent performance issue while adding many element in one draw #}
                 setTimeout(() => {
                     mapCommonController.addElement(
-                        {{ element.point.lat }},
-                        {{ element.point.lon }},
+                        {{ element.point.lat|float }},
+                        {{ element.point.lon|float }},
                         `{% autoescape %}<span class="element-marker">
                         {% if element.error %}
                             <span class="element-error">{{ element.name }}</span>
@@ -70,8 +70,8 @@
                                 data-sidebar-scroll-param="true"
                                 data-turbo-frame="interest-new"
                                 href="{{ path('interest_new', {
-                                lat: element.point.lat,
-                                lon: element.point.lon,
+                                lat: element.point.lat|float,
+                                lon: element.point.lon|float,
                                 trip: trip.id,
                                 name: element.name,
                                 description: description

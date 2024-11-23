@@ -45,6 +45,7 @@ class HelperExtension extends AbstractExtension
                 $this->formatDatetimeApp(...),
                 ['needs_environment' => true]
             ),
+            new TwigFilter('float', fn (mixed $i) => (float) $i, ['is_safe' => ['all']]),
         ];
     }
 
