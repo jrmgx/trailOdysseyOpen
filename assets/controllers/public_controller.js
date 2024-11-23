@@ -2,10 +2,12 @@
 
 import L from 'leaflet';
 import '@elfalem/leaflet-curve';
-import 'leaflet.smooth_marker_bouncing';
+import SmoothMarkerBouncing from 'leaflet.smooth_marker_bouncing';
 import { Controller } from '@hotwired/stimulus';
 import { iconSymbol } from '../helpers';
 import '../js/leaflet-double-touch-drag-zoom';
+
+SmoothMarkerBouncing(L);
 
 export default class extends Controller {
   static targets = [
