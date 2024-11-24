@@ -59,7 +59,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $instanceUrl = $form->get('url')->getData() ?? throw new \Exception('Missing Instance Url.');
-            $oAuthUrl = $this->mastodonService->oAuthInit($instanceUrl);
+            $oAuthUrl = $this->mastodonService->oAuthInit($request, $instanceUrl);
 
             return $this->redirect($oAuthUrl);
         }

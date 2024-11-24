@@ -8,8 +8,6 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 use Lrf141\OAuth2\Client\Provider\Mastodon;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Vazaha\Mastodon\ApiClient;
 use Vazaha\Mastodon\Factories\ApiClientFactory;
@@ -23,7 +21,6 @@ class MastodonService
      * @var array<string, array{instanceUrl: string, clientKey: string, clientSecret: string}>
      */
     private readonly array $info;
-    private readonly SessionInterface $session;
 
     /**
      * @param array<int, string> $instances
@@ -40,9 +37,7 @@ class MastodonService
         array $clientSecrets,
         #[Autowire('%env(PROJECT_BASE_URL)%')]
         private readonly string $redirectUri,
-        RequestStack $requestStack,
     ) {
-        $this->session = $requestStack->getSession();
         $info = [];
         for ($i = 0; $i < \count($instances); ++$i) {
             $instance = self::normalizeInstanceUrl($instances[$i]);
@@ -55,44 +50,44 @@ class MastodonService
         $this->info = $info;
     }
 
-    public function oAuthInit(string $instanceUrl): string
+    public function oAuthInit(Request $request, string $instanceUrl): string
     {
+        $session = $request->getSession();
         $instanceUrl = self::normalizeInstanceUrl($instanceUrl);
 
         $provider = $this->getProvider($instanceUrl);
         $url = $provider->getAuthorizationUrl();
-        $this->session->set('oauthState', $provider->getState());
-        $this->session->set('instanceUrl', $instanceUrl);
+        $session->set('oauthState', $provider->getState());
+        $session->set('instanceUrl', $instanceUrl);
 
         return $url;
     }
 
     public function oAuthHandle(Request $request): AccessToken|AccessTokenInterface
     {
+        $session = $request->getSession();
         $state = $request->query->get('state');
-        if (empty($state) || $state !== $this->session->get('oauthState')) {
+        if (empty($state) || $state !== $session->get('oauthState')) {
             throw new \Exception('Invalid state.');
         }
 
-        $instanceUrl = $this->session->get('instanceUrl');
+        $instanceUrl = $session->get('instanceUrl');
         $provider = $this->getProvider($instanceUrl);
-        $token = $provider->getAccessToken('authorization_code', [
+
+        return $provider->getAccessToken('authorization_code', [
             'code' => $request->query->get('code'),
         ]);
-
-        return $token;
     }
 
     public function uploadMedia(User $user, string $filePath, string $description = ''): MediaAttachmentModel
     {
         // https://docs.joinmastodon.org/methods/media/#v2
         $client = $this->getClient($user);
-        $result = $client->methods()->media()->v2(
+
+        return $client->methods()->media()->v2(
             file: new UploadFile($filePath),
             description: $description,
         );
-
-        return $result;
     }
 
     /**
@@ -102,14 +97,13 @@ class MastodonService
     {
         // https://docs.joinmastodon.org/methods/statuses/#create
         $client = $this->getClient($user);
-        $result = $client->methods()->statuses()->create(
+
+        return $client->methods()->statuses()->create(
             status: $status,
             media_ids: array_map(fn (MediaAttachmentModel $m) => $m->id, $mediaIds),
             visibility: 'public',
             language: 'en', // TODO
         );
-
-        return $result;
     }
 
     /**
@@ -121,13 +115,12 @@ class MastodonService
         $id = end($uriParts);
 
         $client = $this->getClient($user);
-        $result = $client->methods()->statuses()->edit(
+
+        return $client->methods()->statuses()->edit(
             $id,
             status: $status,
             media_ids: array_map(fn (MediaAttachmentModel $m) => $m->id, $mediaIds),
         );
-
-        return $result;
     }
 
     private function getProvider(string $instanceUrl): Mastodon

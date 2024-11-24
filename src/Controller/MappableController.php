@@ -28,6 +28,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Vazaha\Mastodon\Models\MediaAttachmentModel;
@@ -47,6 +48,7 @@ abstract class MappableController extends BaseController
         protected readonly MessageBusInterface $messageBus,
         protected readonly MastodonService $mastodonService,
         protected readonly LeagueCommonMarkConverterFactory $leagueCommonMarkConverterFactory,
+        protected readonly UrlGeneratorInterface $urlGenerator,
         protected readonly string $uploadsDirectory,
         SerializerInterface $serializer,
     ) {
@@ -158,6 +160,11 @@ abstract class MappableController extends BaseController
                 $media = [];
                 $images = $this->findImages($diaryEntry->getDescription() ?? '');
                 $text = $this->convert($diaryEntry->getDescription() ?? '');
+                $text .= "\n\n";
+                $text .= $this->urlGenerator->generate('public_show', [
+                    'trip' => $diaryEntry->getTrip()->getShareKey(),
+                    'user' => $diaryEntry->getUser()->getNickname(),
+                ], UrlGeneratorInterface::ABSOLUTE_URL) . '#' . $diaryEntry->getId();
                 foreach ($images as $image) {
                     $url = $image->getUrl();
                     $parts = explode('/', $url);
