@@ -33,7 +33,7 @@ class GeoHelper
         // Get the GPS data
         $gps['LatDegree'] = $exif['GPSLatitude'][0];
         $gps['LatMinute'] = $exif['GPSLatitude'][1];
-        $gps['LatgSeconds'] = $exif['GPSLatitude'][2];
+        $gps['LatSeconds'] = $exif['GPSLatitude'][2];
         $gps['LongDegree'] = $exif['GPSLongitude'][0];
         $gps['LongMinute'] = $exif['GPSLongitude'][1];
         $gps['LongSeconds'] = $exif['GPSLongitude'][2];
@@ -48,7 +48,7 @@ class GeoHelper
 
         // Calculate the decimal degree
         return new Point(
-            (string) ($latM * ($gps['LatDegree'] + ($gps['LatMinute'] / 60) + ($gps['LatgSeconds'] / 3600))),
+            (string) ($latM * ($gps['LatDegree'] + ($gps['LatMinute'] / 60) + ($gps['LatSeconds'] / 3600))),
             (string) ($lonM * ($gps['LongDegree'] + ($gps['LongMinute'] / 60) + ($gps['LongSeconds'] / 3600)))
         );
     }
