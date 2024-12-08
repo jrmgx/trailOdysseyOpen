@@ -6,6 +6,10 @@ use App\Model\Point;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * This GeoPoint is only used for POI positioning and does not have elevation.
+ * It is also made to be embedded into Entities.
+ */
 #[ORM\Embeddable]
 class GeoPoint
 {

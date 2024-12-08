@@ -55,6 +55,9 @@ class Trip
     #[ORM\Column]
     private int $mapZoom;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isCalculatingSegment = false;
+
     /** @var Collection<int, Tiles> */
     #[Assert\Count(min: 1, minMessage: 'You are required to have at least one set of Tiles.')]
     #[ORM\OneToMany(targetEntity: Tiles::class, mappedBy: 'trip', cascade: ['persist'], orphanRemoval: true)]
@@ -108,6 +111,18 @@ class Trip
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function isCalculatingSegment(): bool
+    {
+        return $this->isCalculatingSegment;
+    }
+
+    public function setIsCalculatingSegment(bool $isCalculatingSegment): self
+    {
+        $this->isCalculatingSegment = $isCalculatingSegment;
 
         return $this;
     }

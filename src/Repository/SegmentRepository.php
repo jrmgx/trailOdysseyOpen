@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Segment;
+use App\Entity\Trip;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,19 @@ class SegmentRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Segment::class);
+    }
+
+    /**
+     * @return array<int, Segment>
+     */
+    public function findByTrip(Trip $trip): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.trip = :trip')
+            ->setParameter('trip', $trip)
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
     /**

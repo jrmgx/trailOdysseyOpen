@@ -2,6 +2,11 @@
 
 namespace App\Message;
 
+use App\MessageHandler\UpdateElevationMessageHandler;
+
+/**
+ * @see UpdateElevationMessageHandler
+ */
 class UpdateElevationMessage
 {
     public function __construct(

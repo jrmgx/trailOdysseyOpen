@@ -7,6 +7,7 @@ use App\Entity\Interest;
 use App\Entity\MappableInterface;
 use App\Entity\Segment;
 use App\Entity\Trip;
+use App\Helper\GeoHelper;
 use App\Model\Point;
 use App\Repository\InterestRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,7 +19,6 @@ use phpGPX\Models\Point as GpxPoint;
 use phpGPX\Models\Segment as GpxSegment;
 use phpGPX\Models\Track;
 use phpGPX\phpGPX;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class GpxService
@@ -31,13 +31,16 @@ class GpxService
     ) {
     }
 
-    public function gpxFile(UploadedFile $file): GpxFile
+    public function gpxFile(string $filePath): GpxFile
     {
         $gpx = new phpGPX();
 
-        return $gpx->load((string) $file->getRealPath());
+        return $gpx->load($filePath);
     }
 
+    /**
+     * This is used into a messenger message (async).
+     */
     public function gpxFileToSegments(GpxFile $gpxFile, Trip $trip): void
     {
         $gpxName = $gpxFile->metadata?->name ?? '';
@@ -51,10 +54,10 @@ class GpxService
                 $points[] = new Point((string) $point->latitude, (string) $point->longitude, (string) $point->elevation);
             }
 
-            if (\count($points) > 0) {
+            if (\count($points) > 1 && !GeoHelper::isRoundabout($points)) {
                 $segment = new Segment();
                 $segment->setPoints($points);
-                $segment->setName($gpxName . ($route->name ?? 'Unnamed Route'));
+                $segment->setName($gpxName . ($route->name ?? 'Unnamed'));
                 $segment->setTrip($trip);
                 $segment->setUser($trip->getUser());
                 $this->entityManager->persist($segment);
@@ -73,10 +76,10 @@ class GpxService
                     $points[] = new Point((string) $point->latitude, (string) $point->longitude, (string) $point->elevation);
                 }
 
-                if (\count($points) > 0) {
+                if (\count($points) > 1 && !GeoHelper::isRoundabout($points)) {
                     $segment = new Segment();
                     $segment->setPoints($points);
-                    $segment->setName($gpxName . ($track->name ?? 'Unnamed Track'));
+                    $segment->setName($gpxName . ($track->name ?? 'Unnamed'));
                     $segment->setTrip($trip);
                     $segment->setUser($trip->getUser());
                     $this->entityManager->persist($segment);
@@ -90,6 +93,9 @@ class GpxService
         }
     }
 
+    /**
+     * This is used into a messenger message (async).
+     */
     public function gpxFileToInterests(GpxFile $gpxFile, Trip $trip): void
     {
         $gpxName = $gpxFile->metadata?->name;

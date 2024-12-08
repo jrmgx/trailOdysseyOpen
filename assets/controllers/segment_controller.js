@@ -56,6 +56,7 @@ export default class extends Controller {
 
     // Export method for external use
     window.segmentController = {
+      reloadSidebar: this.reloadSidebar,
       addSegment: this.addSegment,
       editSegment: this.editSegmentWithPointsAction,
       updateSegment: this.updateSegment,
@@ -165,6 +166,13 @@ export default class extends Controller {
 
     document.body.style.cursor = 'default';
     this.mapTarget.style.cursor = 'grab';
+  };
+
+  reloadSidebar = () => {
+    Turbo.visit(
+      Routing.generate('segment_show', { trip: tripId }),
+      { frame: 'sidebar-segments' },
+    );
   };
 
   mapClickAction = (e) => {

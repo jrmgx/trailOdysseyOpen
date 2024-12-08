@@ -186,26 +186,6 @@ class GeoHelper
     }
 
     /**
-     * @return callable(Point): int
-     */
-    public static function calculateDistanceFastFrom(Point $a): callable
-    {
-        $aLat = (float) $a->lat;
-        $aLon = (float) $a->lon;
-        $kx = cos($aLat * self::K_RAD) * 111.321;
-
-        return function (Point $b) use ($aLon, $aLat, $kx) {
-            $bLat = (float) $b->lat;
-            $bLon = (float) $b->lon;
-
-            $dx = ($aLon - $bLon) * $kx;
-            $dy = ($aLat - $bLat) * 111.139;
-
-            return (int) (sqrt($dx ** 2 + $dy ** 2) * 1000);
-        };
-    }
-
-    /**
      * @param array<Point> $points
      */
     public static function calculateDistanceFromPoints(array $points, bool $withElevation = false): int
@@ -274,5 +254,27 @@ class GeoHelper
         $gpxPoint->elevation = $point->el ? (float) $point->el : null;
 
         return $gpxPoint;
+    }
+
+    /**
+     * Some path are not useful for us, like roundabout.
+     * A roundabout is detected when the extremities of the "path" are very close
+     * and the length of the path is longer than the distance between the extremities.
+     *
+     * @param array<int, Point> $points
+     */
+    public static function isRoundabout(array $points, int $delta = 20, int $maxLength = 100): bool
+    {
+        $length = self::calculateDistanceFromPoints($points);
+        if ($length > $maxLength) {
+            // A path that is > to $maxLength will be kept
+            return false;
+        }
+        $distance = self::calculateDistance($points[0], $points[\count($points) - 1]);
+        if ($distance > $delta) {
+            return false;
+        }
+
+        return $distance < $length;
     }
 }

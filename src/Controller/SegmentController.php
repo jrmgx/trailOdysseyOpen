@@ -37,7 +37,7 @@ class SegmentController extends BaseController
     }
 
     /** @return array<mixed> */
-    #[Route('', name: 'show', methods: ['GET'])]
+    #[Route('', name: 'show', options: ['expose' => true], methods: ['GET'])]
     #[Template('segment/index.html.twig')]
     public function show(Trip $trip): array
     {

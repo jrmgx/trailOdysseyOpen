@@ -74,6 +74,22 @@
                       }
                     </script>
                     <div class="col-12">
+                        {% if trip.isCalculatingSegment %}
+                            <div class="mx-3">
+                                <div class="fs-small">New segments are being imported...</div>
+                                <div class="progress" role="progressbar">
+                                    <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <script>
+                                setTimeout(() => {
+                                    if (typeof segmentController !== 'undefined') {
+                                        console.log(segmentController);
+                                        segmentController.reloadSidebar();
+                                    }
+                                }, 5000);
+                            </script>
+                        {% endif %}
                         {% for segment in segments %}
                             {{ include('segment/show_frame.html.twig') }}
                         {% else %}

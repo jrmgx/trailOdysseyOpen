@@ -2,6 +2,7 @@
 
 use Castor\Attribute\AsArgument;
 use Castor\Attribute\AsOption;
+use Castor\Attribute\AsRawTokens;
 use Castor\Attribute\AsTask;
 use Symfony\Component\Process\Process;
 
@@ -186,11 +187,11 @@ function clear_cache(#[AsArgument] string $env): void
 function load_fixture(#[AsArgument] string $env): void
 {
     assert_not_in_prod();
-
-    run_in_builder("bin/console doctrine:database:drop -n --force --if-exists --env=$env");
-    run_in_builder("bin/console doctrine:database:create -n --if-not-exists --env=$env");
-    run_in_builder("bin/console doctrine:migration:migrate -n --allow-no-migration --env=$env");
     io()->warning('There are no fixtures for now.');
+
+    // run_in_builder("bin/console doctrine:database:drop -n --force --if-exists --env=$env");
+    // run_in_builder("bin/console doctrine:database:create -n --if-not-exists --env=$env");
+    // run_in_builder("bin/console doctrine:migration:migrate -n --allow-no-migration --env=$env");
     // run_in_builder("bin/console doctrine:fixtures:load -n --append --env=$env");
 }
 
@@ -262,11 +263,11 @@ function version(): void
     run_in_builder('bin/console --version');
 }
 
-#[AsTask(namespace: 'dev', description: 'Run tests', aliases: ['test', 'tests'])]
-function tests(#[AsArgument] array $params = []): void
+#[AsTask(namespace: 'dev', description: 'Run tests', aliases: ['test', 'tests'], ignoreValidationErrors: true)]
+function tests(#[AsRawTokens] array $params = []): void
 {
     load_fixture('test');
-    run_in_builder('bin/phpunit ' . implode(' ', $params));
+    run_in_builder('vendor/bin/phpunit ' . implode(' ', $params));
 }
 
 #[AsTask(namespace: 'dev', description: 'Run PHPStan', aliases: ['phpstan'])]

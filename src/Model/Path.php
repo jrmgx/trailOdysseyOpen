@@ -17,6 +17,7 @@ class Path
     public function __construct(
         private array $points,
         private array $children = [],
+        private ?int $id = null,
         private ?string $name = null, // For debug only
     ) {
         if (0 === \count($this->points)) {
@@ -26,8 +27,7 @@ class Path
 
     public static function fromSegment(Segment $segment): self
     {
-        return new self($segment->getPoints(), name: $segment->getName());
-        // 'Segment#' . $segment->getId() . ': ' . $segment->getName());
+        return new self($segment->getPoints(), id: $segment->getId(), name: $segment->getName());
     }
 
     public static function fromRouting(Routing $routing): ?self
@@ -37,14 +37,14 @@ class Path
             return null;
         }
 
-        return new self($points, name: 'Routing#' . $routing->getId());
+        return new self($points, id: $routing->getId(), name: 'Routing#' . $routing->getId());
     }
 
     public function toSegment(): Segment
     {
         $segment = new Segment();
         $segment->setPoints($this->getPoints());
-        $segment->setName('');
+        $segment->setName($this->getName() ?? '');
 
         return $segment;
     }
@@ -57,6 +57,18 @@ class Path
     public function setName(?string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
 
         return $this;
     }
@@ -113,16 +125,6 @@ class Path
         return $this->distance;
     }
 
-    public function getId(): string
-    {
-        $encoded = json_encode($this->points);
-        if (false === $encoded) {
-            throw new \Exception('Could not encode points.');
-        }
-
-        return sha1($encoded);
-    }
-
     public function __toString(): string
     {
         $firstPoint = reset($this->points);
@@ -177,5 +179,15 @@ class Path
         }
 
         return $this->points === $path->points;
+    }
+
+    public function extremitiesCloseToExtremitiesOf(self $path, int $delta): bool
+    {
+        return
+            $this->getFirstPoint()->isCloseTo($path->getFirstPoint(), $delta)
+            || $this->getLastPoint()->isCloseTo($path->getFirstPoint(), $delta)
+            || $this->getFirstPoint()->isCloseTo($path->getLastPoint(), $delta)
+            || $this->getLastPoint()->isCloseTo($path->getLastPoint(), $delta)
+        ;
     }
 }

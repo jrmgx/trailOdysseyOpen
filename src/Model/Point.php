@@ -56,6 +56,9 @@ class Point
         return $this->lat === $point->lat && $this->lon === $point->lon;
     }
 
+    /**
+     * @param int $delta Distance in meters
+     */
     public function isCloseTo(self $point, int $delta): bool
     {
         return GeoHelper::calculateDistanceFast($this, $point) <= $delta;

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Trip;
 use App\Form\GpxFileType;
-use App\Message\UpdateElevationMessage;
+use App\Message\ImportGpxMessage;
 use App\Security\Voter\UserVoter;
 use App\Service\GpxService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,6 +28,7 @@ class GpxController extends AbstractController
         private readonly GpxService $gpxService,
         private readonly MessageBusInterface $messageBus,
         private readonly EntityManagerInterface $entityManager,
+        private readonly string $uploadsDirectory,
     ) {
     }
 
@@ -52,18 +53,20 @@ class GpxController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var array<UploadedFile> $files */
             $files = $form->get('files')->getData() ?? [];
+            $filePaths = [];
             foreach ($files as $file) {
-                $gpxFile = $this->gpxService->gpxFile($file);
-
-                $this->gpxService->gpxFileToSegments($gpxFile, $trip);
-                $this->gpxService->gpxFileToInterests($gpxFile, $trip);
-
-                $this->entityManager->flush();
+                $filename = uniqid();
+                $file->move($this->uploadsDirectory, $filename);
+                $filePaths[] = $this->uploadsDirectory . '/' . $filename;
             }
 
-            $this->messageBus->dispatch(new UpdateElevationMessage($trip->getId() ?? 0));
+            if (\count($filePaths) > 0) {
+                $trip->setIsCalculatingSegment(true);
+                $this->entityManager->flush();
+                $this->messageBus->dispatch(new ImportGpxMessage($trip->getId() ?? 0, $filePaths));
+            }
 
-            return $this->redirectToRoute('stage_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('segment_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return compact('onBoarding', 'trip', 'form');

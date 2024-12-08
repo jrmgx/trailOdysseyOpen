@@ -16,16 +16,10 @@ framework:
             sync: 'sync://'
 
         routing:
-            Symfony\Component\Mailer\Messenger\SendEmailMessage: async
-            Symfony\Component\Notifier\Message\ChatMessage: async
-            Symfony\Component\Notifier\Message\SmsMessage: async
-            App\Message\UpdateElevationMessage: async
+            App\Message\*: async
 
 when@test:
     framework:
         messenger:
             routing:
-                Symfony\Component\Mailer\Messenger\SendEmailMessage: sync
-                Symfony\Component\Notifier\Message\ChatMessage: sync
-                Symfony\Component\Notifier\Message\SmsMessage: sync
-                App\Message\UpdateElevationMessage: sync
+                App\Message\*: sync
