@@ -11,6 +11,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Psr\Log\LoggerInterface;
 
+// TODO this should be checked for removal
 #[AsEntityListener(event: Events::prePersist, method: 'prePersist', entity: Segment::class)]
 #[AsEntityListener(event: Events::preUpdate, method: 'preUpdate', entity: Segment::class)]
 class SegmentChangedNotifier

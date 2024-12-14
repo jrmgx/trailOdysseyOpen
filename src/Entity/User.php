@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: 'user_list')]
 #[UniqueEntity(fields: ['username'], message: 'form.error.email_exist')]
 #[UniqueEntity(fields: ['nickname'], message: 'form.error.nickname_exist')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface

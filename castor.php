@@ -18,7 +18,6 @@ use function Castor\variable;
 const COMMON_CONTEXT = [
     'app_env' => 'dev',
     'app_name' => 'trailodyssey',
-    'dir_backup' => __DIR__ . '/../backup',
 ];
 
 if (file_exists(__DIR__ . '/castor.context.php')) {
@@ -94,40 +93,6 @@ function make_migration(): void
 {
     assert_not_in_prod();
     run_in_builder('bin/console doctrine:migrations:diff --formatted --allow-empty-diff'); // --from-empty-schema
-}
-
-#[AsTask(namespace: 'prod', description: 'Backup the app')]
-function backup(): void
-{
-    if (is_builder()) {
-        io()->warning('Can not backup in builder');
-
-        return;
-    }
-
-    $dir = variable('dir_backup');
-
-    $dateString = date_string();
-    $revision = capture(['git', 'rev-parse', 'HEAD']);
-    $filename = "{$dateString}_$revision";
-
-    backup_database($dir, $filename);
-
-    io()->success('Backup success');
-}
-
-#[AsTask(namespace: 'prod', description: 'Backup database')]
-function backup_database(#[AsArgument] string $directory, #[AsArgument] string $filename = 'database'): void
-{
-    assert_not_in_builder();
-    io()->text('Backing-up database ...');
-    $databasePassword = variable('MYSQL_ROOT_PASSWORD');
-    $appName = variable('app_name');
-    docker_exec(
-        "mysqldump -P 3306 -u root -p$databasePassword $appName | gzip -9 > $directory/$filename.sql.gz",
-        service: "$appName-mysql",
-        user: 'root'
-    );
 }
 
 #[AsTask(namespace: 'app', description: 'Migrate database')]
