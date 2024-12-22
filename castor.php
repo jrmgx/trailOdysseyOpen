@@ -36,8 +36,8 @@ function up(
 ): void {
     $command = [];
     if (!$noRouter) {
-        $command[] = '-f';
-        $command[] = 'docker-traefik-dev.yml';
+        // $command[] = '-f';
+        // $command[] = 'docker-traefik-dev.yml';
     }
     $command[] = 'up';
     if ($build) {
@@ -302,7 +302,7 @@ function yarn(#[AsArgument] array $params = []): void
 }
 
 #[AsTask(namespace: 'dev', aliases: ['tunnel'])]
-function tunnel(#[AsOption] string $domain): void
+function tunnel(#[AsOption] string $domain = 'square-lively-labrador.ngrok-free.app'): void
 {
     assert_not_in_prod();
     assert_not_in_builder();
