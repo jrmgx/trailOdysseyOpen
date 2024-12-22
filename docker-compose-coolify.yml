@@ -6,12 +6,14 @@ volumes:
 
 services:
     php-fpm:
-        build: docker/php-fpm
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+            target: copy
         depends_on:
             postgres:
                 condition: service_healthy
         volumes:
-            - "./:/var/www"
             - "trailodyssey-data:/var/www/var/data"
             - "trailodyssey-sessions:/var/www/var/sessions"
             - "/data/docker/volumes/trailodyssey-backup:/backup"

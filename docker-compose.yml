@@ -11,7 +11,10 @@ volumes:
 services:
     # NEVER ADD ports DIRECTIVES IN PROD
     php-fpm:
-        build: docker/php-fpm
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+            target: main
         container_name: trailodyssey-php-fpm
         restart: "always"
         depends_on:

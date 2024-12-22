@@ -1,5 +1,5 @@
 # see https://gist.github.com/jrmgx/fd96fe94eddba4eaf90b4158c9c3f1d7
-FROM jrmgx/php-8.2-fpm-nginx:4
+FROM jrmgx/php-8.2-fpm-nginx:4 AS main
 
 # Install PostgreSQL PDO extension
 RUN apt update && apt install -y --no-install-recommends \
@@ -36,7 +36,19 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
 RUN curl "https://github.com/jolicode/castor/releases/latest/download/castor.linux-amd64.phar" -Lso /bin/castor \
     && chmod a+x /bin/castor
 
-COPY entrypoint.sh /usr/local/bin/
+COPY docker/php-fpm/entrypoint.sh /usr/local/bin/
+
+ENTRYPOINT ["entrypoint.sh"]
+
+WORKDIR "/var/www"
+
+EXPOSE 80
+
+CMD ["php-fpm"]
+
+FROM main AS copy
+
+COPY . /var/www/
 
 ENTRYPOINT ["entrypoint.sh"]
 
