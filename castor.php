@@ -6,7 +6,6 @@ use Castor\Attribute\AsRawTokens;
 use Castor\Attribute\AsTask;
 use Symfony\Component\Process\Process;
 
-use function Castor\capture;
 use function Castor\context;
 use function Castor\import;
 use function Castor\io;
@@ -18,7 +17,6 @@ use function Castor\variable;
 const COMMON_CONTEXT = [
     'app_env' => 'dev',
     'app_name' => 'trailodyssey',
-    'dir_backup' => __DIR__ . '/../backup',
 ];
 
 if (file_exists(__DIR__ . '/castor.context.php')) {
@@ -96,40 +94,6 @@ function make_migration(): void
     run_in_builder('bin/console doctrine:migrations:diff --formatted --allow-empty-diff'); // --from-empty-schema
 }
 
-#[AsTask(namespace: 'prod', description: 'Backup the app')]
-function backup(): void
-{
-    if (is_builder()) {
-        io()->warning('Can not backup in builder');
-
-        return;
-    }
-
-    $dir = variable('dir_backup');
-
-    $dateString = date_string();
-    $revision = capture(['git', 'rev-parse', 'HEAD']);
-    $filename = "{$dateString}_$revision";
-
-    backup_database($dir, $filename);
-
-    io()->success('Backup success');
-}
-
-#[AsTask(namespace: 'prod', description: 'Backup database')]
-function backup_database(#[AsArgument] string $directory, #[AsArgument] string $filename = 'database'): void
-{
-    assert_not_in_builder();
-    io()->text('Backing-up database ...');
-    $databasePassword = variable('MYSQL_ROOT_PASSWORD');
-    $appName = variable('app_name');
-    docker_exec(
-        "mysqldump -P 3306 -u root -p$databasePassword $appName | gzip -9 > $directory/$filename.sql.gz",
-        service: "$appName-mysql",
-        user: 'root'
-    );
-}
-
 #[AsTask(namespace: 'app', description: 'Migrate database')]
 function migrate(): void
 {
@@ -195,16 +159,35 @@ function load_fixture(#[AsArgument] string $env): void
     // run_in_builder("bin/console doctrine:fixtures:load -n --append --env=$env");
 }
 
-#[AsTask(namespace: 'dev', description: 'Clean potential temp files', aliases: ['clean'])]
-function clean(): void
+#[AsTask(namespace: 'backup', description: 'Make a backup of the database')]
+function db_dump(): void
 {
-    assert_not_in_prod();
-    assert_not_in_builder();
+    assert_is_in_builder();
 
-    $command = 'rm -rf ../mysqld/*';
-    io()->text("=> Will run: $command");
+    $name = '/backup/database-' . date_string();
+    $POSTGRES_HOST = 'postgres';
+    $POSTGRES_PASSWORD = $_SERVER['POSTGRES_PASSWORD'] ?? throw new Exception('Missing POSTGRES_PASSWORD env.');
+    $POSTGRES_USER = $_SERVER['POSTGRES_USER'] ?? throw new Exception('Missing POSTGRES_USER env.');
+    $POSTGRES_DB = $_SERVER['POSTGRES_DB'] ?? throw new Exception('Missing POSTGRES_DB env.');
+    $POSTGRES_PORT = $_SERVER['POSTGRES_PORT'] ?? throw new Exception('Missing POSTGRES_PORT env.');
+    run_in_builder("PGPASSWORD=$POSTGRES_PASSWORD pg_dump -h $POSTGRES_HOST -U $POSTGRES_USER -p $POSTGRES_PORT -f $name.sql $POSTGRES_DB");
+    io()->success('Backup saved');
+}
 
-    run($command);
+#[AsTask(namespace: 'backup', description: 'Restore a backup of the database')]
+function db_restore(#[AsArgument] string $filePath): void
+{
+    assert_is_in_builder();
+
+    $POSTGRES_HOST = 'postgres';
+    $POSTGRES_PASSWORD = $_SERVER['POSTGRES_PASSWORD'] ?? throw new Exception('Missing POSTGRES_PASSWORD env.');
+    $POSTGRES_USER = $_SERVER['POSTGRES_USER'] ?? throw new Exception('Missing POSTGRES_USER env.');
+    $POSTGRES_DB = $_SERVER['POSTGRES_DB'] ?? throw new Exception('Missing POSTGRES_DB env.');
+    $POSTGRES_PORT = $_SERVER['POSTGRES_PORT'] ?? throw new Exception('Missing POSTGRES_PORT env.');
+    run_in_builder('bin/console doctrine:database:drop --force');
+    run_in_builder('bin/console doctrine:database:create');
+    run_in_builder("PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -p $POSTGRES_PORT $POSTGRES_DB -f $filePath");
+    io()->success('Backup restored');
 }
 
 #[AsTask(namespace: 'deploy', description: 'Pre Deploy Script')]
@@ -214,6 +197,8 @@ function pre(): void
     assert_is_in_builder();
 
     background_scripts_stop();
+
+    db_dump();
 
     io()->success('Pre Deploy success');
 }

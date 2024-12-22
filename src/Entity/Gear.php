@@ -33,7 +33,7 @@ class Gear implements Things
     private User $user;
 
     /** @var Collection<int, GearInBag> */
-    #[ORM\OneToMany(mappedBy: 'gear', targetEntity: GearInBag::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: GearInBag::class, mappedBy: 'gear', orphanRemoval: true)]
     private Collection $gearsInBag;
 
     /**

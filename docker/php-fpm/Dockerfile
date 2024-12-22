@@ -1,6 +1,21 @@
 # see https://gist.github.com/jrmgx/fd96fe94eddba4eaf90b4158c9c3f1d7
 FROM jrmgx/php-8.2-fpm-nginx:4
 
+# Install PostgreSQL PDO extension
+RUN apt update && apt install -y --no-install-recommends \
+        libpq-dev \
+    && docker-php-ext-install pdo_pgsql \
+    && apt clean
+
+# Install PostgreSQL tooling
+RUN apt update && apt install -y --no-install-recommends \
+        wget lsb-release \
+    && sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && apt update && apt install -y --no-install-recommends \
+        postgresql-client-17 \
+    && apt clean
+
 # Node 20
 RUN mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \

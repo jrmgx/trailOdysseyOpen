@@ -1,16 +1,21 @@
 volumes:
     trailodyssey-data: {}
     trailodyssey-sessions: {}
-    trailodyssey-uploads: {}
+    trailodyssey-postgresql-data: {}
+    trailodyssey-backup: {}
 
 services:
     php-fpm:
         build: docker/php-fpm
+        depends_on:
+            postgres:
+                condition: service_healthy
         volumes:
             - "./:/var/www"
             - "trailodyssey-data:/var/www/var/data"
             - "trailodyssey-sessions:/var/www/var/sessions"
-            - "trailodyssey-uploads:/var/www/public/uploads"
+            - "/data/docker/volumes/trailodyssey-backup:/backup"
+            - "/data/docker/volumes/trailodyssey-uploads:/var/www/public/uploads"
             - "./docker/php-fpm/etc/ImageMagick-6:/etc/ImageMagick-6"
             - "./docker/php-fpm/usr/local/etc:/usr/local/etc"
             - "./docker/php-fpm/nginx.conf:/etc/nginx/nginx.conf"
@@ -26,7 +31,6 @@ services:
             - MAINTENANCE=${MAINTENANCE:-false}
             - MAPBOX_KEY=${MAPBOX_KEY}
             - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
-            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
             - PROJECT_BASE_URL=${PROJECT_BASE_URL:-https://trailodyssey.net}
             - PROJECT_HOST=${PROJECT_HOST:-trailodyssey.net}
             - REDIS_HOST_DSN=${REDIS_HOST_DSN}
@@ -34,3 +38,23 @@ services:
             - MASTODON_INSTANCES=${MASTODON_INSTANCES}
             - MASTODON_CLIENT_KEYS=${MASTODON_CLIENT_KEYS}
             - MASTODON_CLIENT_SECRETS=${MASTODON_CLIENT_SECRETS}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_PORT=${POSTGRES_PORT}
+
+    postgres:
+        build: docker/postgres
+        volumes:
+            - "trailodyssey-postgresql-data:/var/lib/postgresql/data"
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_DB=${POSTGRES_DB}
+            - PGPORT=${POSTGRES_PORT}
