@@ -30,6 +30,13 @@ export default class extends Controller {
       searchContainerHide: this.searchContainerHide,
       showVisibilityAction: this.showVisibilityAction,
     };
+
+    // Position the resize handle
+    const resizeHandle = this.element.querySelector('.resize-handle');
+    if (resizeHandle) {
+      const sidebarWidth = this.sidebarTarget.offsetWidth;
+      resizeHandle.style.left = `${sidebarWidth}px`;
+    }
   };
 
   // Actions
@@ -89,10 +96,10 @@ export default class extends Controller {
 
   mapVisibilityElements = () => document.querySelectorAll(
     '.leaflet-popup-pane,'
-        + '.leaflet-tooltip-pane,'
-        + '.leaflet-marker-pane,'
-        + '.leaflet-shadow-pane,'
-        + '.leaflet-overlay-pane',
+    + '.leaflet-tooltip-pane,'
+    + '.leaflet-marker-pane,'
+    + '.leaflet-shadow-pane,'
+    + '.leaflet-overlay-pane',
   );
 
   toggleVisibilityAction = () => {
@@ -175,5 +182,47 @@ export default class extends Controller {
     this.offlineButtonTarget = null;
     // Values
     // ...
+  };
+
+  startResize = (event) => {
+    event.preventDefault();
+    event.target.classList.add('resizing');
+
+    const sidebar = this.sidebarTarget;
+    const resizeHandle = event.target;
+    const initialWidth = sidebar.offsetWidth;
+    const initialX = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
+
+    const resize = (moveEvent) => {
+      const currentX = moveEvent.type === 'mousemove' ? moveEvent.clientX : moveEvent.touches[0].clientX;
+      const delta = initialX - currentX;
+      const newWidth = Math.max(0, initialWidth - delta);
+
+      sidebar.style.width = `${newWidth}px`;
+      resizeHandle.style.left = `${newWidth}px`;
+
+      // Update map width to fill remaining space
+      const map = document.getElementById('map');
+      if (map) {
+        map.style.left = `${newWidth}px`;
+      }
+
+      // Trigger a resize event for the map
+      window.dispatchEvent(new Event('resize'));
+      // TODO: Also redraw all elevation graph
+    };
+
+    const stopResize = () => {
+      event.target.classList.remove('resizing');
+      document.removeEventListener('mousemove', resize);
+      document.removeEventListener('mouseup', stopResize);
+      document.removeEventListener('touchmove', resize);
+      document.removeEventListener('touchend', stopResize);
+    };
+
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+    document.addEventListener('touchmove', resize);
+    document.addEventListener('touchend', stopResize);
   };
 }
