@@ -144,6 +144,7 @@ The user manual is a work in progress, still those are hidden features that need
 - On desktop, you can hold the _shift_ key while hovering elevation so the map moves at that point
 - On desktop, you can hold the _shift_ key and click on the name of a segment to make it fit the view
 - After a search of any kind, simply click on the map to discard the last results
+- In a new Interest you can add the _tag_ `%historical_weather%` in the description to get the historical weather at that point.<br>This will only work on new interest creation at save time. 
 
 
 ### Geo JSON

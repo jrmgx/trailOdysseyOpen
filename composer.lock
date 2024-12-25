@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d808ba5d839615fe10e2b155d7277c34",
+    "content-hash": "8feea145208967f341cf6d27a28806f2",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -1513,6 +1513,54 @@
                 }
             ],
             "time": "2023-10-06T06:47:41+00:00"
+        },
+        {
+            "name": "flibidi67/open-meteo",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.com:flibidi67/open-meteo.git",
+                "reference": "f3c5d7414d998112094d8c89c1d1d29553b8172a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/flibidi67%2Fopen-meteo/repository/archive.zip?sha=f3c5d7414d998112094d8c89c1d1d29553b8172a",
+                "reference": "f3c5d7414d998112094d8c89c1d1d29553b8172a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8",
+                "symfony/config": ">=6.2",
+                "symfony/dependency-injection": ">=6.2",
+                "symfony/http-kernel": ">=6.2"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Flibidi67\\OpenMeteo\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "flibidi67"
+                }
+            ],
+            "description": "Symfony SDK for Open-Meteo API",
+            "homepage": "https://gitlab.com/flibidi67/open-meteo",
+            "keywords": [
+                "forecasts",
+                "meteo",
+                "open meteo",
+                "open-meteo",
+                "sdk",
+                "symfony",
+                "weather"
+            ],
+            "time": "2023-03-29T07:14:20+00:00"
         },
         {
             "name": "friendsofsymfony/jsrouting-bundle",

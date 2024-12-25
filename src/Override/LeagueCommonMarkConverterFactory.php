@@ -8,6 +8,8 @@ use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Image;
 use League\CommonMark\Extension\DefaultAttributes\DefaultAttributesExtension;
 use League\CommonMark\Extension\ExternalLink\ExternalLinkExtension;
+use League\CommonMark\Extension\Table\Table;
+use League\CommonMark\Extension\Table\TableExtension;
 
 /**
  * Override to bypass https://github.com/twigphp/Twig/issues/3725.
@@ -34,6 +36,9 @@ final class LeagueCommonMarkConverterFactory
                 Image::class => [
                     'loading' => 'lazy',
                 ],
+                Table::class => [
+                    'class' => 'table table-bordered table-striped',
+                ],
             ],
         ];
 
@@ -41,6 +46,7 @@ final class LeagueCommonMarkConverterFactory
         $converter->getEnvironment()->addExtension(new DefaultAttributesExtension());
         $converter->getEnvironment()->addExtension(new ExternalLinkExtension());
         $converter->getEnvironment()->addExtension(new AutolinkExtension());
+        $converter->getEnvironment()->addExtension(new TableExtension());
         $converter->getEnvironment()->addExtension($this->photoExtension);
 
         return $converter;

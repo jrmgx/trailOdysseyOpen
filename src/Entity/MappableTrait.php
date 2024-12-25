@@ -157,6 +157,11 @@ trait MappableTrait
         return $this;
     }
 
+    public function hasSymbol(): bool
+    {
+        return null !== $this->symbol;
+    }
+
     public function getPointName(): string
     {
         return $this->pointName;

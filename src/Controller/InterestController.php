@@ -2,10 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\GeoPoint;
 use App\Entity\Interest;
 use App\Entity\Trip;
 use App\Form\InterestType;
+use App\Model\Point;
 use App\Security\Voter\UserVoter;
+use App\Service\GeoCodingService;
+use App\Service\WeatherService;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,8 +39,10 @@ class InterestController extends MappableController
      */
     #[Route('/new/{lat}/{lon}/entry', name: 'new', options: ['expose' => true], methods: ['GET', 'POST'])]
     #[Template('interest/new_frame.html.twig')]
-    public function new(Request $request, Trip $trip, string $lat, string $lon): array|Response
-    {
+    public function new(
+        WeatherService $weatherService, GeoCodingService $geoCodingService,
+        Request $request, Trip $trip, string $lat, string $lon,
+    ): array|Response {
         /** @var Interest $interest */
         $interest = $this->commonNew($request, $trip, $lat, $lon, new Interest());
         $interest->setArrivingAt(new \DateTimeImmutable());
@@ -51,6 +57,27 @@ class InterestController extends MappableController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $currentDescription = $interest->getDescription() ?? '';
+            $withHistoricalWeather = str_contains($currentDescription, '%historical_weather%');
+            if ($withHistoricalWeather) {
+                $weatherData = $weatherService->historicalWeatherAtPoint((new GeoPoint())->setLat($lat)->setLon($lon));
+                $weatherPlace = $geoCodingService->findPlaceFromPoint(new Point($lat, $lon)) ?? 'Unknown';
+                $weatherDescription =
+                    "\n\n<hr>\n\n**Weather History from $weatherPlace**<br>Elevation: {$weatherData['elevation']}m\n\n" .
+                    "| Month | Avg min・max / Feels °C |\n" .
+                    "|------|-----------------------|\n" .
+                    $weatherService->formatSequencedWeatherToMarkdown($weatherService->averageWeatherByMonths($weatherData)) .
+                    "\n\n\n" .
+                    "| Week | Avg min・max / Feels °C |\n" .
+                    "|------|-----------------------|\n" .
+                    $weatherService->formatSequencedWeatherToMarkdown($weatherService->averageWeatherByWeeks($weatherData))
+                ;
+                $interest->setDescription(str_replace('%historical_weather%', $weatherDescription, $currentDescription));
+                if (!$interest->hasSymbol()) {
+                    $interest->setSymbol('🌦️');
+                }
+            }
+
             $trip->updatedNow();
             $interest->setUser($trip->getUser());
             $interest->setTrip($trip);

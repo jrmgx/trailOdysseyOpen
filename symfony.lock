@@ -47,6 +47,9 @@
             "migrations/.gitignore"
         ]
     },
+    "flibidi67/open-meteo": {
+        "version": "1.0.0"
+    },
     "friendsofphp/php-cs-fixer": {
         "version": "3.15",
         "recipe": {

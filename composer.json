@@ -15,6 +15,7 @@
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.2",
+        "flibidi67/open-meteo": "^1.0",
         "friendsofsymfony/jsrouting-bundle": "^3.5",
         "graphp/graph": "^1@dev",
         "graphp/graphviz": "^1@dev",
