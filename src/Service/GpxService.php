@@ -28,6 +28,7 @@ class GpxService
         private readonly InterestRepository $interestRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly string $projectName,
+        private readonly string $projectHost,
     ) {
     }
 
@@ -218,7 +219,7 @@ class GpxService
         if ($trip->getShareKey()) {
             $link = new Link();
             $link->text = 'Public URL'; // TODO translate
-            $link->href = 'https://trailodyssey.net';
+            $link->href = $this->projectHost;
 
             $gpx->metadata->links[] = $link;
         }
