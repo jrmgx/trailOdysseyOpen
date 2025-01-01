@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
@@ -16,11 +18,9 @@ class HomeController extends AbstractController
         return [];
     }
 
-    /** @return array<mixed> */
     #[Route('/help', name: 'help', methods: ['GET'])]
-    #[Template('home/help.html.twig')]
-    public function help(): array
+    public function help(): never
     {
-        return [];
+        throw new NotFoundHttpException();
     }
 }
