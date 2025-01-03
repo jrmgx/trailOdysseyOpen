@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\GeoPoint;
 use App\Entity\Routing;
 use App\Entity\Stage;
 use App\Entity\Trip;
@@ -132,50 +133,77 @@ class StageController extends MappableController
         return compact('trip', 'stage', 'form');
     }
 
-    #[Route('/new/{id}', name: 'split', methods: ['GET', 'POST'])] // TODO change to post
-    public function split(Trip $trip, Routing $routing): Response
+    #[Route('/new/{id}', name: 'split', methods: ['POST'])]
+    public function split(Request $request, Trip $trip, Routing $routing): Response
     {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);
 
         $startStage = $routing->getStartStage();
         $finishStage = $routing->getFinishStage();
-        $point = null;
+        $steps = max(2, (int) $request->request->get('step', 2));
+        $startTime = (int) $startStage->getArrivingAt()->format('U');
+        $endTime = (int) $finishStage->getArrivingAt()->format('U');
+        $deltaTime = $endTime - $startTime;
+        $totalDistance = $routing->getDistance();
+        $intermediateDistance = (int) ($totalDistance / $steps);
+        $intermediateTime = (int) ($deltaTime / $steps);
 
-        // Calculate the mid point between the two Stages, if we have details on the Routing, use it
+        /** @var array<array{0: GeoPoint, 1: \DateTimeImmutable}> $stepsInfo */
+        $stepsInfo = [];
         if ($routing->pathPointsNotEmpty() && $routing->getDistance()) {
-            $midDistance = (int) ($routing->getDistance() / 2);
-            $point = GeoHelper::findPointAtDistance($routing->getPathPoints() ?? [], $midDistance)?->toGeoPoint();
-        }
-
-        // Fallback
-        if (!$point) {
+            for ($i = 1; $i < $steps; ++$i) {
+                $distance = $intermediateDistance * $i;
+                $time = $intermediateTime * $i;
+                $point = GeoHelper::findPointAtDistance($routing->getPathPoints() ?? [], $distance)?->toGeoPoint();
+                $date = $startStage->getArrivingAt()->modify("+ $time seconds")->modify('midnight');
+                if (!$point) {
+                    continue;
+                }
+                $stepsInfo[] = [$point, $date];
+            }
+        } else {
+            // If the current routing is not a valid path, we fallback on the best effort
             $previousPoint = $startStage->getPoint();
             $nextPoint = $finishStage->getPoint();
+            $time = (int) ($deltaTime / 2);
             $point = GeoHelper::midPoint($previousPoint->toPoint(), $nextPoint->toPoint())->toGeoPoint();
+            $date = $startStage->getArrivingAt()->modify("+ $time seconds")->modify('midnight');
+            $stepsInfo[] = [$point, $date];
         }
 
-        $intermediateStage = new Stage();
-        $intermediateStage->setPoint($point);
-        $intermediateStage->setArrivingAt($startStage->getArrivingAt());
-        $intermediateStage->setUser($trip->getUser());
-        $intermediateStage->setTrip($trip);
+        $currentRouting = $routing;
+        foreach ($stepsInfo as $info) {
+            /**
+             * @var GeoPoint           $point
+             * @var \DateTimeImmutable $date
+             */
+            [$point, $date] = $info;
+            // New stage
+            $intermediateStage = new Stage();
+            $intermediateStage->setPoint($point);
+            $intermediateStage->setArrivingAt($date);
+            $intermediateStage->setUser($trip->getUser());
+            $intermediateStage->setTrip($trip);
 
-        $this->geoCodingService->tryUpdatePointName($intermediateStage);
+            $this->geoCodingService->tryUpdatePointName($intermediateStage);
 
-        $this->entityManager->persist($intermediateStage);
+            $this->entityManager->persist($intermediateStage);
 
-        // Update Routing
-        // This Routing now points to that Stage
-        $routing->setFinishStage($intermediateStage);
-        $routing->setPathPoints(null);
-        $this->routingService->updatePathPoints($trip, $routing);
-        $this->routingService->updateCalculatedValues($routing);
+            // Update routing
+            $currentRouting->setFinishStage($intermediateStage);
+            $currentRouting->setPathPoints(null);
 
-        $this->entityManager->flush();
+            $this->routingService->updatePathPoints($trip, $currentRouting);
+            $this->routingService->updateCalculatedValues($currentRouting);
 
-        // Create a new Routing between that Stage and the nextStage
-        $newRouting = $this->createNewRouting($trip, $intermediateStage, $finishStage);
-        $this->entityManager->persist($newRouting);
+            $this->entityManager->flush();
+
+            // New routing
+            $newRouting = $this->createNewRouting($trip, $intermediateStage, $finishStage);
+            $this->entityManager->persist($newRouting);
+
+            $currentRouting = $newRouting;
+        }
 
         $trip->updatedNow();
         $this->entityManager->flush();

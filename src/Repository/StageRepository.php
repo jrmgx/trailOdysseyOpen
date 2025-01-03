@@ -27,16 +27,36 @@ class StageRepository extends ServiceEntityRepository
      */
     public function findByTrip(Trip $trip): array
     {
-        return $this->findBy(['trip' => $trip], ['arrivingAt' => 'ASC']);
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.trip = :trip')
+            ->setParameter('trip', $trip)
+            ->addOrderBy('s.arrivingAt', 'ASC')
+            ->addOrderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function findLastStage(Trip $trip): ?Stage
     {
-        return $this->findOneBy(['trip' => $trip], ['arrivingAt' => 'DESC']);
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.trip = :trip')
+            ->setParameter('trip', $trip)
+            ->addOrderBy('s.arrivingAt', 'DESC')
+            ->addOrderBy('s.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     public function findFirstStage(Trip $trip): ?Stage
     {
-        return $this->findOneBy(['trip' => $trip], ['arrivingAt' => 'ASC']);
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.trip = :trip')
+            ->setParameter('trip', $trip)
+            ->addOrderBy('s.arrivingAt', 'ASC')
+            ->addOrderBy('s.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

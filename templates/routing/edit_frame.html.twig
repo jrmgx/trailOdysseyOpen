@@ -4,26 +4,34 @@
 <turbo-frame id="routing_{{ routing.id }}">
     <div class="card mx-3 border-top-0 rounded-top-0">
         <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <a data-turbo-frame="sidebar-stages"
-                       href="{{ path('stage_split', { trip: trip.id, id: routing.id }) }}"
-                       class="btn btn-secondary">
-                        {{ 'action.split'|trans }}
-                    </a>
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <div class="flex-grow-1">
+                    <form method="post"
+                          action="{{ path('stage_split', { trip: trip.id, id: routing.id }) }}"
+                          data-turbo-frame="sidebar-stages">
+                        <div class="input-group w-100">
+                            <button class="btn btn-secondary">{{ 'action.split'|trans }}</button>
+                            <input type="number" name="step" class="form-control" style="width: 3rem; text-align: center" value="2">
+                        </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token('split' ~ routing.id) }}">
+                    </form>
                 </div>
-                <form method="post"
-                      action="{{ path('routing_update_path', { trip: trip.id, id: routing.id }) }}">
-                    <button class="btn btn-secondary">{{ 'action.update'|trans }}</button>
-                    <input type="hidden" name="_token" value="{{ csrf_token('update_path' ~ routing.id) }}">
-                </form>
-                <form method="post"
-                      action="{{ path('routing_clear_path', { trip: trip.id, id: routing.id }) }}">
-                    <button class="btn btn-secondary">{{ 'action.clear'|trans }}</button>
-                    <input type="hidden" name="_token" value="{{ csrf_token('clear_path' ~ routing.id) }}">
-                </form>
-                <div>
-                    <a class="btn btn-outline-secondary"
+                <div class="flex-grow-1">
+                    <form method="post"
+                          action="{{ path('routing_update_path', { trip: trip.id, id: routing.id }) }}">
+                        <button class="btn btn-secondary w-100">{{ 'action.update'|trans }}</button>
+                        <input type="hidden" name="_token" value="{{ csrf_token('update_path' ~ routing.id) }}">
+                    </form>
+                </div>
+                <div class="flex-grow-1">
+                    <form method="post"
+                          action="{{ path('routing_clear_path', { trip: trip.id, id: routing.id }) }}">
+                        <button class="btn btn-secondary w-100">{{ 'action.clear'|trans }}</button>
+                        <input type="hidden" name="_token" value="{{ csrf_token('clear_path' ~ routing.id) }}">
+                    </form>
+                </div>
+                <div class="flex-grow-1">
+                    <a class="btn btn-outline-secondary w-100"
                        href="{{ path('stage_show', { trip: trip.id }) }}">
                         cancel
                     </a>
