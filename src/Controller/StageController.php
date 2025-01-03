@@ -8,6 +8,7 @@ use App\Entity\Stage;
 use App\Entity\Trip;
 use App\Form\StageType;
 use App\Form\TripMapOptionType;
+use App\Helper\CommonHelper;
 use App\Helper\GeoHelper;
 use App\Message\UpdateElevationMessage;
 use App\Security\Voter\UserVoter;
@@ -147,6 +148,10 @@ class StageController extends MappableController
         $totalDistance = $routing->getDistance();
         $intermediateDistance = (int) ($totalDistance / $steps);
         $intermediateTime = (int) ($deltaTime / $steps);
+        $many = $steps > 5;
+        if ($many) {
+            CommonHelper::allowMoreResources();
+        }
 
         /** @var array<array{0: GeoPoint, 1: \DateTimeImmutable}> $stepsInfo */
         $stepsInfo = [];
@@ -185,7 +190,9 @@ class StageController extends MappableController
             $intermediateStage->setUser($trip->getUser());
             $intermediateStage->setTrip($trip);
 
-            $this->geoCodingService->tryUpdatePointName($intermediateStage);
+            if (!$many) {
+                $this->geoCodingService->tryUpdatePointName($intermediateStage);
+            }
 
             $this->entityManager->persist($intermediateStage);
 
