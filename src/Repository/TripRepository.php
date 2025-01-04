@@ -2,6 +2,12 @@
 
 namespace App\Repository;
 
+use App\Entity\DiaryEntry;
+use App\Entity\Interest;
+use App\Entity\Routing;
+use App\Entity\Segment;
+use App\Entity\Stage;
+use App\Entity\Tiles;
 use App\Entity\Trip;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -59,5 +65,60 @@ class TripRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
+    }
+
+    public function delete(Trip $trip): void
+    {
+        $tripId = $trip->getId();
+        $entityManager = $this->getEntityManager();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Routing::class, 'r')
+            ->where('r.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Stage::class, 's')
+            ->where('s.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Segment::class, 's')
+            ->where('s.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Interest::class, 'i')
+            ->where('i.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(DiaryEntry::class, 'd')
+            ->where('d.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Tiles::class, 't')
+            ->where('t.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Trip::class, 't')
+            ->where('t.id = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
     }
 }

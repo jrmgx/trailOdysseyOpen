@@ -173,8 +173,7 @@ class TripController extends BaseController
     {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);
         if ($this->isCsrfTokenValid('delete' . $trip->getId(), (string) $request->request->get('_token'))) {
-            $this->entityManager->remove($trip);
-            $this->entityManager->flush();
+            $this->tripRepository->delete($trip);
         }
 
         return $this->redirectToRoute('trip_index', [], Response::HTTP_SEE_OTHER);
