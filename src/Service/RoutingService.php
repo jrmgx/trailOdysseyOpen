@@ -74,6 +74,11 @@ class RoutingService
     }
 
     /**
+     * https://www.gpsvisualizer.com/tutorials/elevation_gain.html
+     * Horizontal smoothing is 20m
+     * Vertical smoothing is 20m
+     * Those value comes from tests with multiples path and external elevation sources.
+     *
      * @param array<Point> $points
      *
      * @return array{int, int}
@@ -100,7 +105,7 @@ class RoutingService
             $diff = $previousElevation - $currentElevation;
 
             // Vertical smoothing
-            if (abs($diff) < 10) {
+            if (abs($diff) < 20) {
                 continue;
             }
 
