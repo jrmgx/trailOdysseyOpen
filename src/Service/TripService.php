@@ -92,9 +92,11 @@ class TripService
         while ($currentStage) {
             $routingOut = $currentStage->getRoutingOut();
             if ($routingOut) {
-                $distance += $routingOut->getDistance() ?? 0;
-                $elevationPositive += $routingOut->getElevationPositive() ?? 0;
-                $elevationNegative += $routingOut->getElevationNegative() ?? 0;
+                if (!$routingOut->getAsTheCrowFly()) {
+                    $distance += $routingOut->getDistance() ?? 0;
+                    $elevationPositive += $routingOut->getElevationPositive() ?? 0;
+                    $elevationNegative += $routingOut->getElevationNegative() ?? 0;
+                }
                 $currentStage = $routingOut->getFinishStage();
             } else {
                 $currentStage = null;
