@@ -57,7 +57,7 @@ class RoutingService
     {
         if ($routing->pathPointsNotEmpty()) {
             $points = $routing->getPathPoints() ?? [];
-            $routing->setDistance(GeoHelper::calculateDistanceFromPoints($points, withElevation: true));
+            $routing->setDistance(GeoHelper::calculateDistanceFromPoints($points));
             [$positive, $negative] = $this->calculateElevations($points);
             $routing->setElevationPositive($positive);
             $routing->setElevationNegative($negative);

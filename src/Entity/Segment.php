@@ -62,7 +62,7 @@ class Segment
     #[ORM\PreUpdate]
     public function updateDistance(): void
     {
-        $this->setDistance(GeoHelper::calculateDistanceFromPoints($this->getPoints(), withElevation: true));
+        $this->setDistance(GeoHelper::calculateDistanceFromPoints($this->getPoints()));
     }
 
     public function getId(): ?int
