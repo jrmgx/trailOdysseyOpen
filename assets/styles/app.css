@@ -3,8 +3,9 @@
 }
 
 html, body {
-    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-    color: #333;
+    font-family: var(--bs-body-font-family);
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
     padding: 0;
     margin: 0;
 }
@@ -20,21 +21,21 @@ iframe {
 .sticky-bottom-action {
     position: sticky;
     bottom: 0;
-    background: white;
-    border-top: solid 1px #D2D2D2;
+    background: var(--bs-body-bg);
+    border-top: solid 1px var(--bs-border-color);
 }
 
 .sticky-bottom-sidebar {
     position: sticky;
     bottom: 0;
-    background: white;
-    border-top: solid 1px #D2D2D2;
+    background: var(--bs-body-bg);
+    border-top: solid 1px var(--bs-border-color);
 }
 
 .sticky-top-tabs {
     position: sticky;
     top: 0;
-    background: white;
+    background: var(--bs-body-bg);
     z-index: 1;
 }
 
@@ -100,9 +101,9 @@ iframe {
 .map-button {
     display: block;
     text-decoration: none;
-    color: #333;
+    color: var(--bs-body-color);
     padding: 0.5rem;
-    background: white;
+    background: var(--bs-body-bg);
     min-width: 2.6rem;
     text-align: center;
     height: 2.6rem;
@@ -123,7 +124,7 @@ iframe {
     width: 2rem;
     height: 12rem;
     text-align: right;
-    color: #080;
+    color: var(--bs-success);
     transform: rotate(-180deg);
     writing-mode: vertical-rl;
     left: 0.75rem;
@@ -183,14 +184,14 @@ iframe {
 
     .container-body {
         border-style: solid;
-        border-color: rgb(0,0,0,0.2);
+        border-color: var(--bs-border-color);
         border-width: 0 2px;
     }
 
     .sidebar {
         right: initial;
         width: var(--sidebar-width);
-        box-shadow: 0 0 0 2px rgb(0,0,0,0.2)
+        box-shadow: 0 0 0 2px var(--bs-border-color);
     }
 
     .map {
@@ -250,12 +251,12 @@ iframe {
 .element-error {
     display: block;
     font-weight: bold;
-    color: darkred;
+    color: var(--bs-danger);
 }
 
 .element-marker a, .element-marker a:visited, .element-marker a:hover {
     text-decoration: underline;
-    color: darkblue;
+    color: var(--bs-link-color);
 }
 
 /** PATH RELATED **/
@@ -275,7 +276,7 @@ path.leaflet-interactive {
 
 .popup-extra-distance {
     font-size: 0.85rem;
-    color: #888;
+    color: var(--bs-secondary);
 }
 
 .popup-arriving-at, .popup-leaving-at {
@@ -318,9 +319,9 @@ path.leaflet-interactive {
     left: 0;
     right: calc(100% - 70%);
     bottom: 0;
-    background: #000ff02e;
+    background: var(--bs-primary-bg-subtle);
     z-index: -1;
-    border-right: 2px blue solid;
+    border-right: 2px var(--bs-primary) solid;
 }
 
 .sidebar .live-graph {
@@ -330,7 +331,7 @@ path.leaflet-interactive {
 }
 
 .u-progress {
-    border-right: 2px dotted #258656;
+    border-right: 2px dotted var(--bs-success);
     position: absolute;
     pointer-events: none;
     user-select: none;
@@ -374,7 +375,7 @@ path.leaflet-interactive {
     left: 0;
     bottom: 0;
     right: 0;
-    background-color: white;
+    background-color: var(--bs-body-bg);
 }
 
 .public-bar-action {
@@ -384,7 +385,7 @@ path.leaflet-interactive {
 }
 
 .public-bar-action button {
-    background-color: rgba(255,255,255,0.25);
+    background-color: var(--bs-tertiary-bg);
 }
 
 .public-bar-action-home {
@@ -454,7 +455,7 @@ path.leaflet-interactive {
 }
 
 .public-bar-description.auto-sized .markdown-container {
-    color: #444;
+    color: var(--bs-secondary-color);
     padding: 0;
     font-weight: 500;
     transform: scale(75%) translateY(-10px);
@@ -467,7 +468,10 @@ path.leaflet-interactive {
     left: 0;
     right: 0;
     height: 16px;
-    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(180deg,
+        rgba(var(--bs-body-bg-rgb), 0) 0%,
+        rgba(var(--bs-body-bg-rgb), 1) 100%
+    );
 }
 
 /* Public bar in desktop version */
@@ -570,4 +574,68 @@ path.leaflet-interactive {
     top: 0;
     left: 0;
     flex-direction: row;
+}
+
+/* Leaflet popup dark mode styles */
+[data-bs-theme="dark"] .leaflet-popup-content-wrapper {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .leaflet-popup-tip {
+    background-color: var(--bs-body-bg);
+}
+
+/* Update popup border style for both themes */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    border: 1px solid var(--bs-border-color);
+}
+
+/* Ensure links in popups are visible in dark mode */
+[data-bs-theme="dark"] .leaflet-popup-content a {
+    color: var(--bs-link-color);
+}
+
+/* Leaflet layer control dark mode styles */
+[data-bs-theme="dark"] .leaflet-control-layers {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .leaflet-control-layers-expanded {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .leaflet-control-layers-toggle {
+    filter: invert(1);
+}
+
+[data-bs-theme="dark"] .leaflet-control-layers-separator {
+    border-top-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .leaflet-control-layers label:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+/* Leaflet zoom control dark mode styles */
+[data-bs-theme="dark"] .leaflet-control-zoom {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .leaflet-control-zoom-in,
+[data-bs-theme="dark"] .leaflet-control-zoom-out {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .leaflet-control-zoom-in:hover,
+[data-bs-theme="dark"] .leaflet-control-zoom-out:hover {
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
 }

@@ -4,7 +4,7 @@
         <span>{{ mappable.nameWithPointName }}</span>
     </div>
     {% if mappable.extra %}
-        <div class="popup-extra-distance"> (+{{ mappable.extra.distance|to_km }}&nbsp;km)</div>
+        <div class="popup-extra-distance text-body-secondary"> (+{{ mappable.extra.distance|to_km }}&nbsp;km)</div>
     {% endif %}
     <div class="popup-markdown-container">{{ mappable.description|default|markdown_to_html }}</div>
     {% if object_name != 'interest' %}

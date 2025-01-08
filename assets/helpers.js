@@ -1,5 +1,6 @@
 import L from 'leaflet';
 import markerIconUrl from './images/marker.png';
+import markerDarkIconUrl from './images/marker-dark.png';
 import markerDefaultIconUrl from './images/leaflet/marker-icon.png';
 // import gpsPointImage from './images/gps_point_2x.png';
 // import gpsCompassImage from './images/gps_compass_2x.png';
@@ -23,12 +24,17 @@ export const debugConsole = (message) => {
   // console.log(`%c${time}${message}`, 'color: blue; font-weight: bold;');
 };
 
-export const iconSymbol = (symbol) => L.divIcon({
-  html: `<span class="stage-marker"><img alt="" src="${markerIconUrl}${'">%</span>'.replace('%', symbol)}`,
-  iconSize: [48, 48],
-  iconAnchor: [24, 42],
-  popupAnchor: [0, 16],
-});
+// We could have a mutation observer that change the icon in live, but that's too much of a detail.
+export const iconSymbol = (symbol) => {
+  const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+  const iconUrl = isDark ? markerDarkIconUrl : markerIconUrl;
+  return L.divIcon({
+    html: `<span class="stage-marker"><img alt="" src="${iconUrl}">%</span>`.replace('%', symbol),
+    iconSize: [48, 48],
+    iconAnchor: [24, 42],
+    popupAnchor: [0, 16],
+  });
+};
 
 export const iconGpsPoint = L.icon({
   iconUrl: gpsPointImage,
@@ -66,6 +72,7 @@ export const subPolyline = (polyline, pointA, pointB) => {
 
   return polylineLatLngs.slice(indexA, indexB + 1);
 };
+
 export const curve = (startPoint, endPoint, pathOptions) => {
   // From: https://gist.github.com/ryancatalani/6091e50bf756088bf9bf5de2017b32e6
   const latlng1 = [startPoint.lat, startPoint.lng];

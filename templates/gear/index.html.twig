@@ -12,7 +12,7 @@
         <div class="col-12">
             <ul class="list-group">
                 {% for gear in gears %}
-                    <li class="list-group-item {{ loop.index is even ? 'list-group-item-light' }} clearfix">
+                    <li class="list-group-item {{ loop.index is even ? 'list-group-item-secondary' }} clearfix">
                         <div class="float-end">
                             <a class="btn btn-outline-secondary border-0"
                                href="{{ path('gear_edit', { id: gear.id }) }}">

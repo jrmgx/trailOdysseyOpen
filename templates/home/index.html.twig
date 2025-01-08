@@ -15,7 +15,7 @@
 
 {% block body %}
     {# https://getbootstrap.com/docs/5.3/layout/containers/#how-they-work #}
-    <div class="container-md bg-white container-body position-relative" style="max-width: 992px; min-height: 100vh;">
+    <div class="container-md bg-body container-body position-relative" style="max-width: 992px; min-height: 100vh;">
         <div class="mx-3">
             <turbo-frame data-turbo-action="replace" id="main">
                 {% for label, messages in app.flashes %}

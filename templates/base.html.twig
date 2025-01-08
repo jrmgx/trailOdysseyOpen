@@ -4,6 +4,15 @@
         {% set public = public is defined and public %}
         <meta charset="UTF-8">
         <title>{% block title %}{{ project_name }}{% endblock %}</title>
+        <script>
+            (function() {
+                const systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+                document.documentElement.setAttribute(
+                    'data-bs-theme',
+                    systemDarkMode.matches ? 'dark' : 'light'
+                );
+            })();
+        </script>
         <meta name="description" content="{{ 'pitch.description'|trans }}">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
         {# TODO change meta/og when public #}
