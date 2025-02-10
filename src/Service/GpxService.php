@@ -251,9 +251,14 @@ class GpxService
         $gpxPoint->longitude = (float) $point->lon;
         $gpxPoint->elevation = (float) $point->el;
         $gpxPoint->name = $mappable->getNameWithPointName();
+        if ($mappable->getSymbol()) {
+            $gpxPoint->name = $mappable->getSymbol() . ' ' . $gpxPoint->name;
+        }
         // TODO translate + date format
-        $gpxPoint->description = 'Date: ' . $mappable->getArrivingAt()->format('D j M') . \PHP_EOL
-            . ($mappable->getDescription() ?? '');
+        $gpxPoint->description = 'Date: ' . $mappable->getArrivingAt()->format('D j M');
+        if ($mappable->getDescription()) {
+            $gpxPoint->description .= \PHP_EOL . $mappable->getDescription();
+        }
 
         return $gpxPoint;
     }
