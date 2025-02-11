@@ -4,12 +4,16 @@ namespace App\Model;
 
 use App\Entity\GeoPoint;
 use App\Helper\GeoHelper;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 class Point
 {
     public function __construct(
+        #[Groups(['public'])]
         public string $lat,
+        #[Groups(['public'])]
         public string $lon,
+        #[Groups(['public'])]
         public ?string $el = null,
     ) {
     }

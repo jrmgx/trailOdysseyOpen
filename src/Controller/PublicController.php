@@ -13,6 +13,7 @@ use App\Service\TripService;
 use Liip\ImagineBundle\Service\FilterService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bridge\Twig\Attribute\Template;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
@@ -127,6 +128,16 @@ class PublicController extends BaseController
         $response->headers->set('Content-Type', 'text/javascript');
 
         return $response;
+    }
+
+    #[Route('/{user}/{trip}/js/progress.json', name: 'progress_json', methods: ['GET'])]
+    public function progress(
+        #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
+        #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip,
+    ): JsonResponse {
+        $point = $trip->getProgressPoint();
+
+        return $this->json($point, context: ['groups' => ['public']]);
     }
 
     #[Route('/{user}/{trip}/photo/{path}', name: 'photo', methods: ['GET'])]
