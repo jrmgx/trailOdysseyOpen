@@ -13,7 +13,16 @@
             <div class="col-12">
                 <div class="card mb-3">
                     <div class="card-body clearfix">
-                        <h5 class="card-title">{{ trip.name }}</h5>
+                        <h5 class="card-title">{{ trip.name }}
+                            {% apply spaceless %}
+                                {% if trip.firstStage %}
+                                    <small><br>{{ trip.firstStage.arrivingAt|date('F Y') }}
+                                        {% if trip.firstStage.arrivingAt|date('mY') != trip.lastStage.arrivingAt|date('mY') %}
+                                        - {{ trip.lastStage.arrivingAt|date('F Y') }}
+                                        {% endif %}</small>
+                                {% endif %}
+                            {% endapply %}
+                        </h5>
                         <p class="card-text">{{ trip.description }}</p>
                         <div class="mb-3">
                             {{ include('common/_trip_buttons.html.twig') }}

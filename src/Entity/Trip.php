@@ -218,6 +218,24 @@ class Trip
         return $this;
     }
 
+    public function getFirstStage(): ?Stage
+    {
+        if ($stage = $this->getStages()->first()) {
+            return $stage;
+        }
+
+        return null;
+    }
+
+    public function getLastStage(): ?Stage
+    {
+        if ($stage = $this->getStages()->last()) {
+            return $stage;
+        }
+
+        return null;
+    }
+
     /**
      * @return Collection<int, Routing>
      */

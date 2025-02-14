@@ -35,23 +35,33 @@
                     </button>
                 </div>
                 {% if diaryEntries|length > 0 %}
-                <div class="public-bar-action public-bar-action-next"
-                     data-action="click->public#nextDiaryClickAction"
-                     data-public-id-param="0"
-                >
-                    <button class="btn btn-lg btn-light border-0">
-                        {{ include('common/_icon.html.twig', {
-                            icon_name: 'arrow-right-circle-fill',
-                            icon_size: 2,
-                        }) }}
-                    </button>
-                </div>
+                    <div class="public-bar-action public-bar-action-next"
+                         data-action="click->public#nextDiaryClickAction"
+                         data-public-id-param="0"
+                    >
+                        <button class="btn btn-lg btn-light border-0">
+                            {{ include('common/_icon.html.twig', {
+                                icon_name: 'arrow-right-circle-fill',
+                                icon_size: 2,
+                            }) }}
+                        </button>
+                    </div>
                 {% endif %}
                 <div class="public-bar-description">
                     <div class="markdown-container container clearfix">
                         <h1 class="fs-2 my-3 row">
                             <span class="col-12">
                                 {{ trip.name }}
+                            </span>
+                            <span class="col-12 fs-small">
+                                {% apply spaceless %}
+                                    {% if trip.firstStage %}
+                                        {{ trip.firstStage.arrivingAt|date('F Y') }}
+                                        {% if trip.firstStage.arrivingAt|date('mY') != trip.lastStage.arrivingAt|date('mY') %}
+                                            to {{ trip.lastStage.arrivingAt|date('F Y') }}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endapply %}
                             </span>
                             <span class="col-12 fs-small">
                                 {{ sum_distance|to_km }}&nbsp;km
