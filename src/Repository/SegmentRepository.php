@@ -11,9 +11,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Segment>
  *
  * @method Segment|null find($id, $lockMode = null, $lockVersion = null)
- * @method Segment|null findOneBy(array $criteria, array $orderBy = null)
- * @method Segment[]    findAll()
- * @method Segment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class SegmentRepository extends ServiceEntityRepository
 {

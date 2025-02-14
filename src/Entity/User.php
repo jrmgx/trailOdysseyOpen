@@ -108,10 +108,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * A visual identifier that represents this user.
      *
-     * @see UserInterface
+     * @return non-empty-string
      */
     public function getUserIdentifier(): string
     {
+        if (empty($this->username)) {
+            throw new \RuntimeException('Username cannot be blank.');
+        }
+
         return $this->username;
     }
 

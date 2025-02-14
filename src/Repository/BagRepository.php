@@ -26,6 +26,21 @@ class BagRepository extends ServiceEntityRepository
     /**
      * @return array<int, Bag>
      */
+    public function findByTripAndUser(Trip $trip, User $user): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.trip = :trip')
+            ->setParameter('trip', $trip)
+            ->andWhere('b.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @return array<int, Bag>
+     */
     public function findBagsForTripAndUser(Trip $trip, User $user): array
     {
         return $this->createQueryBuilder('b')

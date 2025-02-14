@@ -32,7 +32,7 @@ class GearController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $gears = $this->gearRepository->findBy(['user' => $user], ['name' => 'ASC']);
+        $gears = $this->gearRepository->findByUserOrderedByName($user);
 
         return compact('gears');
     }

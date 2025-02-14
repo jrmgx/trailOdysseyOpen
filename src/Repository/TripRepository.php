@@ -18,9 +18,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<Trip>
  *
  * @method Trip|null find($id, $lockMode = null, $lockVersion = null)
- * @method Trip|null findOneBy(array $criteria, array $orderBy = null)
- * @method Trip[]    findAll()
- * @method Trip[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class TripRepository extends ServiceEntityRepository
 {
@@ -35,9 +32,11 @@ class TripRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('t')
+            ->leftJoin('t.stages', 's')
             ->andWhere('t.user = :user')
             ->setParameter('user', $user)
-            ->addOrderBy('t.updatedAt', 'DESC')
+            ->addOrderBy('s.arrivingAt', 'DESC')
+            ->addOrderBy('s.id', 'DESC')
             ->getQuery()
             ->getResult()
         ;

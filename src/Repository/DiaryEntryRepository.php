@@ -9,11 +9,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<DiaryEntry>
- *
- * @method DiaryEntry|null find($id, $lockMode = null, $lockVersion = null)
- * @method DiaryEntry|null findOneBy(array $criteria, array $orderBy = null)
- * @method DiaryEntry[]    findAll()
- * @method DiaryEntry[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class DiaryEntryRepository extends ServiceEntityRepository
 {
@@ -27,6 +22,11 @@ class DiaryEntryRepository extends ServiceEntityRepository
      */
     public function findByTrip(Trip $trip): array
     {
-        return $this->findBy(['trip' => $trip], ['arrivingAt' => 'ASC']);
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.trip = :trip')
+            ->setParameter('trip', $trip)
+            ->orderBy('d.arrivingAt', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

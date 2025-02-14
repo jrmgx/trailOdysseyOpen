@@ -10,11 +10,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Routing>
- *
- * @method Routing|null find($id, $lockMode = null, $lockVersion = null)
- * @method Routing|null findOneBy(array $criteria, array $orderBy = null)
- * @method Routing[]    findAll()
- * @method Routing[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class RoutingRepository extends ServiceEntityRepository
 {

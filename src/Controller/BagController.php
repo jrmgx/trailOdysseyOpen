@@ -193,10 +193,7 @@ class BagController extends AbstractController
                 $gearInBag = new GearInBag();
                 $gearInBag->setBag($bag);
                 $gearInBag->setGear($thing);
-                $gearInBagExist = $this->gearInBagRepository->findOneBy([
-                    'gear' => $thing,
-                    'bag' => $bag,
-                ]);
+                $gearInBagExist = $this->gearInBagRepository->findOneByGearAndBag($thing, $bag);
                 if ($gearInBagExist) {
                     $gearInBagExist->setCount($gearInBagExist->getCount() + 1);
                 } else {
@@ -313,7 +310,7 @@ class BagController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $bags = $this->bagRepository->findBy(['trip' => $trip, 'user' => $user]);
+        $bags = $this->bagRepository->findByTripAndUser($trip, $user);
         $gears = $this->gearRepository->findGearsForUserAndTripWithBagInfo($user);
 
         $bagIds = array_map(fn (Bag $bag) => $bag->getId(), $bags);

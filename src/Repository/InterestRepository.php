@@ -9,11 +9,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Interest>
- *
- * @method Interest|null find($id, $lockMode = null, $lockVersion = null)
- * @method Interest|null findOneBy(array $criteria, array $orderBy = null)
- * @method Interest[]    findAll()
- * @method Interest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class InterestRepository extends ServiceEntityRepository
 {
@@ -27,6 +22,11 @@ class InterestRepository extends ServiceEntityRepository
      */
     public function findByTrip(Trip $trip): array
     {
-        return $this->findBy(['trip' => $trip], ['arrivingAt' => 'ASC']);
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.trip = :trip')
+            ->setParameter('trip', $trip)
+            ->orderBy('i.arrivingAt', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

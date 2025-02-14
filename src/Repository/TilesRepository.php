@@ -9,11 +9,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Tiles>
- *
- * @method Tiles|null find($id, $lockMode = null, $lockVersion = null)
- * @method Tiles|null findOneBy(array $criteria, array $orderBy = null)
- * @method Tiles[]    findAll()
- * @method Tiles[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class TilesRepository extends ServiceEntityRepository
 {
