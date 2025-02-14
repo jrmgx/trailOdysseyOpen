@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Bag;
 use App\Entity\DiaryEntry;
 use App\Entity\Interest;
 use App\Entity\Routing;
@@ -74,6 +75,8 @@ class TripRepository extends ServiceEntityRepository
         $tripId = $trip->getId();
         $entityManager = $this->getEntityManager();
 
+        // TODO remove bags too
+
         $entityManager->createQueryBuilder()
             ->delete(Routing::class, 'r')
             ->where('r.trip = :tripId')
@@ -112,6 +115,13 @@ class TripRepository extends ServiceEntityRepository
         $entityManager->createQueryBuilder()
             ->delete(Tiles::class, 't')
             ->where('t.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Bag::class, 'b')
+            ->where('b.trip = :tripId')
             ->setParameter('tripId', $tripId)
             ->getQuery()
             ->execute();
