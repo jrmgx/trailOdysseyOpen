@@ -48,10 +48,12 @@ class TripRepository extends ServiceEntityRepository
     public function findPublicForUser(User $user): array
     {
         return $this->createQueryBuilder('t')
+            ->leftJoin('t.stages', 's')
             ->andWhere('t.user = :user')
             ->setParameter('user', $user)
             ->andWhere('t.shareKey IS NOT NULL')
-            ->addOrderBy('t.updatedAt', 'DESC')
+            ->addOrderBy('s.arrivingAt', 'DESC')
+            ->addOrderBy('s.id', 'DESC')
             ->getQuery()
             ->getResult()
         ;
