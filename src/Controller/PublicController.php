@@ -96,8 +96,6 @@ class PublicController extends BaseController
 
         $diaryEntries = $this->diaryEntryRepository->findByTrip($trip);
         $routings = $this->tripService->calculateRoutings($trip);
-        // TODO/BUG: routing/distance should only count the progress part of the trip!?
-        [$sumDistance, $sumPositive, $sumNegative] = $this->tripService->calculateSums($trip);
 
         // Bags
         $bags = $this->bagRepository->findBagsForTripAndUser($trip, $user);
@@ -111,9 +109,6 @@ class PublicController extends BaseController
             'trip' => $trip,
             'diaryEntries' => $diaryEntries,
             'routings' => $routings,
-            'sum_distance' => $sumDistance,
-            'sum_positive' => $sumPositive,
-            'sum_negative' => $sumNegative,
             'bags' => $bags,
         ];
     }

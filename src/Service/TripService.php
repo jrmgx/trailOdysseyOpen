@@ -9,15 +9,9 @@ use App\Helper\GeoHelper;
 use App\Model\Extra;
 use App\Model\Path;
 use App\Model\Point;
-use App\Repository\StageRepository;
 
 class TripService
 {
-    public function __construct(
-        private readonly StageRepository $stageRepository,
-    ) {
-    }
-
     /**
      * @return array{0: array<Stage|Routing>, 1: array<Stage>, 2: array<Routing>, 3: array<Extra>}
      */
@@ -30,7 +24,7 @@ class TripService
         /** @var array<Routing> $routings */
         $routings = [];
 
-        $currentStage = $this->stageRepository->findFirstStage($trip);
+        $currentStage = $trip->getFirstStage();
         $number = 1;
         while ($currentStage) {
             $currentStage->setSymbol((string) $number);
@@ -66,7 +60,7 @@ class TripService
         /** @var array<Routing> $routings */
         $routings = [];
 
-        $currentStage = $this->stageRepository->findFirstStage($trip);
+        $currentStage = $trip->getFirstStage();
         while ($currentStage) {
             $routingOut = $currentStage->getRoutingOut();
             if ($routingOut) {
@@ -78,32 +72,6 @@ class TripService
         }
 
         return $routings;
-    }
-
-    /**
-     * @return array{0: int, 1: int, 2: int}
-     */
-    public function calculateSums(Trip $trip): array
-    {
-        $currentStage = $this->stageRepository->findFirstStage($trip);
-        $distance = 0;
-        $elevationPositive = 0;
-        $elevationNegative = 0;
-        while ($currentStage) {
-            $routingOut = $currentStage->getRoutingOut();
-            if ($routingOut) {
-                if (!$routingOut->getAsTheCrowFly()) {
-                    $distance += $routingOut->getDistance() ?? 0;
-                    $elevationPositive += $routingOut->getElevationPositive() ?? 0;
-                    $elevationNegative += $routingOut->getElevationNegative() ?? 0;
-                }
-                $currentStage = $routingOut->getFinishStage();
-            } else {
-                $currentStage = null;
-            }
-        }
-
-        return [$distance, $elevationPositive, $elevationNegative];
     }
 
     /**

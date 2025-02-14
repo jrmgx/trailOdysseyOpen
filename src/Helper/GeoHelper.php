@@ -137,7 +137,7 @@ class GeoHelper
         return new Point((string) rad2deg($lat3), (string) rad2deg($lon3));
     }
 
-    public static function metersToKilometers(int|string|null $meters): ?string
+    public static function metersToKilometers(int|string|null $meters, int $precision = 0): ?string
     {
         if (null === $meters) {
             return null;
@@ -145,7 +145,7 @@ class GeoHelper
 
         $kilometers = ((int) $meters) / 1000;
 
-        return number_format($kilometers, 2);
+        return number_format($kilometers, $precision);
     }
 
     /**

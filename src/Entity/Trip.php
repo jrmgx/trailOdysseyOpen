@@ -87,6 +87,13 @@ class Trip
      */
     private array $pictures = [];
 
+    /**
+     * This is a calculus cache property.
+     *
+     * @var array{0: int, 1: int, 2: int}|null
+     */
+    private ?array $calculatedSums = null;
+
     public function __construct()
     {
         $this->updatedAt = new \DateTimeImmutable();
@@ -220,20 +227,104 @@ class Trip
 
     public function getFirstStage(): ?Stage
     {
-        if ($stage = $this->getStages()->first()) {
-            return $stage;
+        if (0 === $this->getStages()->count()) {
+            return null;
         }
 
-        return null;
+        return $this->getStages()->reduce(function (?Stage $carry, Stage $stage) {
+            if (null === $carry) {
+                return $stage;
+            }
+
+            if ($stage->getArrivingAt() < $carry->getArrivingAt()) {
+                return $stage;
+            }
+
+            if ($stage->getArrivingAt()->getTimestamp() === $carry->getArrivingAt()->getTimestamp()) {
+                return $stage->getId() < $carry->getId() ? $stage : $carry;
+            }
+
+            return $carry;
+        });
     }
 
     public function getLastStage(): ?Stage
     {
-        if ($stage = $this->getStages()->last()) {
-            return $stage;
+        if (0 === $this->getStages()->count()) {
+            return null;
         }
 
-        return null;
+        return $this->getStages()->reduce(function (?Stage $carry, Stage $stage) {
+            if (null === $carry) {
+                return $stage;
+            }
+
+            if ($stage->getArrivingAt() > $carry->getArrivingAt()) {
+                return $stage;
+            }
+
+            if ($stage->getArrivingAt()->getTimestamp() === $carry->getArrivingAt()->getTimestamp()) {
+                return $stage->getId() > $carry->getId() ? $stage : $carry;
+            }
+
+            return $carry;
+        });
+    }
+
+    /**
+     * TODO/BUG: routing/distance should only count the progress part of the trip!?
+     *
+     * @return array{0: int, 1: int, 2: int}
+     */
+    private function calculateSums(): array
+    {
+        if (!$this->calculatedSums) {
+            $currentStage = $this->getFirstStage();
+            $distance = 0;
+            $elevationPositive = 0;
+            $elevationNegative = 0;
+            while ($currentStage) {
+                $routingOut = $currentStage->getRoutingOut();
+                if ($routingOut) {
+                    if (!$routingOut->getAsTheCrowFly()) {
+                        $distance += $routingOut->getDistance() ?? 0;
+                        $elevationPositive += $routingOut->getElevationPositive() ?? 0;
+                        $elevationNegative += $routingOut->getElevationNegative() ?? 0;
+                    }
+                    $currentStage = $routingOut->getFinishStage();
+                } else {
+                    $currentStage = null;
+                }
+            }
+
+            $this->calculatedSums = [$distance, $elevationPositive, $elevationNegative];
+        }
+
+        return $this->calculatedSums;
+    }
+
+    /**
+     * @return int in meters
+     */
+    public function getDistance(): int
+    {
+        return $this->calculateSums()[0];
+    }
+
+    /**
+     * @return int in meters
+     */
+    public function getElevationPositive(): int
+    {
+        return $this->calculateSums()[1];
+    }
+
+    /**
+     * @return int in meters
+     */
+    public function getElevationNegative(): int
+    {
+        return $this->calculateSums()[2];
     }
 
     /**

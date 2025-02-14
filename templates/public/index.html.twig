@@ -17,7 +17,7 @@
                                     <small><br>{{ trip.firstStage.arrivingAt|date('F Y') }}
                                         {% if trip.firstStage.arrivingAt|date('mY') != trip.lastStage.arrivingAt|date('mY') %}
                                         - {{ trip.lastStage.arrivingAt|date('F Y') }}
-                                        {% endif %}</small>
+                                        {% endif %} - {{ trip.distance|to_km }}&nbsp;km</small>
                                 {% endif %}
                             {% endapply %}
                         </h5>

@@ -35,28 +35,4 @@ class StageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-    public function findLastStage(Trip $trip): ?Stage
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.trip = :trip')
-            ->setParameter('trip', $trip)
-            ->addOrderBy('s.arrivingAt', 'DESC')
-            ->addOrderBy('s.id', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    public function findFirstStage(Trip $trip): ?Stage
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.trip = :trip')
-            ->setParameter('trip', $trip)
-            ->addOrderBy('s.arrivingAt', 'ASC')
-            ->addOrderBy('s.id', 'ASC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
 }

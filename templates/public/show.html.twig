@@ -64,9 +64,9 @@
                                 {% endapply %}
                             </span>
                             <span class="col-12 fs-small">
-                                {{ sum_distance|to_km }}&nbsp;km
-                                {% if sum_positive > 0 %}
-                                    {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
+                                {{ trip.distance|to_km }}&nbsp;km
+                                {% if trip.elevationPositive > 0 %}
+                                    {{ 'routing.elevation'|trans }} +{{ trip.elevationPositive|number_format }}&nbsp;m / -{{ trip.elevationNegative|number_format }}&nbsp;m
                                 {% endif %}
                             </span>
                         </h1>

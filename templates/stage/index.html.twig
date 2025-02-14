@@ -56,9 +56,9 @@
                     <div class="mb-3">
                         <div>{{ trip.description }}</div>
                         <div data-plan-target="totalDistance" class="trip-total">
-                            {{ sum_distance|to_km }}&nbsp;km
-                            {% if sum_positive > 0 %}
-                                {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
+                            {{ trip.distance|to_km }}&nbsp;km
+                            {% if trip.elevationPositive > 0 %}
+                                {{ 'routing.elevation'|trans }} +{{ trip.elevationPositive|number_format }}&nbsp;m / -{{ trip.elevationNegative|number_format }}&nbsp;m
                             {% endif %}
                         </div>
                     </div>
@@ -129,9 +129,9 @@
                         {{ include('stage/index.js.twig') }}
                         if (typeof planController !== 'undefined') {
                           planController.updateDistance(`
-                            {{ sum_distance|to_km }}&nbsp;km
-                            {% if sum_positive > 0 %}
-                                {{ 'routing.elevation'|trans }} +{{ sum_positive }}m / -{{ sum_negative }}m
+                            {{ trip.distance|to_km }}&nbsp;km
+                            {% if trip.elevationPositive > 0 %}
+                                {{ 'routing.elevation'|trans }} +{{ trip.elevationPositive|number_format }}&nbsp;m / -{{ trip.elevationNegative|number_format }}&nbsp;m
                             {% endif %}
                           `);
                         }

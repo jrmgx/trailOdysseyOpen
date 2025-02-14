@@ -35,7 +35,6 @@ class StageController extends MappableController
 
         $interests = $this->interestRepository->findByTrip($trip);
         [$results, $stages, $routings, $extras] = $this->tripService->calculateResults($trip);
-        [$sumDistance, $sumPositive, $sumNegative] = $this->tripService->calculateSums($trip);
         $saveMapOptionForm = $this->createForm(TripMapOptionType::class, $trip, [
             'action' => $this->generateUrl('trip_edit_map_option', ['trip' => $trip->getId()]),
             'csrf_protection' => false,
@@ -51,9 +50,6 @@ class StageController extends MappableController
             'routings' => $routings,
             'extras' => $extras,
             'interests' => $interests,
-            'sum_distance' => $sumDistance,
-            'sum_positive' => $sumPositive,
-            'sum_negative' => $sumNegative,
             'tab' => $request->query->get('tab', 'stages'),
             'segments' => $trip->getSegments(),
         ];
@@ -89,7 +85,7 @@ class StageController extends MappableController
         /** @var Stage $stage */
         $stage = $this->commonNew($request, $trip, $lat, $lon, new Stage());
 
-        $previousStage = $this->stageRepository->findLastStage($trip);
+        $previousStage = $trip->getLastStage();
         if ($previousStage) {
             $stage->setArrivingAt($previousStage->getArrivingAt()->modify('+ 1 day'));
         } else {
