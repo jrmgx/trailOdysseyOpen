@@ -4,6 +4,7 @@ use Castor\Attribute\AsArgument;
 use Castor\Attribute\AsOption;
 use Castor\Attribute\AsRawTokens;
 use Castor\Attribute\AsTask;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 use function Castor\context;
@@ -160,17 +161,31 @@ function load_fixture(#[AsArgument] string $env): void
 }
 
 #[AsTask(namespace: 'backup', description: 'Make a backup of the database')]
-function db_dump(): void
+function db_dump(#[AsOption] ?string $clean = null): void
 {
     assert_is_in_builder();
 
-    $name = '/backup/database-' . date_string();
+    $directory = '/backup';
+    $name = $directory . '/database-' . date_string();
     $POSTGRES_HOST = 'postgres';
     $POSTGRES_PASSWORD = $_SERVER['POSTGRES_PASSWORD'] ?? throw new Exception('Missing POSTGRES_PASSWORD env.');
     $POSTGRES_USER = $_SERVER['POSTGRES_USER'] ?? throw new Exception('Missing POSTGRES_USER env.');
     $POSTGRES_DB = $_SERVER['POSTGRES_DB'] ?? throw new Exception('Missing POSTGRES_DB env.');
     $POSTGRES_PORT = $_SERVER['POSTGRES_PORT'] ?? throw new Exception('Missing POSTGRES_PORT env.');
     run_in_builder("PGPASSWORD=$POSTGRES_PASSWORD pg_dump -h $POSTGRES_HOST -U $POSTGRES_USER -p $POSTGRES_PORT -f $name.sql $POSTGRES_DB");
+
+    if ($clean) {
+        $finder = new Finder();
+        $finder->files()
+            ->in($directory)
+            ->date("< $clean ago");
+
+        foreach ($finder as $file) {
+            unlink($file->getPathname());
+            io()->info($file->getPathname() . ' deleted');
+        }
+    }
+
     io()->success('Backup saved');
 }
 
