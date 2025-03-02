@@ -31,16 +31,20 @@
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('build/images/favicons/favicon-96x96.png') }}">
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('build/images/favicons/apple-touch-icon.png') }}">
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('build/images/favicons/favicon-32x32.png') }}">
-        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('build/images/favicons/favicon-16x16.png') }}">
+
         <meta name="application-name" content="{{ project_name }}">
         <meta name="apple-mobile-web-app-title" content="{{ project_name }}">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="theme-color" content="#ffffff">
-        <link rel="mask-icon" href="{{ asset('build/images/favicons/safari-pinned-tab.svg') }}" color="#5bbad5">
+
         <link rel="manifest" href="{{ path('web_manifest') }}">
+
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
