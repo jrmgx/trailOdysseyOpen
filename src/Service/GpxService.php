@@ -21,14 +21,14 @@ use phpGPX\Models\Track;
 use phpGPX\phpGPX;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
-class GpxService
+readonly class GpxService
 {
     public function __construct(
-        private readonly TripService $tripService,
-        private readonly InterestRepository $interestRepository,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly string $projectName,
-        private readonly string $projectHost,
+        private TripService $tripService,
+        private InterestRepository $interestRepository,
+        private EntityManagerInterface $entityManager,
+        private string $projectName,
+        private string $projectHost,
     ) {
     }
 
@@ -250,6 +250,7 @@ class GpxService
         $gpxPoint->latitude = (float) $point->lat;
         $gpxPoint->longitude = (float) $point->lon;
         $gpxPoint->elevation = (float) $point->el;
+        $gpxPoint->time = \DateTime::createFromImmutable($mappable->getArrivingAt());
         $gpxPoint->name = $mappable->getNameWithPointName();
         if ($mappable->getSymbol()) {
             $gpxPoint->name = $mappable->getSymbol() . ' ' . $gpxPoint->name;
