@@ -60,15 +60,21 @@
                                     >
                                     <label for="gear-in-bag-{{ inBag.id }}" class="form-check-label ms-1">
                                         <div>
-                                            {% if thing.isBag %}🛄{% endif %}
-                                            {{ thing.name }}
-                                            {% set weight = thing.isBag ? inBag.totalWeight : (inBag.weight ? inBag.weight : null) %}
-                                            {% if inBag.count > 1 and weight %}
-                                                ({{ inBag.count }} = {{ weight }}gr)
-                                            {% elseif weight %}
-                                                ({{ weight }}gr)
-                                            {% elseif inBag.count > 1 %}
-                                                ({{ inBag.count }})
+                                            {% if thing.isBag %}
+                                                🛄 {{ thing.name }}
+                                                ({{ 'info.checked_of_total_kg'|trans({
+                                                    checked_weight: (thing.totalCheckedWeight / 1000),
+                                                    weight: (thing.totalWeight / 1000),
+                                                }) }})
+                                            {% else %}
+                                                {{ thing.name }}
+                                                {% if inBag.count > 1 and inBag.weight %}
+                                                    ({{ inBag.count }} = {{ inBag.weight }}gr)
+                                                {% elseif inBag.weight %}
+                                                    ({{ inBag.weight }}gr)
+                                                {% elseif inBag.count > 1 %}
+                                                    ({{ inBag.count }})
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                         {% if thing.description %}<div class="fs-small">{{ thing.description }}</div>{% endif %}
