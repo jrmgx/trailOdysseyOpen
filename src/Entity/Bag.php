@@ -37,14 +37,14 @@ class Bag implements Things, InBag
     private Trip $trip;
 
     /** @var Collection<int, GearInBag> */
-    #[ORM\OneToMany(mappedBy: 'bag', targetEntity: GearInBag::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: GearInBag::class, mappedBy: 'bag', orphanRemoval: true)]
     private Collection $gearsInBag;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'bagsInBag')]
     private ?self $parentBag = null;
 
     /** @var Collection<int, Bag> */
-    #[ORM\OneToMany(mappedBy: 'parentBag', targetEntity: self::class)]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentBag')]
     private Collection $bagsInBag;
 
     #[ORM\Column]
