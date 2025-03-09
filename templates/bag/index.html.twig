@@ -62,9 +62,9 @@
                                         <div>
                                             {% if thing.isBag %}
                                                 🛄 {{ thing.name }}
-                                                ({{ 'info.checked_of_total_kg'|trans({
-                                                    checked_weight: (thing.totalCheckedWeight / 1000),
-                                                    weight: (thing.totalWeight / 1000),
+                                                ({{ 'info.checked_of_total_gr'|trans({
+                                                    checked_weight: thing.totalCheckedWeight,
+                                                    weight: thing.totalWeight,
                                                 }) }})
                                             {% else %}
                                                 {{ thing.name }}

@@ -166,6 +166,7 @@ info:
   total_kg: 'Total: {weight} kg'
   checked_kg: '{weight} kg'
   checked_of_total_kg: '{checked_weight} kg of {weight} kg'
+  checked_of_total_gr: '{checked_weight}gr of {weight}gr'
   no_stage_found_create_one_to_start: 'No Stage Found.<br> Create one to Start!'
   no_interest_found_create_one_to_start: 'No Point of Interest Found.<br> Create one to Start!'
   no_segment_found_create_one_to_start: 'No Segment Found.<br> Create one to Start!'
