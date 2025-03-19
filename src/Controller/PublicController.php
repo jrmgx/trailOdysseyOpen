@@ -9,6 +9,7 @@ use App\Helper\CommonHelper;
 use App\Repository\BagRepository;
 use App\Repository\DiaryEntryRepository;
 use App\Repository\TripRepository;
+use App\Service\GpxService;
 use App\Service\TripService;
 use Liip\ImagineBundle\Service\FilterService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -19,6 +20,8 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use ZipStream\ZipStream;
 
 #[Route('/public', name: 'public_')]
 class PublicController extends BaseController
@@ -32,6 +35,8 @@ class PublicController extends BaseController
         private readonly BagRepository $bagRepository,
         private readonly TripRepository $tripRepository,
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly GpxService $gpxService,
+        private readonly string $publicDirectory,
         SerializerInterface $serializer,
     ) {
         parent::__construct($serializer);
@@ -111,6 +116,41 @@ class PublicController extends BaseController
             'routings' => $routings,
             'bags' => $bags,
         ];
+    }
+
+    #[Route('/{user}/{trip}/export', name: 'export', methods: ['GET'])]
+    public function export(
+        #[MapEntity(mapping: ['user' => 'nickname'])] User $user,
+        #[MapEntity(mapping: ['trip' => 'shareKey'])] Trip $trip,
+    ): Response {
+        if (!$trip->isShared() || $trip->getUser() !== $user) {
+            throw $this->createNotFoundException();
+        }
+
+        $slug = new AsciiSlugger();
+        $name = mb_strtolower($slug->slug($trip->getName()));
+        $zip = new ZipStream(
+            sendHttpHeaders: true,
+            outputName: $name . '.zip',
+        );
+
+        $tripCacheDir = $this->publicDirectory . '/cache/gpx/' . $trip->getId();
+        $tripCachePath = $tripCacheDir . '/' . $trip->getUpdatedAt()->format('Y-m-d') . '.gpx';
+        if (file_exists($tripCachePath)) {
+            $zip->addFileFromPath($name . '.gpx', $tripCachePath);
+        } else {
+            $file = $this->gpxService->buildPublicGpx($trip);
+            $content = (string) $file->toXML()->saveXML();
+            if (!file_exists($tripCacheDir)) {
+                mkdir($tripCacheDir, 0777, true);
+            }
+            file_put_contents($tripCachePath, $content);
+            $zip->addFile($name . '.gpx', $content);
+        }
+
+        $zip->finish();
+        /* @phpstan-ignore-next-line */
+        exit;
     }
 
     #[Route('/{user}/{trip}/js/index.js', name: 'show_js', methods: ['GET'])]

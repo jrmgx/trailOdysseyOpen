@@ -79,6 +79,7 @@ label:
   overlay: Par dessus
   public: Public
   tiles: Tuiles
+  get_gpx: Télécharger le GPX
 gpx:
   workflow:
     import:

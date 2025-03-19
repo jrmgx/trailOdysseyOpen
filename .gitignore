@@ -15,6 +15,7 @@
 ###< symfony/phpunit-bridge ###
 
 /public/uploads/*
+/public/cache/*
 !/public/uploads/.gitkeep
 
 ###> friendsofphp/php-cs-fixer ###

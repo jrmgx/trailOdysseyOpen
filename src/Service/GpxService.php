@@ -120,6 +120,50 @@ readonly class GpxService
         $this->entityManager->flush();
     }
 
+    public function buildPublicGpx(Trip $trip): GpxFile
+    {
+        [, , $routings] = $this->tripService->calculateResults($trip);
+
+        $gpxFile = $this->gpxContainer($trip);
+
+        $routingCount = \count($routings);
+        for ($i = 0; $i < $routingCount; ++$i) {
+            $routing = $routings[$i];
+
+            // First point of the track
+            if (0 === $i) {
+                $startStage = $routing->getStartStage();
+                $startWayPoint = self::waypoint($startStage, public: true);
+                $startWayPoint->name = 'Start';
+                $gpxFile->waypoints[] = $startWayPoint;
+            }
+
+            // Last point of the track
+            if ($i === $routingCount - 1) {
+                $finishStage = $routing->getFinishStage();
+                $finishWayPoint = self::waypoint($finishStage, public: true);
+                $finishWayPoint->name = 'Finish';
+                $gpxFile->waypoints[] = $finishWayPoint;
+            }
+
+            // Add track
+            if ($routing->getPathPoints()) {
+                foreach ($routing->getPathPoints() as $point) {
+                    $gpxPoint = self::point($point);
+                    $gpxFile->tracks[0]->segments[0]->points[] = $gpxPoint;
+                }
+            }
+        }
+
+        if ($trip->getProgressPoint()) {
+            $progressWayPoint = self::point($trip->getProgressPoint(), GpxPoint::WAYPOINT);
+            $progressWayPoint->name = 'Progress';
+            $gpxFile->waypoints[] = $progressWayPoint;
+        }
+
+        return $gpxFile;
+    }
+
     /**
      * @return array<GpxFile>
      */
@@ -128,7 +172,7 @@ readonly class GpxService
         [, $stages, $routings] = $this->tripService->calculateResults($trip);
 
         $files = [];
-        $global = $this->gpx($trip);
+        $global = $this->gpxContainer($trip);
 
         $slug = new AsciiSlugger();
         $tripName = mb_substr(mb_strtolower($slug->slug($trip->getName())), 0, 16);
@@ -140,10 +184,10 @@ readonly class GpxService
             $startStage = $routing->getStartStage();
             $finishStage = $routing->getFinishStage();
 
-            $startGpxPoint = $this->point($startStage->getPoint()->toPoint());
-            $finishGpxPoint = $this->point($finishStage->getPoint()->toPoint());
+            $startGpxPoint = self::point($startStage->getPoint()->toPoint());
+            $finishGpxPoint = self::point($finishStage->getPoint()->toPoint());
 
-            $local = $this->gpx(
+            $local = $this->gpxContainer(
                 $trip,
                 'From ' . $startStage->getNameWithPointName() .
                 ' to ' . $finishStage->getNameWithPointName()
@@ -152,7 +196,7 @@ readonly class GpxService
             // Add track
             if ($routing->getPathPoints()) {
                 foreach ($routing->getPathPoints() as $point) {
-                    $gpxPoint = $this->point($point);
+                    $gpxPoint = self::point($point);
                     $local->tracks[0]->segments[0]->points[] = $gpxPoint;
                     $global->tracks[0]->segments[0]->points[] = $gpxPoint;
                 }
@@ -165,10 +209,10 @@ readonly class GpxService
             }
 
             // Add waypoint
-            $startWayPoint = $this->waypoint($startStage);
+            $startWayPoint = self::waypoint($startStage, public: false);
             $local->waypoints[] = $startWayPoint;
 
-            $finishWayPoint = $this->waypoint($finishStage);
+            $finishWayPoint = self::waypoint($finishStage, public: false);
             $local->waypoints[] = $finishWayPoint;
 
             $slugName = $slug->slug(
@@ -189,11 +233,11 @@ readonly class GpxService
         }
 
         foreach ($stages as $stage) {
-            $global->waypoints[] = $this->waypoint($stage);
+            $global->waypoints[] = self::waypoint($stage, public: false);
         }
 
         foreach ($this->interestRepository->findByTrip($trip) as $interest) {
-            $global->waypoints[] = $this->waypoint($interest);
+            $global->waypoints[] = self::waypoint($interest, public: false);
         }
 
         $files[$tripName] = $global;
@@ -201,7 +245,7 @@ readonly class GpxService
         return $files;
     }
 
-    private function gpx(Trip $trip, ?string $name = null): GpxFile
+    private function gpxContainer(Trip $trip, ?string $name = null): GpxFile
     {
         $name = $name ? ': ' . $name : '';
 
@@ -232,9 +276,9 @@ readonly class GpxService
         return $gpx;
     }
 
-    private static function point(Point $point): GpxPoint
+    private static function point(Point $point, string $pointType = GpxPoint::TRACKPOINT): GpxPoint
     {
-        $gpxPoint = new GpxPoint(GpxPoint::TRACKPOINT);
+        $gpxPoint = new GpxPoint($pointType);
         $gpxPoint->latitude = (float) $point->lat;
         $gpxPoint->longitude = (float) $point->lon;
         $gpxPoint->elevation = (float) $point->el;
@@ -242,23 +286,23 @@ readonly class GpxService
         return $gpxPoint;
     }
 
-    private static function waypoint(MappableInterface $mappable): GpxPoint
+    private static function waypoint(MappableInterface $mappable, bool $public): GpxPoint
     {
         $point = $mappable->getPoint()->toPoint();
+        $gpxPoint = self::point($point, GpxPoint::WAYPOINT);
 
-        $gpxPoint = new GpxPoint(GpxPoint::WAYPOINT);
-        $gpxPoint->latitude = (float) $point->lat;
-        $gpxPoint->longitude = (float) $point->lon;
-        $gpxPoint->elevation = (float) $point->el;
-        $gpxPoint->time = \DateTime::createFromImmutable($mappable->getArrivingAt());
-        $gpxPoint->name = $mappable->getNameWithPointName();
-        if ($mappable->getSymbol()) {
-            $gpxPoint->name = $mappable->getSymbol() . ' ' . $gpxPoint->name;
-        }
-        // TODO translate + date format
-        $gpxPoint->description = 'Date: ' . $mappable->getArrivingAt()->format('D j M');
-        if ($mappable->getDescription()) {
-            $gpxPoint->description .= \PHP_EOL . $mappable->getDescription();
+        // Routing/stage names/descriptions can contain personal information and we don't want to expose that
+        if (!$public) {
+            $gpxPoint->time = \DateTime::createFromImmutable($mappable->getArrivingAt());
+            $gpxPoint->name = $mappable->getNameWithPointName();
+            if ($mappable->getSymbol()) {
+                $gpxPoint->name = $mappable->getSymbol() . ' ' . $gpxPoint->name;
+            }
+            // TODO translate + date format
+            $gpxPoint->description = 'Date: ' . $mappable->getArrivingAt()->format('D j M');
+            if ($mappable->getDescription()) {
+                $gpxPoint->description .= \PHP_EOL . $mappable->getDescription();
+            }
         }
 
         return $gpxPoint;

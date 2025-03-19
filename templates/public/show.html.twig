@@ -64,6 +64,9 @@
                                 {% endapply %}
                             </span>
                             <span class="col-12 fs-small">
+                                <a href="{{ path('public_export', { user: user.nickname, trip: trip.shareKey }) }}"
+                                   class="btn btn-sm btn btn-outline-secondary float-end"
+                                >{{ 'label.get_gpx'|trans }}</a>
                                 {{ trip.distance|to_km }}&nbsp;km
                                 {% if trip.elevationPositive > 0 %}
                                     {{ 'routing.elevation'|trans }} +{{ trip.elevationPositive|number_format }}&nbsp;m / -{{ trip.elevationNegative|number_format }}&nbsp;m
