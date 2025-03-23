@@ -108,8 +108,8 @@ function install_cron(): void
     run_in_builder("bash -c 'cat ./config/crontab | crontab -'");
 }
 
-#[AsTask(namespace: 'app', description: 'Start background scripts', aliases: ['bg-start', 'start-bg'])]
-function background_scripts_start(#[AsOption] int $limit = 1): void
+#[AsTask(namespace: 'app', description: 'Start background scripts', aliases: ['bg-start', 'start-bg', 'consume'])]
+function background_scripts_start(#[AsOption] int $limit = 100): void
 {
     if (is_prod()) {
         run_in_builder('supervisord -c ./config/supervisord.conf', user: 'root');

@@ -18,6 +18,7 @@ use App\Form\TripType;
 use App\Repository\TilesRepository;
 use App\Repository\TripRepository;
 use App\Security\Voter\UserVoter;
+use App\Service\GpxService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,7 +85,7 @@ class TripController extends BaseController
 
             return $this->redirectToRoute('gpx_new', [
                 'trip' => $trip->getId(),
-                'onBoarding' => true,
+                'importVariant' => GpxService::IMPORT_ONBOARDING,
             ], Response::HTTP_SEE_OTHER);
         }
 

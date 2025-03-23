@@ -3,18 +3,20 @@
 namespace App\Message;
 
 use App\MessageHandler\ImportGpxMessageHandler;
+use App\Service\GpxService;
 
 /**
  * @see ImportGpxMessageHandler
  */
-class ImportGpxMessage
+readonly class ImportGpxMessage
 {
     /**
      * @param array<int, string> $filePaths
      */
     public function __construct(
-        public readonly int $tripId,
-        public readonly array $filePaths,
+        public int $tripId,
+        public array $filePaths,
+        public int $importVariant = GpxService::IMPORT_BASE,
     ) {
     }
 }

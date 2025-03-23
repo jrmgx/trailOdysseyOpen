@@ -38,14 +38,15 @@ class GpxController extends AbstractController
     public function new(
         Request $request,
         Trip $trip,
-        #[MapQueryParameter(filter: \FILTER_VALIDATE_BOOL)] bool $onBoarding = false,
+        #[MapQueryParameter(filter: \FILTER_VALIDATE_INT)]
+        int $importVariant = GpxService::IMPORT_BASE,
     ): Response|array {
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);
 
         $form = $this->createForm(GpxFileType::class, options: [
             'action' => $this->generateUrl('gpx_new', [
                 'trip' => $trip->getId(),
-                'onBoarding' => $onBoarding,
+                'importVariant' => $importVariant,
             ]),
         ]);
         $form->handleRequest($request);
@@ -63,13 +64,13 @@ class GpxController extends AbstractController
             if (\count($filePaths) > 0) {
                 $trip->setIsCalculatingSegment(true);
                 $this->entityManager->flush();
-                $this->messageBus->dispatch(new ImportGpxMessage($trip->getId() ?? 0, $filePaths));
+                $this->messageBus->dispatch(new ImportGpxMessage($trip->getId() ?? 0, $filePaths, $importVariant));
             }
 
             return $this->redirectToRoute('segment_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
         }
 
-        return compact('onBoarding', 'trip', 'form');
+        return compact('importVariant', 'trip', 'form');
     }
 
     #[Route('/export', name: 'export', methods: ['GET'])]

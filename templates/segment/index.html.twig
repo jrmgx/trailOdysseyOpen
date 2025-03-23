@@ -120,7 +120,10 @@
                                 </a>
                                 <a class="btn btn-outline-primary btn-block"
                                    data-turbo-frame="_top"
-                                   href="{{ path('gpx_new', { trip: trip.id, onBoarding: false }) }}"
+                                   href="{{ path('gpx_new', {
+                                       trip: trip.id,
+                                       importVariant: constant('\\App\\Service\\GpxService::IMPORT_BASE')
+                                   }) }}"
                                 >
                                     {{ 'action.import_gpx'|trans }}
                                 </a>

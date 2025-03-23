@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\DiaryEntry;
 use App\Entity\GeoPoint;
 use App\Entity\Interest;
 use App\Entity\MappableInterface;
@@ -23,6 +24,10 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 readonly class GpxService
 {
+    public const IMPORT_BASE = 0;
+    public const IMPORT_ONBOARDING = 1;
+    public const IMPORT_DIARY = 2;
+
     public function __construct(
         private TripService $tripService,
         private InterestRepository $interestRepository,
@@ -97,7 +102,7 @@ readonly class GpxService
     /**
      * This is used into a messenger message (async).
      */
-    public function gpxFileToInterests(GpxFile $gpxFile, Trip $trip): void
+    public function gpxFileToMappable(GpxFile $gpxFile, Trip $trip, bool $diary = false): void
     {
         $gpxName = $gpxFile->metadata?->name;
         $date = (new \DateTimeImmutable())->modify('+ 1 days')->setTime(18, 0);
@@ -106,15 +111,15 @@ readonly class GpxService
             $point->setLat((string) $waypoint->latitude);
             $point->setLon((string) $waypoint->longitude);
 
-            $interest = new Interest();
-            $interest->setName($waypoint->name ?? $gpxName ?? 'No Name');
-            $interest->setArrivingAt($date);
-            $interest->setPoint($point);
-            $interest->setDescription(($waypoint->description ?? '') . \PHP_EOL . ($waypoint->comment ?? ''));
-            $interest->setTrip($trip);
-            $interest->setUser($trip->getUser());
+            $mappable = $diary ? new DiaryEntry() : new Interest();
+            $mappable->setName($waypoint->name ?? $gpxName ?? 'No Name');
+            $mappable->setArrivingAt($date);
+            $mappable->setPoint($point);
+            $mappable->setDescription(($waypoint->description ?? '') . \PHP_EOL . ($waypoint->comment ?? ''));
+            $mappable->setTrip($trip);
+            $mappable->setUser($trip->getUser());
 
-            $this->entityManager->persist($interest);
+            $this->entityManager->persist($mappable);
         }
 
         $this->entityManager->flush();

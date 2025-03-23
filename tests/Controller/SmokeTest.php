@@ -41,7 +41,7 @@ class SmokeTest extends WebTestCase
             '/trip/2908/photo/48.80098420100443/-1.1784553527832033/new',
             '/trip/2908/segments/102/edit',
             '/trip/2908/segments/new/itinerary',
-            '/trip/2908/gpx/new?onBoarding=0',
+            '/trip/2908/gpx/new?importVariant=0',
         ];
 
         foreach ($urls as $url) {

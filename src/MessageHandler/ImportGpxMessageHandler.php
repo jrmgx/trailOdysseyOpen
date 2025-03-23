@@ -35,8 +35,12 @@ class ImportGpxMessageHandler
         foreach ($message->filePaths as $filePath) {
             $gpxFile = $this->gpxService->gpxFile($filePath);
 
-            $this->gpxService->gpxFileToSegments($gpxFile, $trip);
-            $this->gpxService->gpxFileToInterests($gpxFile, $trip);
+            if (GpxService::IMPORT_DIARY === $message->importVariant) {
+                $this->gpxService->gpxFileToMappable($gpxFile, $trip, diary: true);
+            } else {
+                $this->gpxService->gpxFileToSegments($gpxFile, $trip);
+                $this->gpxService->gpxFileToMappable($gpxFile, $trip);
+            }
         }
 
         // Confirm that the message has been handled
