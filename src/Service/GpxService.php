@@ -171,11 +171,13 @@ readonly class GpxService
     {
         [, $stages, $routings] = $this->tripService->calculateResults($trip);
 
+        $namePattern = $trip->getUser()->getExportFilenamePattern();
+
         $files = [];
         $global = $this->gpxContainer($trip);
 
         $slug = new AsciiSlugger();
-        $tripName = mb_substr(mb_strtolower($slug->slug($trip->getName())), 0, 16);
+        $tripNameSlug = mb_substr(mb_strtolower($slug->slug($trip->getName())), 0, 16);
 
         $count = 0;
         foreach ($routings as $routing) {
@@ -187,11 +189,17 @@ readonly class GpxService
             $startGpxPoint = self::point($startStage->getPoint()->toPoint());
             $finishGpxPoint = self::point($finishStage->getPoint()->toPoint());
 
-            $local = $this->gpxContainer(
-                $trip,
-                'From ' . $startStage->getNameWithPointName() .
-                ' to ' . $finishStage->getNameWithPointName()
-            );
+            $fromToName = $startStage->getNameWithPointName() . ' to ' . $finishStage->getNameWithPointName();
+            $countName = str_pad((string) $count, 3, '0', \STR_PAD_LEFT);
+            $tripName = $trip->getName();
+
+            $tripNameLocal = str_replace('}{', '} - {', $namePattern);
+            $tripNameLocal = trim(str_replace([
+                '{counter}', '{stage_name}', '{trip_name}'], [
+                    $countName, $fromToName, $tripName,
+                ], $tripNameLocal));
+
+            $local = $this->gpxContainer($trip, $tripNameLocal);
 
             // Add track
             if ($routing->getPathPoints()) {
@@ -215,19 +223,12 @@ readonly class GpxService
             $finishWayPoint = self::waypoint($finishStage, public: false);
             $local->waypoints[] = $finishWayPoint;
 
-            $slugName = $slug->slug(
-                $startStage->getNameWithPointName() .
-                ' to ' . $finishStage->getNameWithPointName()
-            );
-            $filenamePattern = $trip->getUser()->getExportFilenamePattern();
-            $filenamePattern = str_replace('}{', '}_{', $filenamePattern);
+            $fromToSlug = mb_substr(mb_strtolower($slug->slug($fromToName)), 0, 32);
+            $filename = str_replace('}{', '}_{', $namePattern);
             $filename = str_replace([
-                '{counter}', '{stage_name}', '{trip_name}',
-            ], [
-                mb_str_pad((string) $count, 3, '0', \STR_PAD_LEFT),
-                mb_substr(mb_strtolower($slugName), 0, 32),
-                $tripName,
-            ], $filenamePattern);
+                '{counter}', '{stage_name}', '{trip_name}', ], [
+                    $countName, $fromToSlug, $tripNameSlug,
+                ], $filename);
 
             $files[$filename] = $local;
         }
@@ -240,22 +241,20 @@ readonly class GpxService
             $global->waypoints[] = self::waypoint($interest, public: false);
         }
 
-        $files[$tripName] = $global;
+        $files[$tripNameSlug] = $global;
 
         return $files;
     }
 
     private function gpxContainer(Trip $trip, ?string $name = null): GpxFile
     {
-        $name = $name ? ': ' . $name : '';
-
         $person = new Person();
         $person->name = $this->projectName . ' u#' . $trip->getUser()->getId();
 
         $gpx = new GpxFile();
         $gpx->creator = $this->projectName;
         $gpx->metadata = new Metadata();
-        $gpx->metadata->name = $trip->getName() . $name;
+        $gpx->metadata->name = $name ?? $trip->getName();
         $gpx->metadata->description = $trip->getDescription();
         $gpx->metadata->author = $person;
         $gpx->metadata->time = new \DateTime();

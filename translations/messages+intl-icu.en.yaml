@@ -180,6 +180,7 @@ form:
       map_zoom: Zoom
       point: Point
       json_points: Points
+    export_filename_pattern: Export Name Pattern
     select_trip_import_bag: Select a Trip to import its Bags
     lon: Longitude
     add_existing_tiles: Add from existing Tiles
