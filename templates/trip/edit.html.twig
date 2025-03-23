@@ -73,10 +73,6 @@
 {% endmacro %}
 
 {% block main %}
-    {# This javascript is only used here, and it is needed to be loaded on a turbo frame (so not in <head>) #}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"></script>
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-start my-3 flex-column">
@@ -106,16 +102,6 @@
             >
                 <div data-form-tiles-collection-target="collectionContainer">
                     {% for tiles in form.tiles %}
-{#                            index: loop.index0,#}
-{#                            position: tiles.position.vars.value,#}
-{#                            name: tiles.name.vars.value,#}
-{#                            description: tiles.description.vars.value,#}
-{#                            url: tiles.url.vars.value,#}
-{#                            overlay: tiles.overlay.vars.checked,#}
-{#                            public: tiles.public.vars.checked,#}
-{#                            useProxy: tiles.useProxy.vars.checked,#}
-{#                            geoJson: tiles.geoJson.vars.checked,#}
-{#                            geoJsonHtml: tiles.geoJsonHtml.vars.value,#}
                         {{ _self.tiles_form(
                             loop.index0,
                             tiles.position.vars.value,
