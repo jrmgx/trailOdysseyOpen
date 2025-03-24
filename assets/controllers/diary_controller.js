@@ -1,11 +1,13 @@
 // noinspection JSUnusedGlobalSymbols
 
+// eslint-disable-next-line no-unused-vars
 import L from 'leaflet';
 import '@elfalem/leaflet-curve';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
 import Routing from 'fos-router';
-import { iconSymbol, removeFromMap } from '../helpers';
+import { iconSymbol, removeFromMap } from '../js/helpers';
+import createDraggableMarker from '../js/draggableMarker';
 import '../js/leaflet-double-touch-drag-zoom';
 
 export default class extends Controller {
@@ -77,31 +79,25 @@ export default class extends Controller {
   // Marker related
 
   addDiaryEntry = (id, lat, lon, symbol, popup) => {
-    this.diaryEntries[id] = L.marker([parseFloat(lat), parseFloat(lon)], {
-      icon: iconSymbol(symbol),
-      draggable: true,
-    })
+    this.diaryEntries[id] = createDraggableMarker(
+      id,
+      lat,
+      lon,
+      symbol,
+      'diaryEntry_move',
+      'sidebar-diaryEntries',
+    )
       .bindPopup(popup)
-      .on('dragend', (event) => {
-        const marker = event.target;
-        const position = marker.getLatLng();
-        Turbo.visit(
-          Routing.generate('diaryEntry_move', {
-            id, lat: position.lat, lon: position.lng, trip: tripId,
-          }),
-          { frame: 'sidebar-diaryEntries' },
-        );
-      })
       .addTo(this.map());
   };
 
-  updateDiaryEntry = (id, symbol, popin) => {
+  updateDiaryEntry = (id, symbol, popup) => {
     const marker = this.diaryEntries[id];
     if (!marker) {
       return;
     }
     marker.setIcon(iconSymbol(symbol));
-    marker.getPopup().setContent(popin);
+    marker.getPopup().setContent(popup);
   };
 
   removeAllDiaryEntries = () => {

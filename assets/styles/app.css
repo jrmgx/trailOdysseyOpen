@@ -564,7 +564,7 @@ path.leaflet-interactive {
     background-color: var(--bs-primary);
 }
 
-/* Add this to the parent div to enable proper resizing */
+/* Enable proper resizing */
 [data-controller="sidebar map-common plan"] {
     display: flex;
     width: 100%;
@@ -576,7 +576,7 @@ path.leaflet-interactive {
     flex-direction: row;
 }
 
-/* Leaflet popup dark mode styles */
+/* Dark mode styles */
 [data-bs-theme="dark"] .leaflet-popup-content-wrapper {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
@@ -586,18 +586,15 @@ path.leaflet-interactive {
     background-color: var(--bs-body-bg);
 }
 
-/* Update popup border style for both themes */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
     border: 1px solid var(--bs-border-color);
 }
 
-/* Ensure links in popups are visible in dark mode */
 [data-bs-theme="dark"] .leaflet-popup-content a {
     color: var(--bs-link-color);
 }
 
-/* Leaflet layer control dark mode styles */
 [data-bs-theme="dark"] .leaflet-control-layers {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
@@ -621,7 +618,6 @@ path.leaflet-interactive {
     background-color: var(--bs-tertiary-bg);
 }
 
-/* Leaflet zoom control dark mode styles */
 [data-bs-theme="dark"] .leaflet-control-zoom {
     background-color: var(--bs-body-bg);
     border-color: var(--bs-border-color);
@@ -638,4 +634,9 @@ path.leaflet-interactive {
 [data-bs-theme="dark"] .leaflet-control-zoom-out:hover {
     background-color: var(--bs-tertiary-bg);
     color: var(--bs-body-color);
+}
+
+/* Bootstrap overrides */
+.toast-container > :not(:last-child) {
+    margin-bottom: 0.75rem !important;
 }

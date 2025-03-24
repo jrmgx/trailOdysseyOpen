@@ -3,7 +3,10 @@
         "browser": true,
         "es2021": true
     },
-    "ignorePatterns": ["assets/js/*.js", "assets/controllers/TileLayer.GeoJSON.js"],
+    "ignorePatterns": [
+        "assets/js/leaflet-double-touch-drag-zoom.js",
+        "assets/controllers/TileLayer.GeoJSON.js"
+    ],
     "extends": [
         "airbnb-base"
     ],
@@ -23,6 +26,7 @@
         "planController": true,
         "segmentController": true,
         "mapCommonController": true,
-        "tripId": true
+        "tripId": true,
+        "bootstrap": true
     }
 }

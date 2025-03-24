@@ -1,7 +1,7 @@
 import L from 'leaflet';
-import markerIconUrl from './images/marker.png';
-import markerDarkIconUrl from './images/marker-dark.png';
-import markerDefaultIconUrl from './images/leaflet/marker-icon.png';
+import markerIconUrl from '../images/marker.png';
+import markerDarkIconUrl from '../images/marker-dark.png';
+import markerDefaultIconUrl from '../images/leaflet/marker-icon.png';
 // import gpsPointImage from './images/gps_point_2x.png';
 // import gpsCompassImage from './images/gps_compass_2x.png';
 

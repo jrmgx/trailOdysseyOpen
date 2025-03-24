@@ -7,7 +7,7 @@ import 'leaflet-lasso';
 import { Controller } from '@hotwired/stimulus';
 import * as Turbo from '@hotwired/turbo';
 import Routing from 'fos-router';
-import { removeFromMap } from '../helpers';
+import { removeFromMap } from '../js/helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 import markerCircleFakeIconUrl from '../images/marker-circle-fake.png';
 
@@ -118,8 +118,7 @@ export default class extends Controller {
     this.actionPointForSegmentActive = true;
     document.body.style.cursor = 'crosshair';
     this.mapTarget.style.cursor = 'crosshair';
-    e.target.innerHTML = `${this.translationsValue.clickMapToAdd}<br>${
-      this.translationsValue.andHereToFinish}`;
+    e.target.innerHTML = `${this.translationsValue.clickMapToAdd}<br>${this.translationsValue.andHereToFinish}`;
     sidebarController.switchToMapAction();
   };
 

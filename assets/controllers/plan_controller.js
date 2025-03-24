@@ -7,7 +7,8 @@ import * as Turbo from '@hotwired/turbo';
 import Routing from 'fos-router';
 import {
   curve, subPolyline, iconSymbol, markerDefaultIcon, removeFromMap,
-} from '../helpers';
+} from '../js/helpers';
+import createDraggableMarker from '../js/draggableMarker';
 import '../js/leaflet-double-touch-drag-zoom';
 
 export default class extends Controller {
@@ -72,14 +73,14 @@ export default class extends Controller {
 
   centerMapAction = (e) => {
     e.stopImmediatePropagation();
-    const latLngs = [];
+    const latlngs = [];
     const stageIds = Object.keys(this.stages);
     for (const stageId of stageIds) {
       const stage = this.stages[stageId];
-      latLngs.push(stage.getLatLng());
+      latlngs.push(stage.getLatLng());
     }
 
-    this.map().fitBounds(L.latLngBounds(latLngs));
+    this.map().fitBounds(L.latLngBounds(latlngs));
     sidebarController.showVisibilityAction();
   };
 
@@ -132,22 +133,16 @@ export default class extends Controller {
 
   // Marker related
 
-  addStage = (id, lat, lon, symbol, popin) => {
-    this.stages[id] = L.marker([parseFloat(lat), parseFloat(lon)], {
-      icon: iconSymbol(symbol),
-      draggable: true,
-    })
-      .bindPopup(popin)
-      .on('dragend', (event) => {
-        const marker = event.target;
-        const position = marker.getLatLng();
-        Turbo.visit(
-          Routing.generate('stage_move', {
-            lat: position.lat, lon: position.lng, id, trip: tripId,
-          }),
-          { frame: 'sidebar-stages' },
-        );
-      })
+  addStage = (id, lat, lon, symbol, popup) => {
+    this.stages[id] = createDraggableMarker(
+      id,
+      lat,
+      lon,
+      symbol,
+      'stage_move',
+      'sidebar-stages',
+    )
+      .bindPopup(popup)
       .addTo(this.map());
   };
 
@@ -233,31 +228,25 @@ export default class extends Controller {
   };
 
   addInterest = (id, lat, lon, symbol, popup) => {
-    this.interests[id] = L.marker([parseFloat(lat), parseFloat(lon)], {
-      icon: iconSymbol(symbol),
-      draggable: true,
-    })
+    this.interests[id] = createDraggableMarker(
+      id,
+      lat,
+      lon,
+      symbol,
+      'interest_move',
+      'sidebar-interests',
+    )
       .bindPopup(popup)
-      .on('dragend', (event) => {
-        const marker = event.target;
-        const position = marker.getLatLng();
-        Turbo.visit(
-          Routing.generate('interest_move', {
-            lat: position.lat, lon: position.lng, id, trip: tripId,
-          }),
-          { frame: 'sidebar-interests' },
-        );
-      })
       .addTo(this.map());
   };
 
-  updateInterest = (id, symbol, popin) => {
+  updateInterest = (id, symbol, popup) => {
     const marker = this.interests[id];
     if (!marker) {
       return;
     }
     marker.setIcon(iconSymbol(symbol));
-    marker.getPopup().setContent(popin);
+    marker.getPopup().setContent(popup);
   };
 
   removeAllInterests = () => {

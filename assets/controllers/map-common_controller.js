@@ -8,8 +8,8 @@ import '@elfalem/leaflet-curve';
 import '../js/leaflet-double-touch-drag-zoom';
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
-import { markerDefaultIcon, removeFromMap } from '../helpers';
-import { flattenJsonDataToDotNotation, jsonToHtml } from '../jsonToHtml';
+import { markerDefaultIcon, removeFromMap } from '../js/helpers';
+import { flattenJsonDataToDotNotation, jsonToHtml } from '../js/jsonToHtml';
 
 export default class extends Controller {
   static targets = [

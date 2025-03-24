@@ -4,7 +4,7 @@ import L from 'leaflet';
 import '@elfalem/leaflet-curve';
 import SmoothMarkerBouncing from 'leaflet.smooth_marker_bouncing';
 import { Controller } from '@hotwired/stimulus';
-import { iconSymbol } from '../helpers';
+import { iconSymbol } from '../js/helpers';
 import '../js/leaflet-double-touch-drag-zoom';
 
 SmoothMarkerBouncing(L);
@@ -270,6 +270,6 @@ export default class extends Controller {
     this.publicBarTarget = null;
     this.mapTarget = null;
     // Values
-    this.translationsValue = { };
+    this.translationsValue = {};
   };
 }
