@@ -105,7 +105,7 @@ readonly class GpxService
     public function gpxFileToMappable(GpxFile $gpxFile, Trip $trip, bool $diary = false): void
     {
         $gpxName = $gpxFile->metadata?->name;
-        $date = (new \DateTimeImmutable())->modify('+ 1 days')->setTime(18, 0);
+        $defaultDate = (new \DateTime())->modify('+ 1 days')->setTime(18, 0);
         foreach ($gpxFile->waypoints as $waypoint) {
             $point = new GeoPoint();
             $point->setLat((string) $waypoint->latitude);
@@ -113,7 +113,7 @@ readonly class GpxService
 
             $mappable = $diary ? new DiaryEntry() : new Interest();
             $mappable->setName($waypoint->name ?? $gpxName ?? 'No Name');
-            $mappable->setArrivingAt($date);
+            $mappable->setArrivingAt(\DateTimeImmutable::createFromMutable($waypoint->time ?? $defaultDate));
             $mappable->setPoint($point);
             $mappable->setDescription(($waypoint->description ?? '') . \PHP_EOL . ($waypoint->comment ?? ''));
             $mappable->setTrip($trip);
