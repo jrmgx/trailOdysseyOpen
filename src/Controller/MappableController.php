@@ -160,11 +160,11 @@ abstract class MappableController extends BaseController
                 $media = [];
                 $images = $this->findImages($diaryEntry->getDescription() ?? '');
                 $text = $this->convert($diaryEntry->getDescription() ?? '');
-                $text .= "\n\n";
-                $text .= $this->urlGenerator->generate('public_show', [
-                    'trip' => $diaryEntry->getTrip()->getShareKey(),
-                    'user' => $diaryEntry->getUser()->getNickname(),
-                ], UrlGeneratorInterface::ABSOLUTE_URL) . '#' . $diaryEntry->getId();
+                // $text .= "\n\n";
+                // $text .= $this->urlGenerator->generate('public_show', [
+                //    'trip' => $diaryEntry->getTrip()->getShareKey(),
+                //    'user' => $diaryEntry->getUser()->getNickname(),
+                // ], UrlGeneratorInterface::ABSOLUTE_URL) . '#' . $diaryEntry->getId();
                 foreach ($images as $image) {
                     $url = $image->getUrl();
                     $parts = explode('/', $url);
