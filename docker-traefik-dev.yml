@@ -1,19 +1,11 @@
-networks:
-    traefik_network:
-        external: false
-        driver: bridge
-        name: traefik_network
-
 services:
     router:
         image: traefik:v2.7
-        restart: "always"
+        restart: "no"
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock"
             - "./docker/traefik/etc/ssl/certs:/etc/ssl/certs"
             - "./docker/traefik/etc/traefik:/etc/traefik"
-        networks:
-            - "traefik_network"
         ports:
             - "80:80"
             - "443:443"
