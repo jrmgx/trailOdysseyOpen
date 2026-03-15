@@ -195,11 +195,11 @@ readonly class GpxService
             $finishGpxPoint = self::point($finishStage->getPoint()->toPoint());
 
             $fromToName = $startStage->getNameWithPointName() . ' to ' . $finishStage->getNameWithPointName();
-            $countName = str_pad((string) $count, 3, '0', \STR_PAD_LEFT);
+            $countName = mb_str_pad((string) $count, 3, '0', \STR_PAD_LEFT);
             $tripName = $trip->getName();
 
             $tripNameLocal = str_replace('}{', '} - {', $namePattern);
-            $tripNameLocal = trim(str_replace([
+            $tripNameLocal = mb_trim(str_replace([
                 '{counter}', '{stage_name}', '{trip_name}'], [
                     $countName, $fromToName, $tripName,
                 ], $tripNameLocal));
