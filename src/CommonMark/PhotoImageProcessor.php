@@ -18,7 +18,7 @@ class PhotoImageProcessor
     public function __invoke(DocumentParsedEvent $e): void
     {
         foreach ($e->getDocument()->iterator() as $image) {
-            if (!($image instanceof Image)) {
+            if (!$image instanceof Image) {
                 continue;
             }
 
@@ -30,7 +30,7 @@ class PhotoImageProcessor
                 continue;
             }
 
-            [$user, $trip, $path] = explode('/', trim($image->getUrl(), '/'));
+            [$user, $trip, $path] = explode('/', mb_trim($image->getUrl(), '/'));
 
             $image->setUrl($this->urlGenerator->generate(
                 'public_photo', compact('user', 'trip', 'path')

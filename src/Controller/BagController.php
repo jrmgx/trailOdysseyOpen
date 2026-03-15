@@ -313,14 +313,14 @@ class BagController extends AbstractController
         $bags = $this->bagRepository->findByTripAndUser($trip, $user);
         $gears = $this->gearRepository->findGearsForUserAndTripWithBagInfo($user);
 
-        $bagIds = array_map(fn (Bag $bag) => $bag->getId(), $bags);
+        $bagIds = array_map(static fn (Bag $bag) => $bag->getId(), $bags);
         foreach ($bags as $bag) {
             $bag->setIsInCurrentBag(null !== $bag->getParentBag());
         }
 
         foreach ($gears as $gear) {
             $isInCurrentBag = $gear->getGearsInBag()
-                ->filter(fn (GearInBag $gib) => \in_array($gib->getBag()->getId(), $bagIds, true))
+                ->filter(static fn (GearInBag $gib) => \in_array($gib->getBag()->getId(), $bagIds, true))
                 ->count() > 0
             ;
             $gear->setIsInCurrentBag($isInCurrentBag);

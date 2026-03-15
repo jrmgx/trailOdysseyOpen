@@ -1,11 +1,14 @@
 parameters:
     level: 8
+    excludePaths:
+        - config/reference.php
     paths:
         - bin/
         - config/
         - public/
         - src/
         - tests/
+    reportUnmatchedIgnoredErrors: false
 includes:
     - vendor/ekino/phpstan-banned-code/extension.neon
 #   - phar://phpstan.phar/conf/bleedingEdge.neon

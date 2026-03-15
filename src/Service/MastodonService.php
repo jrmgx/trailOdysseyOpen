@@ -100,7 +100,7 @@ class MastodonService
 
         return $client->methods()->statuses()->create(
             status: $status,
-            media_ids: array_map(fn (MediaAttachmentModel $m) => $m->id, $mediaIds),
+            media_ids: array_map(static fn (MediaAttachmentModel $m) => $m->id, $mediaIds),
             visibility: 'public',
             language: 'en', // TODO
         );
@@ -119,7 +119,7 @@ class MastodonService
         return $client->methods()->statuses()->edit(
             $id,
             status: $status,
-            media_ids: array_map(fn (MediaAttachmentModel $m) => $m->id, $mediaIds),
+            media_ids: array_map(static fn (MediaAttachmentModel $m) => $m->id, $mediaIds),
         );
     }
 

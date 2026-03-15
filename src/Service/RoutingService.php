@@ -26,8 +26,8 @@ class RoutingService
 
         /** @var array<int, Path> $paths */
         $paths = $trip->getSegments()
-            ->filter(fn (Segment $segment) => \count($segment->getPoints()) >= 2)
-            ->map(fn (Segment $segment) => Path::fromSegment($segment))
+            ->filter(static fn (Segment $segment) => \count($segment->getPoints()) >= 2)
+            ->map(static fn (Segment $segment) => Path::fromSegment($segment))
             ->toArray()
         ;
 

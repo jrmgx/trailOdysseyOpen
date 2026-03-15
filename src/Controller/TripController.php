@@ -102,7 +102,7 @@ class TripController extends BaseController
 
         $tilesList = $this->tilesRepository->findTilesForUser(
             $user,
-            $trip->getTiles()->map(fn (Tiles $t) => $t->getUrl())->toArray()
+            $trip->getTiles()->map(static fn (Tiles $t) => $t->getUrl())->toArray()
         );
         $formTilesList = null;
         if (\count($tilesList) > 0) {

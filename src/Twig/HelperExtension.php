@@ -45,7 +45,7 @@ class HelperExtension extends AbstractExtension
                 $this->formatDatetimeApp(...),
                 ['needs_environment' => true]
             ),
-            new TwigFilter('float', fn (mixed $i) => (float) $i, ['is_safe' => ['all']]),
+            new TwigFilter('float', static fn (mixed $i) => (float) $i, ['is_safe' => ['all']]),
         ];
     }
 
@@ -76,7 +76,7 @@ class HelperExtension extends AbstractExtension
             return $dateTime;
         }
 
-        return trim($parts[0], ',') . ' ' . trim($parts[1]);
+        return mb_trim($parts[0], ',') . ' ' . mb_trim($parts[1]);
     }
 
     public function instanceof(?object $object, string $class): bool

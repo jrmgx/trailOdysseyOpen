@@ -224,7 +224,7 @@ readonly class GpxService
             $filename = str_replace([
                 '{counter}', '{stage_name}', '{trip_name}',
             ], [
-                str_pad((string) $count, 3, '0', \STR_PAD_LEFT),
+                mb_str_pad((string) $count, 3, '0', \STR_PAD_LEFT),
                 mb_substr(mb_strtolower($slugName), 0, 32),
                 $tripName,
             ], $filenamePattern);

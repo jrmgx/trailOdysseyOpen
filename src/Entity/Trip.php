@@ -231,7 +231,7 @@ class Trip
             return null;
         }
 
-        return $this->getStages()->reduce(function (?Stage $carry, Stage $stage) {
+        return $this->getStages()->reduce(static function (?Stage $carry, Stage $stage) {
             if (null === $carry) {
                 return $stage;
             }
@@ -254,7 +254,7 @@ class Trip
             return null;
         }
 
-        return $this->getStages()->reduce(function (?Stage $carry, Stage $stage) {
+        return $this->getStages()->reduce(static function (?Stage $carry, Stage $stage) {
             if (null === $carry) {
                 return $stage;
             }

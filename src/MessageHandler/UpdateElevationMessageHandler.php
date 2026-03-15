@@ -39,7 +39,7 @@ class UpdateElevationMessageHandler
             $segmentPoints = $segment->getPoints();
 
             // Find points without elevations (20 max)
-            $pointsWithoutElevationMax = array_filter($segmentPoints, fn (Point $point) => !$point->hasElevation());
+            $pointsWithoutElevationMax = array_filter($segmentPoints, static fn (Point $point) => !$point->hasElevation());
             $pointsWithoutElevationMax20 = \array_slice($pointsWithoutElevationMax, 0, 20);
 
             $this->logger->info(

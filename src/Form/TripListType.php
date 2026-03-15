@@ -26,7 +26,7 @@ class TripListType extends AbstractType
         $builder
             ->add('trips', ChoiceType::class, [
                 'choices' => $trips,
-                'choice_label' => fn (Trip $trip) => $trip->getName(),
+                'choice_label' => static fn (Trip $trip) => $trip->getName(),
             ])
         ;
     }

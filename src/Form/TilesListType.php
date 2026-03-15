@@ -18,7 +18,7 @@ class TilesListType extends AbstractType
             ->add('tiles', ChoiceType::class, [
                 'label' => 'form.label.add_existing_tiles',
                 'choices' => $tiles,
-                'choice_label' => fn (Tiles $tiles) => $tiles->getName() . ' (' . $tiles->getUrl() . ')',
+                'choice_label' => static fn (Tiles $tiles) => $tiles->getName() . ' (' . $tiles->getUrl() . ')',
             ])
         ;
     }

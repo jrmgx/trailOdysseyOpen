@@ -195,7 +195,7 @@ class SegmentController extends BaseController
         }
 
         $ids = array_map(
-            fn (string $id) => (int) $id,
+            static fn (string $id) => (int) $id,
             explode(',', $form->get('ids')->getData())
         );
         $segments = $this->segmentRepository->findByIds($ids);
@@ -224,7 +224,7 @@ class SegmentController extends BaseController
                 // TODO this could be handled with a formView/Model
                 $jsonPoints = json_decode($form->get('jsonPoints')->getData(), true);
                 $points = array_map(
-                    fn (array $jsonPoint) => new Point($jsonPoint['lat'], $jsonPoint['lon'], $jsonPoint['el'] ?? null),
+                    static fn (array $jsonPoint) => new Point($jsonPoint['lat'], $jsonPoint['lon'], $jsonPoint['el'] ?? null),
                     $jsonPoints
                 );
                 $segment->setPoints($points);

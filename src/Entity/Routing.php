@@ -161,7 +161,7 @@ class Routing
 
         $data = json_decode($this->pathPointsStore, true);
 
-        $points = array_map(fn (array $p) => new Point($p[0], $p[1], $p[2] ?? null), $data);
+        $points = array_map(static fn (array $p) => new Point($p[0], $p[1], $p[2] ?? null), $data);
 
         $startStagePoint = $this->startStage->getPoint()->toPoint();
         /** @var Point $firstPoint */
@@ -187,7 +187,7 @@ class Routing
 
             return $this;
         }
-        $data = array_map(fn (Point $point) => [$point->lat, $point->lon, GeoElevationService::nonNegative($point->el)], $pathPoints);
+        $data = array_map(static fn (Point $point) => [$point->lat, $point->lon, GeoElevationService::nonNegative($point->el)], $pathPoints);
         $this->pathPointsStore = json_encode($data);
 
         return $this;

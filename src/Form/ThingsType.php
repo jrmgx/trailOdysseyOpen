@@ -21,8 +21,8 @@ class ThingsType extends AbstractType
         $bag = $options['bag'];
         /** @var array<int, Things> $things */
         $things = $options['things'];
-        $things = array_filter($things, fn (Things $thing) => $thing !== $bag);
-        usort($things, fn (Things $a, Things $b) =>
+        $things = array_filter($things, static fn (Things $thing) => $thing !== $bag);
+        usort($things, static fn (Things $a, Things $b) =>
             // Adding an emoji will push the entry to the end
             ($a->isBag() ? '🛄 ' : '') . $a->getName() <=> ($b->isBag() ? '🛄 ' : '') . $b->getName()
         );

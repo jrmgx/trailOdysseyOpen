@@ -213,7 +213,7 @@ class Bag implements Things, InBag
     public function inBag(): array
     {
         $inBag = array_merge($this->gearsInBag->toArray(), $this->bagsInBag->toArray());
-        usort($inBag, function (InBag $a, InBag $b) {
+        usort($inBag, static function (InBag $a, InBag $b) {
             if ($a->getChecked() === $b->getChecked()) {
                 // Adding an emoji will push the entry to the end
                 return ($a->getThing()->isBag() ? '🛄 ' : '') . $a->getThing()->getName()

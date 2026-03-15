@@ -140,7 +140,7 @@ class GeoArithmeticService
         $this->createEdge($graph, $vertices, $pathEnd->getFirstPoint(), $pointTo);
         $this->createEdge($graph, $vertices, $pathEnd->getLastPoint(), $pointTo);
         // Other paths
-        $paths = array_filter($paths, fn (Path $p) => $p !== $pathStart && $p !== $pathEnd);
+        $paths = array_filter($paths, static fn (Path $p) => $p !== $pathStart && $p !== $pathEnd);
         foreach ($paths as $path) {
             $a = $path->getFirstPoint();
             $b = $path->getLastPoint();
@@ -192,7 +192,7 @@ class GeoArithmeticService
         // Aggressive optimization: we will only include $paths that cross the bounding box of $start + $endPath
         $boundingBox = GeoHelper::getBoundingBox(new Path(array_merge($startPath->getPoints(), $endPath->getPoints())));
         // To be safe we enlarge our bounding box times 3, in specific cases it could not even be enough
-        $boundingBox = array_map(fn (string $value) => (float) $value, $boundingBox);
+        $boundingBox = array_map(static fn (string $value) => (float) $value, $boundingBox);
         $bbLatSize = $boundingBox['maxLat'] - $boundingBox['minLat'];
         $bbLonSize = $boundingBox['maxLon'] - $boundingBox['minLon'];
         $boundingBox['maxLat'] = (string) ($boundingBox['maxLat'] + $bbLatSize);
@@ -200,7 +200,7 @@ class GeoArithmeticService
         $boundingBox['maxLon'] = (string) ($boundingBox['maxLon'] + $bbLonSize);
         $boundingBox['minLon'] = (string) ($boundingBox['minLon'] - $bbLonSize);
 
-        $paths = array_filter($paths, fn (Path $otherPath) => GeoHelper::doBoundingBoxesOverlap(
+        $paths = array_filter($paths, static fn (Path $otherPath) => GeoHelper::doBoundingBoxesOverlap(
             $boundingBox,
             GeoHelper::getBoundingBox($otherPath)
         ));

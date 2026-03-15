@@ -32,7 +32,7 @@ class TilesRepository extends ServiceEntityRepository
             ->getResult()
         ;
 
-        return array_filter($list, function (Tiles $t) use (&$urls) {
+        return array_filter($list, static function (Tiles $t) use (&$urls) {
             $found = \in_array($t->getUrl(), $urls, true);
             $urls[] = $t->getUrl();
 

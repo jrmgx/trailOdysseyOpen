@@ -16,7 +16,7 @@ class SearchElementEntries
      */
     public function getEntries(): array
     {
-        return $this->cache->get('get-entries-' . sha1(self::ENTRIES), function () {
+        return $this->cache->get('get-entries-' . sha1(self::ENTRIES), static function () {
             $lines = explode(\PHP_EOL, self::ENTRIES);
             $results = [];
             foreach ($lines as $line) {

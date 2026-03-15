@@ -60,7 +60,7 @@ trait MappableTrait
 
     public function getNameWithPointName(): string
     {
-        return trim((string) str_replace('%POINT_NAME%', $this->getPointName(), $this->getName()));
+        return mb_trim((string) str_replace('%POINT_NAME%', $this->getPointName(), $this->getName()));
     }
 
     public function getDescription(): ?string

@@ -28,7 +28,7 @@ class GeoElevationService
         if (\count($points) > 20) {
             throw new \RuntimeException('Asked for too many points, 20 maximum.');
         }
-        $points = array_filter($points, fn (Point $p) => !$p->hasElevation());
+        $points = array_filter($points, static fn (Point $p) => !$p->hasElevation());
         if (0 === \count($points)) {
             return;
         }

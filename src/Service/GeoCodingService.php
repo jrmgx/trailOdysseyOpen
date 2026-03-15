@@ -58,7 +58,7 @@ class GeoCodingService
         ])->toArray();
         $has = [];
 
-        return array_filter($results, function (array $entry) use (&$has) {
+        return array_filter($results, static function (array $entry) use (&$has) {
             $name = $entry['display_name'];
             if (!\in_array($name, $has, true)) {
                 $has[] = $name;
@@ -156,7 +156,7 @@ QUERY;
         }
 
         return array_filter(array_map(
-            fn (array $e) => SearchElementResult::fromElementOverpassResult($e, $key, $value),
+            static fn (array $e) => SearchElementResult::fromElementOverpassResult($e, $key, $value),
             $results['elements']
         ));
     }
@@ -195,7 +195,7 @@ QUERY;
         }
 
         return array_filter(array_map(
-            fn (array $e) => SearchElementResult::fromElementGoogleResult($e),
+            static fn (array $e) => SearchElementResult::fromElementGoogleResult($e),
             $results
         ));
     }
