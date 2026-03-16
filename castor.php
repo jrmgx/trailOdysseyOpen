@@ -255,6 +255,13 @@ function builder(#[AsOption] ?string $user = null): void
     run($docker, context: context()->withAllowFailure()->withTty()->withPty());
 }
 
+#[AsTask(namespace: 'dev', description: 'Start all messenger consumers', aliases: ['consume'])]
+function consume_messages(#[AsOption] int $limit = 100): void
+{
+    assert_not_in_prod();
+    run_in_builder("bin/console messenger:consume async -vvv --memory-limit=512M --time-limit=3600 --limit=$limit");
+}
+
 #[AsTask(namespace: 'dev', description: 'Give Symfony version as a test command')]
 function version(): void
 {
