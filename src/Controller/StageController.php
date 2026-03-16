@@ -10,6 +10,7 @@ use App\Form\StageType;
 use App\Form\TripMapOptionType;
 use App\Helper\CommonHelper;
 use App\Helper\GeoHelper;
+use App\Message\SplitSegmentsMessage;
 use App\Message\UpdateElevationMessage;
 use App\Security\Voter\UserVoter;
 use Symfony\Bridge\Twig\Attribute\Template;
@@ -64,6 +65,7 @@ class StageController extends MappableController
     ): Response {
         // TODO could find a better place to put that
         // + a specific message bus with only one worker should be setup to prevent mass request on the service
+        $this->messageBus->dispatch(new SplitSegmentsMessage($trip->getId() ?? 0));
         $this->messageBus->dispatch(new UpdateElevationMessage($trip->getId() ?? 0));
 
         $response = $this->render('stage/index.js.twig', array_merge($this->show($request, $trip), ['first_load' => $firstLoad]));

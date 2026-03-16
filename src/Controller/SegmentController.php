@@ -135,11 +135,11 @@ class SegmentController extends BaseController
             }
         }
         $name = $segment->getName();
-        $segment->setName($name . ' - A');
+        $segment->setName($name);
         $segment->setPoints($pointsCurrent);
 
         $segmentB = new Segment();
-        $segmentB->setName($name . ' - B');
+        $segmentB->setName($name);
         $segmentB->setPoints($pointsNext);
         $segmentB->setTrip($trip);
         $segmentB->setUser($trip->getUser());

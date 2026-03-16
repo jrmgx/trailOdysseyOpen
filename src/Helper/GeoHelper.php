@@ -256,6 +256,85 @@ class GeoHelper
         return $gpxPoint;
     }
 
+    private const INTERSECTION_EPSILON_PARALLEL = 1e-12;
+
+    private const INTERSECTION_EPSILON_BOUNDS = 1e-2;
+
+    /**
+     * Line segment intersection using orientation/cross-product.
+     * Treats lat/lon as planar (valid for short trail segments).
+     *
+     * @return Point|null Intersection point if segments AB and CD properly cross, null otherwise
+     */
+    public static function lineSegmentIntersection(Point $a, Point $b, Point $c, Point $d): ?Point
+    {
+        $ax = (float) $a->lon;
+        $ay = (float) $a->lat;
+        $bx = (float) $b->lon;
+        $by = (float) $b->lat;
+        $cx = (float) $c->lon;
+        $cy = (float) $c->lat;
+        $dx = (float) $d->lon;
+        $dy = (float) $d->lat;
+
+        $denom = ($bx - $ax) * ($dy - $cy) - ($by - $ay) * ($dx - $cx);
+        if (abs($denom) < self::INTERSECTION_EPSILON_PARALLEL) {
+            return null;
+        }
+
+        $t = (($cx - $ax) * ($dy - $cy) - ($cy - $ay) * ($dx - $cx)) / $denom;
+        $s = (($cx - $ax) * ($by - $ay) - ($cy - $ay) * ($bx - $ax)) / $denom;
+
+        if ($t < -self::INTERSECTION_EPSILON_BOUNDS || $t > 1 + self::INTERSECTION_EPSILON_BOUNDS) {
+            return null;
+        }
+        if ($s < -self::INTERSECTION_EPSILON_BOUNDS || $s > 1 + self::INTERSECTION_EPSILON_BOUNDS) {
+            return null;
+        }
+
+        $lon = $ax + $t * ($bx - $ax);
+        $lat = $ay + $t * ($by - $ay);
+
+        return new Point((string) $lat, (string) $lon);
+    }
+
+    /**
+     * Same as lineSegmentIntersection but also returns parametric t (along AB) and s (along CD).
+     *
+     * @return array{0: Point, 1: float, 2: float}|null
+     */
+    public static function lineSegmentIntersectionWithT(Point $a, Point $b, Point $c, Point $d): ?array
+    {
+        $ax = (float) $a->lon;
+        $ay = (float) $a->lat;
+        $bx = (float) $b->lon;
+        $by = (float) $b->lat;
+        $cx = (float) $c->lon;
+        $cy = (float) $c->lat;
+        $dx = (float) $d->lon;
+        $dy = (float) $d->lat;
+
+        $denom = ($bx - $ax) * ($dy - $cy) - ($by - $ay) * ($dx - $cx);
+        if (abs($denom) < self::INTERSECTION_EPSILON_PARALLEL) {
+            return null;
+        }
+
+        $t = (($cx - $ax) * ($dy - $cy) - ($cy - $ay) * ($dx - $cx)) / $denom;
+        $s = (($cx - $ax) * ($by - $ay) - ($cy - $ay) * ($bx - $ax)) / $denom;
+
+        if ($t < -self::INTERSECTION_EPSILON_BOUNDS || $t > 1 + self::INTERSECTION_EPSILON_BOUNDS) {
+            return null;
+        }
+        if ($s < -self::INTERSECTION_EPSILON_BOUNDS || $s > 1 + self::INTERSECTION_EPSILON_BOUNDS) {
+            return null;
+        }
+
+        $lon = $ax + $t * ($bx - $ax);
+        $lat = $ay + $t * ($by - $ay);
+
+        return [new Point((string) $lat, (string) $lon), $t, $s];
+    }
+
     /**
      * Some path are not useful for us, like roundabout.
      * A roundabout is detected when the extremities of the "path" are very close

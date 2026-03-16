@@ -2,8 +2,6 @@
 
 namespace App\MessageHandler;
 
-namespace App\MessageHandler;
-
 use App\Message\ImportGpxMessage;
 use App\Message\UpdateElevationMessage;
 use App\Repository\TripRepository;
@@ -32,6 +30,7 @@ class ImportGpxMessageHandler
 
         $this->logger->info('Trip #' . $trip->getId() . ' import GPX files...');
 
+        $importedSegments = false;
         foreach ($message->filePaths as $filePath) {
             $gpxFile = $this->gpxService->gpxFile($filePath);
 
@@ -40,10 +39,14 @@ class ImportGpxMessageHandler
             } else {
                 $this->gpxService->gpxFileToSegments($gpxFile, $trip);
                 $this->gpxService->gpxFileToMappable($gpxFile, $trip);
+                $importedSegments = true;
             }
         }
 
-        // Confirm that the message has been handled
+        if ($importedSegments) {
+            $this->entityManager->flush();
+        }
+
         $trip->setIsCalculatingSegment(false);
         $this->entityManager->flush();
 
