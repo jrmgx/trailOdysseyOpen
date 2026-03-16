@@ -248,11 +248,14 @@ function builder(#[AsOption] ?string $user = null): void
     }
 
     $builderService = variable('app_name') . '-php-fpm';
-    $docker = "docker exec -it $user $builderService bash";
+    $it = is_cursor_agent() ? '' : ' -it';
+    $docker = "docker exec$it $user $builderService bash";
 
     io()->text("=> Will run via $docker");
 
-    run($docker, context: context()->withAllowFailure()->withTty()->withPty());
+    $ctx = context()->withAllowFailure();
+    $ctx = is_cursor_agent() ? $ctx->withTty(false)->withPty(false) : $ctx->withTty()->withPty();
+    run($docker, context: $ctx);
 }
 
 #[AsTask(namespace: 'dev', description: 'Start all messenger consumers', aliases: ['consume'])]
@@ -340,6 +343,11 @@ function is_prod(): bool
     return 'prod' === variable('app_env');
 }
 
+function is_cursor_agent(): bool
+{
+    return isset($_SERVER['CURSOR_AGENT']) && '1' === $_SERVER['CURSOR_AGENT'];
+}
+
 function is_builder(): bool
 {
     return variable('in_builder');
@@ -353,7 +361,10 @@ function date_string(): string
 function run_in_builder(string $runCommand, bool $allowFailure = false, ?string $user = null): Process
 {
     if (is_builder()) {
-        return run($runCommand, context: context()->withAllowFailure($allowFailure));
+        $ctx = context()->withAllowFailure($allowFailure);
+        $ctx = is_cursor_agent() ? $ctx->withTty(false)->withPty(false) : $ctx;
+
+        return run($runCommand, context: $ctx);
     }
 
     return docker_exec($runCommand, allowFailure: $allowFailure, user: $user);
@@ -368,12 +379,15 @@ function docker_exec(string $runCommand, bool $allowFailure = false, ?string $se
 
     $service = $service ?: variable('app_name') . '-php-fpm';
     $context = context();
-    $it = $context->tty || $context->pty ? '-it' : '';
+    $it = is_cursor_agent() ? '' : ($context->tty || $context->pty ? '-it' : '');
     $docker = "docker exec $it $user $service $runCommand";
 
     io()->text("=> Will run: $docker");
 
-    return run($docker, context: context()->withAllowFailure($allowFailure));
+    $ctx = context()->withAllowFailure($allowFailure);
+    $ctx = is_cursor_agent() ? $ctx->withTty(false)->withPty(false) : $ctx;
+
+    return run($docker, context: $ctx);
 }
 
 function assert_is_in_builder(): void
@@ -427,5 +441,8 @@ function docker_compose(array $subCommand, bool $allowFailure = false): Process
 
     io()->text("=> Will run: $fullCommand");
 
-    return run($command, context: context()->withAllowFailure($allowFailure));
+    $ctx = context()->withAllowFailure($allowFailure);
+    $ctx = is_cursor_agent() ? $ctx->withTty(false)->withPty(false) : $ctx;
+
+    return run($command, context: $ctx);
 }

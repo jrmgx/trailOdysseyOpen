@@ -13,9 +13,9 @@
 
 ## Environment
 
-Commands run via Docker through Castor. Prefix host commands with `castor --no-it`.
+Commands run via Docker through Castor. Prefix host commands with `castor builder`.
 
-Example: `bin/console clear:cache` → `castor --no-it bin/console clear:cache`
+Example: `bin/console clear:cache` → `castor builder bin/console clear:cache`
 
 
 ## PHP and Symfony
