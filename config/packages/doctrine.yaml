@@ -4,6 +4,8 @@ doctrine:
         driver: 'pdo_pgsql'
         charset: utf8
         server_version: '15'
+        mapping_types:
+            geometry: string
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
