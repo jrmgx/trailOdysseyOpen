@@ -636,6 +636,10 @@ path.leaflet-interactive {
     color: var(--bs-body-color);
 }
 
+.card-header.interest-card-header--checkpoint {
+    border-bottom: 2px solid #fa0c0c;
+}
+
 /* Bootstrap overrides */
 .toast-container > :not(:last-child) {
     margin-bottom: 0.75rem !important;

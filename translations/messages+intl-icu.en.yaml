@@ -196,6 +196,7 @@ form:
     password: Password
     agree_terms: Agree Terms
     arriving_at: Arriving At
+    checkpoint: Checkpoint
     leaving_at: Leaving At
     address: Address
     url: URL

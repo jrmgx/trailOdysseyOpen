@@ -26,6 +26,7 @@ class InterestRepository extends ServiceEntityRepository
             ->andWhere('i.trip = :trip')
             ->setParameter('trip', $trip)
             ->orderBy('i.arrivingAt', 'ASC')
+            ->addOrderBy('i.id', 'ASC')
             ->getQuery()
             ->getResult();
     }

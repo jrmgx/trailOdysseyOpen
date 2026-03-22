@@ -262,6 +262,7 @@ class TripController extends BaseController
             $interestCopy->setPoint($interest->getPoint());
             $interestCopy->setType($interest->getType());
             $interestCopy->setSymbol($interest->getSymbol());
+            $interestCopy->setCheckpoint($interest->isCheckpoint());
 
             $this->entityManager->persist($interestCopy);
             $tripCopy->addInterest($interestCopy);

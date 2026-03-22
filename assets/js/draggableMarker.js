@@ -4,11 +4,11 @@ import Routing from 'fos-router';
 import showToastWithUndo from './toast';
 import { iconSymbol } from './helpers';
 
-export default (id, lat, lon, symbol, moveUrl, frame) => {
+export default (id, lat, lon, symbol, moveUrl, frame, checkpoint = false) => {
   const originalPosition = { lat: parseFloat(lat), lon: parseFloat(lon) };
 
   return L.marker([originalPosition.lat, originalPosition.lon], {
-    icon: iconSymbol(symbol),
+    icon: iconSymbol(symbol, checkpoint),
     draggable: true,
   })
     .on('dragend', (event) => {

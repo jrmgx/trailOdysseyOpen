@@ -159,6 +159,7 @@ form:
     password: Mot de passe
     agree_terms: Accepter les conditions d'utilisation
     arriving_at: Arrivée à
+    checkpoint: Point de passage
     leaving_at: Départ à
     address: Adresse
     url: URL

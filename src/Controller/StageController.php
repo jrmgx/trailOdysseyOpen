@@ -119,6 +119,8 @@ class StageController extends MappableController
             $errors = $this->validator->validate($stage);
             if (0 === $errors->count()) {
                 $this->entityManager->flush();
+                $this->routingService->refreshAllPathPointsForTrip($trip);
+                $this->entityManager->flush();
 
                 return $this->redirectToRoute('stage_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
             }
@@ -233,19 +235,7 @@ class StageController extends MappableController
         $stage->getPoint()->setLon($lon);
         $stage->getPoint()->setLat($lat);
 
-        $routing = $stage->getRoutingIn();
-        if ($routing) {
-            $routing->setPathPoints(null);
-            $this->routingService->updatePathPoints($trip, $routing);
-            $this->routingService->updateCalculatedValues($routing);
-        }
-
-        $routing = $stage->getRoutingOut();
-        if ($routing) {
-            $routing->setPathPoints(null);
-            $this->routingService->updatePathPoints($trip, $routing);
-            $this->routingService->updateCalculatedValues($routing);
-        }
+        $this->routingService->refreshAllPathPointsForTrip($trip);
 
         $this->geoCodingService->tryUpdatePointName($stage);
 

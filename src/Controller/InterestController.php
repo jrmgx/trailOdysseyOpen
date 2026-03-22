@@ -45,7 +45,7 @@ class InterestController extends MappableController
     ): array|Response {
         /** @var Interest $interest */
         $interest = $this->commonNew($request, $trip, $lat, $lon, new Interest());
-        $interest->setArrivingAt(new \DateTimeImmutable());
+        $interest->setArrivingAt(new \DateTimeImmutable('midnight'));
 
         $form = $this->createForm(InterestType::class, $interest, [
             'action' => $this->generateUrl('interest_new', [
@@ -83,6 +83,8 @@ class InterestController extends MappableController
             $interest->setTrip($trip);
             $this->entityManager->persist($interest);
             $this->entityManager->flush();
+            $this->routingService->refreshAllPathPointsForTrip($trip);
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('stage_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
         }
@@ -110,6 +112,9 @@ class InterestController extends MappableController
         $this->geoCodingService->tryUpdatePointName($interest);
 
         $trip->updatedNow();
+        if ($interest->isCheckpoint()) {
+            $this->routingService->refreshAllPathPointsForTrip($trip);
+        }
         $this->entityManager->flush();
 
         return $this->redirectToRoute('stage_show', ['trip' => $trip->getId()], Response::HTTP_SEE_OTHER);
@@ -127,6 +132,8 @@ class InterestController extends MappableController
 
         $trip->updatedNow();
         $this->entityManager->remove($interest);
+        $this->entityManager->flush();
+        $this->routingService->refreshAllPathPointsForTrip($trip);
         $this->entityManager->flush();
 
         return $this->redirectToRoute('stage_show', ['trip' => $trip->getId()]);

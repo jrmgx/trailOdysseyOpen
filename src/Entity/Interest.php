@@ -23,9 +23,28 @@ class Interest implements MappableInterface
     #[Assert\Length(max: 16)]
     protected ?string $symbol = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $checkpoint = false;
+
     public function __construct()
     {
         $this->updatedAt = new \DateTimeImmutable();
+        $this->arrivingAt = new \DateTimeImmutable('midnight');
+    }
+
+    /**
+     * Same as {@see Stage}: date-only, time always midnight.
+     */
+    public function getArrivingAt(): \DateTimeImmutable
+    {
+        return $this->arrivingAt->setTime(0, 0);
+    }
+
+    public function setArrivingAt(\DateTimeImmutable $arrivingAt): self
+    {
+        $this->arrivingAt = $arrivingAt->setTime(0, 0);
+
+        return $this;
     }
 
     public function getSymbol(): string
@@ -45,6 +64,18 @@ class Interest implements MappableInterface
     public function setType(?string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function isCheckpoint(): bool
+    {
+        return $this->checkpoint;
+    }
+
+    public function setCheckpoint(bool $checkpoint): self
+    {
+        $this->checkpoint = $checkpoint;
 
         return $this;
     }

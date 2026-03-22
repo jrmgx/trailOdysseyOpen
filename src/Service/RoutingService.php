@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Interest;
 use App\Entity\Routing;
 use App\Entity\Segment;
 use App\Entity\Trip;
@@ -15,6 +16,7 @@ class RoutingService
     public function __construct(
         private readonly GeoArithmeticService $geoArithmeticService,
         private readonly LoggerInterface $logger,
+        private readonly TripService $tripService,
     ) {
     }
 
@@ -42,14 +44,52 @@ class RoutingService
                 $finishStage->getPoint()->toPoint(), $paths
             );
 
-            $routing->setPathPoints($this->geoArithmeticService
-                ->getPointsFromPointToPoint(
-                    $paths, $startPath, $finishPath, $startPoint, $finishPoint
-                )
-            );
+            $checkpointInterests = $this->checkpointInterestsForRouting($trip, $routing);
+            if (\count($checkpointInterests) > 0) {
+                /** @var array<int, array<int, Point>> $segments */
+                $segments = [];
+                $currentPoint = $startPoint;
+                $currentPath = $startPath;
+                foreach ($checkpointInterests as $interest) {
+                    [$viaPoint, $viaPath] = GeoArithmeticService::findClosestPointOnPaths(
+                        $interest->getPoint()->toPoint(), $paths
+                    );
+                    $leg = $this->geoArithmeticService->getPointsFromPointToPoint(
+                        $paths, $currentPath, $viaPath, $currentPoint, $viaPoint
+                    );
+                    \assert(null !== $leg);
+                    $segments[] = $leg;
+                    $currentPoint = $viaPoint;
+                    $currentPath = $viaPath;
+                }
+                $lastLeg = $this->geoArithmeticService->getPointsFromPointToPoint(
+                    $paths, $currentPath, $finishPath, $currentPoint, $finishPoint
+                );
+                \assert(null !== $lastLeg);
+                $segments[] = $lastLeg;
+                $routing->setPathPoints($this->mergePathSegments($segments));
+            } else {
+                $routing->setPathPoints($this->geoArithmeticService
+                    ->getPointsFromPointToPoint(
+                        $paths, $startPath, $finishPath, $startPoint, $finishPoint
+                    )
+                );
+            }
         } catch (\Exception $e) {
             $this->logger->warning('No route found from $start to $finish point: ' . $e->getMessage());
             // TODO feedback to user
+        }
+    }
+
+    /**
+     * Recalculates every leg: checkpoint assignment uses interest and stage datetimes.
+     */
+    public function refreshAllPathPointsForTrip(Trip $trip): void
+    {
+        foreach ($this->tripService->calculateRoutings($trip) as $routing) {
+            $routing->setPathPoints(null);
+            $this->updatePathPoints($trip, $routing);
+            $this->updateCalculatedValues($routing);
         }
     }
 
@@ -119,5 +159,74 @@ class RoutingService
         }
 
         return [$positive, $negative];
+    }
+
+    /**
+     * @return array<Interest>
+     */
+    private function checkpointInterestsForRouting(Trip $trip, Routing $routing): array
+    {
+        $candidates = [];
+        foreach ($trip->getInterests() as $interest) {
+            if (!$interest->isCheckpoint()) {
+                continue;
+            }
+            $assigned = $this->routingForCheckpointInterestByDate($trip, $interest);
+            if ($assigned === $routing) {
+                $candidates[] = $interest;
+            }
+        }
+
+        usort($candidates, static function (Interest $a, Interest $b): int {
+            $byDate = $a->getArrivingAt() <=> $b->getArrivingAt();
+            if (0 !== $byDate) {
+                return $byDate;
+            }
+
+            return ($a->getId() ?? 0) <=> ($b->getId() ?? 0);
+        });
+
+        return $candidates;
+    }
+
+    /**
+     * Legs are consecutive in trip order. Inclusive time window per leg [startStage, finishStage];
+     * when several legs match (e.g. shared boundary instant), the last leg along the trip wins.
+     */
+    private function routingForCheckpointInterestByDate(Trip $trip, Interest $interest): ?Routing
+    {
+        $routings = $this->tripService->calculateRoutings($trip);
+        $interestAt = $interest->getArrivingAt();
+        $match = null;
+        foreach ($routings as $candidateRouting) {
+            $startAt = $candidateRouting->getStartStage()->getArrivingAt();
+            $finishAt = $candidateRouting->getFinishStage()->getArrivingAt();
+            if ($interestAt >= $startAt && $interestAt <= $finishAt) {
+                $match = $candidateRouting;
+            }
+        }
+
+        return $match;
+    }
+
+    /**
+     * @param array<int, array<int, Point>> $segments
+     *
+     * @return array<int, Point>
+     */
+    private function mergePathSegments(array $segments): array
+    {
+        $merged = [];
+        foreach ($segments as $segment) {
+            foreach ($segment as $point) {
+                $last = $merged[\count($merged) - 1] ?? null;
+                if ($last instanceof Point && $point->equalsWithoutElevation($last)) {
+                    continue;
+                }
+                $merged[] = $point;
+            }
+        }
+
+        return $merged;
     }
 }

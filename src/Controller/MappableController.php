@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\DiaryEntry;
 use App\Entity\GeoPoint;
+use App\Entity\Interest;
 use App\Entity\MappableInterface;
 use App\Entity\Stage;
 use App\Entity\Trip;
@@ -134,6 +135,10 @@ abstract class MappableController extends BaseController
 
             if ($mappable instanceof DiaryEntry) {
                 $this->commonBroadcast($mappable, $form);
+            }
+
+            if ($mappable instanceof Stage || $mappable instanceof Interest) {
+                $this->routingService->refreshAllPathPointsForTrip($trip);
             }
 
             $this->entityManager->flush();

@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import markerIconUrl from '../images/marker.png';
 import markerDarkIconUrl from '../images/marker-dark.png';
+import markerRedIconUrl from '../images/marker-red.png';
 import markerDefaultIconUrl from '../images/leaflet/marker-icon.png';
 // import gpsPointImage from './images/gps_point_2x.png';
 // import gpsCompassImage from './images/gps_compass_2x.png';
@@ -25,9 +26,14 @@ export const debugConsole = (message) => {
 };
 
 // We could have a mutation observer that change the icon in live, but that's too much of a detail.
-export const iconSymbol = (symbol) => {
+export const iconSymbol = (symbol, checkpoint = false) => {
   const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-  const iconUrl = isDark ? markerDarkIconUrl : markerIconUrl;
+  let iconUrl = markerIconUrl;
+  if (checkpoint) {
+    iconUrl = markerRedIconUrl;
+  } else if (isDark) {
+    iconUrl = markerDarkIconUrl;
+  }
   return L.divIcon({
     html: `<span class="stage-marker"><img alt="" src="${iconUrl}">%</span>`.replace('%', symbol),
     iconSize: [48, 48],

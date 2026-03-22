@@ -43,6 +43,7 @@ class Trip
 
     /** @var Collection<int, Stage> */
     #[ORM\OneToMany(targetEntity: Stage::class, mappedBy: 'trip', orphanRemoval: true)]
+    #[ORM\OrderBy(['arrivingAt' => 'ASC', 'id' => 'ASC'])]
     private Collection $stages;
 
     /** @var Collection<int, Routing> */
@@ -66,6 +67,7 @@ class Trip
 
     /** @var Collection<int, Interest> */
     #[ORM\OneToMany(targetEntity: Interest::class, mappedBy: 'trip', orphanRemoval: true)]
+    #[ORM\OrderBy(['arrivingAt' => 'ASC', 'id' => 'ASC'])]
     private Collection $interests;
 
     /** @var Collection<int, DiaryEntry> */

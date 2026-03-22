@@ -227,7 +227,7 @@ export default class extends Controller {
     }
   };
 
-  addInterest = (id, lat, lon, symbol, popup) => {
+  addInterest = (id, lat, lon, symbol, popup, checkpoint = false) => {
     this.interests[id] = createDraggableMarker(
       id,
       lat,
@@ -235,17 +235,18 @@ export default class extends Controller {
       symbol,
       'interest_move',
       'sidebar-interests',
+      checkpoint,
     )
       .bindPopup(popup)
       .addTo(this.map());
   };
 
-  updateInterest = (id, symbol, popup) => {
+  updateInterest = (id, symbol, popup, checkpoint = false) => {
     const marker = this.interests[id];
     if (!marker) {
       return;
     }
-    marker.setIcon(iconSymbol(symbol));
+    marker.setIcon(iconSymbol(symbol, checkpoint));
     marker.getPopup().setContent(popup);
   };
 

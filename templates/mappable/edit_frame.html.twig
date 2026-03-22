@@ -1,15 +1,38 @@
 {% set object_name_plural = object_name_plural|default(object_name ~ 's') %}
 {% set extraClass = object_name == 'stage' ? 'mb-0 border-bottom-0 rounded-bottom-0' %}
 <div class="card m-3 position-relative {{ extraClass }}">
-    <form method="post"
-          style="position: absolute; right: 1rem; bottom: 1rem;"
-          action="{{ path(object_name ~ '_delete', { trip: trip.id, id: mappable.id }) }}"
-          data-turbo-frame="sidebar-{{ object_name_plural }}"
-          onsubmit="return confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`);">
-        <button class="btn btn-outline-danger">{{ 'action.delete'|trans }}</button>
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ mappable.id) }}">
-    </form>
-    {{ form_start(form) }}
+    {% if object_name == 'interest' %}
+        <form id="delete-interest-{{ mappable.id }}"
+              class="d-none"
+              aria-hidden="true"
+              method="post"
+              action="{{ path(object_name ~ '_delete', { trip: trip.id, id: mappable.id }) }}"
+              data-turbo-frame="sidebar-{{ object_name_plural }}"
+              onsubmit="return confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`);">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ mappable.id) }}">
+        </form>
+    {% else %}
+        <form method="post"
+              style="position: absolute; right: 1rem; bottom: 1rem;"
+              action="{{ path(object_name ~ '_delete', { trip: trip.id, id: mappable.id }) }}"
+              data-turbo-frame="sidebar-{{ object_name_plural }}"
+              onsubmit="return confirm(`{{ 'confirm.are_you_sure_delete'|trans }}`);">
+            <button class="btn btn-outline-danger">{{ 'action.delete'|trans }}</button>
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ mappable.id) }}">
+        </form>
+    {% endif %}
+    {% if object_name == 'interest' %}
+        {{ form_start(form, { attr: {
+            id: 'interest-edit-form-' ~ mappable.id,
+            'data-turbo-frame': 'sidebar-' ~ object_name_plural,
+        }}) }}
+    {% elseif object_name in ['stage', 'diaryEntry'] %}
+        {{ form_start(form, { attr: {
+            'data-turbo-frame': 'sidebar-' ~ object_name_plural,
+        }}) }}
+    {% else %}
+        {{ form_start(form) }}
+    {% endif %}
     {{ include('mappable/_form.html.twig') }}
     {{ form_end(form) }}
 </div>

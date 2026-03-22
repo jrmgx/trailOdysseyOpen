@@ -41,7 +41,8 @@ planController.addInterest(
   '{{ interest.point.lat }}',
   '{{ interest.point.lon }}',
   '{{ interest.symbol }}',
-  `{{ include('common/_mappable_popup.html.twig', { object_name: 'interest', mappable: interest }) }}`
+  `{{ include('common/_mappable_popup.html.twig', { object_name: 'interest', mappable: interest }) }}`,
+  {{ interest.checkpoint ? 'true' : 'false' }}
 );
 {% endfor %}
 

@@ -1,4 +1,5 @@
-<div class="card-header">
+{% set interestCheckpointHeader = object_name|default('') == 'interest' and form.vars.data.checkpoint %}
+<div class="card-header {{ interestCheckpointHeader ? 'interest-card-header--checkpoint' }}">
     <div class="input-group">
         {% if form.symbol is defined %}
             {{ form_widget(form.symbol, { attr: { style: 'width: 3rem; flex: 0 1 auto;' }}) }}
@@ -17,16 +18,6 @@
     <div>
         <label class="fs-small mt-3">{{ 'mappable.arriving_at'|trans({date: ''}) }}</label>
         {{ form_widget(form.arrivingAt) }}
-        <script>
-            var arrivingAtInput = document.getElementById('{{ form.arrivingAt.vars.id }}');
-            var arrivingAtHasChanged = false;
-            arrivingAtInput.addEventListener('change', () => arrivingAtHasChanged = true);
-            var form = arrivingAtInput.form;
-            form.addEventListener('submit', () => {
-                if (!arrivingAtHasChanged) return;
-                form.dataset.turboFrame = 'sidebar-{{ object_name_plural }}';
-            });
-        </script>
     </div>
 </div>
 <div class="card-body">
@@ -35,10 +26,31 @@
         {{ form_row(form.broadcast) }}
     </div>
     {% endif %}
+    {% if object_name == 'interest' %}
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <button type="submit" class="btn btn-primary" data-role="submit">{{ 'action.save'|trans }}</button>
+            {% if form.checkpoint is defined %}
+                <div class="form-check mb-0">
+                    {{ form_widget(form.checkpoint, { attr: { class: 'form-check-input' } }) }}
+                    {{ form_label(form.checkpoint, null, { label_attr: { class: 'form-check-label' } }) }}
+                </div>
+                {{ form_errors(form.checkpoint) }}
+            {% endif %}
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <a class="btn btn-outline-secondary" data-role="cancel" href="{{ path(object_name ~ '_show', { trip: trip.id }) }}">cancel</a>
+            {% if mappable.id is not null %}
+                <button type="submit" class="btn btn-outline-danger" form="delete-interest-{{ mappable.id }}">{{ 'action.delete'|trans }}</button>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
     <div>
         <button class="btn btn-primary" data-role="submit">{{ 'action.save'|trans }}</button>
         <a class="btn btn-outline-secondary" data-role="cancel" href="{{ path(object_name ~ '_show', { trip: trip.id }) }}">cancel</a>
     </div>
+    {% endif %}
 </div>
 
 <div class="d-none">
