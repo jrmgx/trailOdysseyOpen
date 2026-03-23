@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Bag;
 use App\Entity\DiaryEntry;
 use App\Entity\Interest;
+use App\Entity\Photo;
 use App\Entity\Routing;
 use App\Entity\Segment;
 use App\Entity\Stage;
@@ -107,6 +108,13 @@ class TripRepository extends ServiceEntityRepository
         $entityManager->createQueryBuilder()
             ->delete(DiaryEntry::class, 'd')
             ->where('d.trip = :tripId')
+            ->setParameter('tripId', $tripId)
+            ->getQuery()
+            ->execute();
+
+        $entityManager->createQueryBuilder()
+            ->delete(Photo::class, 'p')
+            ->where('p.trip = :tripId')
             ->setParameter('tripId', $tripId)
             ->getQuery()
             ->execute();
