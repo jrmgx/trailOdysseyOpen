@@ -11,6 +11,11 @@ import 'uplot/dist/uPlot.min.css';
 import { markerDefaultIcon, removeFromMap } from '../js/helpers';
 import { flattenJsonDataToDotNotation, jsonToHtml } from '../js/jsonToHtml';
 
+const MAP_BASE_LAYER_STORAGE_PREFIX = 'trailOdyssey.mapBaseLayer.';
+const MAP_BASE_LAYER_TTL_MS = 400 * 24 * 60 * 60 * 1000;
+
+const mapBaseLayerStorageKey = (tripId) => `${MAP_BASE_LAYER_STORAGE_PREFIX}${tripId}`;
+
 export default class extends Controller {
   static targets = [
     'map',
@@ -26,6 +31,7 @@ export default class extends Controller {
     cacheName: String,
     isPublic: Boolean,
     isLive: Boolean,
+    tripId: { type: String, default: '' },
   };
 
   connect = () => {
@@ -50,6 +56,7 @@ export default class extends Controller {
     const baseLayers = {};
     const overlayLayers = {};
     const firstLayer = [];
+    const baseTileLayerByTilesId = {};
 
     for (const tiles of this.tilesValue) {
       // noinspection JSUnresolvedReference
@@ -79,6 +86,7 @@ export default class extends Controller {
             firstLayer.push(currentLayer);
           }
           baseLayers[tiles.name] = currentLayer;
+          baseTileLayerByTilesId[tiles.id] = currentLayer;
           if (!this.isLive) {
             // noinspection JSUnresolvedReference
             this.proxyLayers[tiles.id] = L.tileLayer(tiles.proxyUrl);
@@ -87,8 +95,14 @@ export default class extends Controller {
       }
     }
 
+    let layersForMap = firstLayer;
+    const persistedTilesId = this.readPersistedBaseLayerTilesId(baseTileLayerByTilesId);
+    if (persistedTilesId !== null) {
+      layersForMap = [baseTileLayerByTilesId[persistedTilesId]];
+    }
+
     this.map = L.map('map', {
-      layers: firstLayer,
+      layers: layersForMap,
       preferCanvas: true,
       doubleTouchDragZoom: true,
       doubleTouchDragZoomInvert: true,
@@ -123,6 +137,15 @@ export default class extends Controller {
 
     this.map.on('moveend', this.fetchGeoJson);
 
+    if (this.tripIdValue) {
+      this.onBaseLayerChangePersist = (e) => {
+        if (e.layer && typeof e.layer.id === 'number') {
+          this.writePersistedBaseLayerTilesId(e.layer.id);
+        }
+      };
+      this.map.on('baselayerchange', this.onBaseLayerChangePersist);
+    }
+
     // Export method for external use
     window.mapCommonController = {
       addElement: this.addElement,
@@ -138,6 +161,76 @@ export default class extends Controller {
       fit: this.fit,
       mapClickActionDelegate: this.mapClickActionDelegate,
     };
+  };
+
+  disconnect = () => {
+    if (this.map && this.onBaseLayerChangePersist) {
+      this.map.off('baselayerchange', this.onBaseLayerChangePersist);
+      this.onBaseLayerChangePersist = null;
+    }
+  };
+
+  readPersistedBaseLayerTilesId = (baseTileLayerByTilesId) => {
+    if (!this.tripIdValue) {
+      return null;
+    }
+    const key = mapBaseLayerStorageKey(this.tripIdValue);
+    let raw;
+    try {
+      raw = localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+    if (!raw) {
+      return null;
+    }
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // ignore
+      }
+      return null;
+    }
+    if (typeof data.expiresAt !== 'number' || typeof data.tilesId !== 'number') {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // ignore
+      }
+      return null;
+    }
+    if (Date.now() > data.expiresAt) {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // ignore
+      }
+      return null;
+    }
+    if (!baseTileLayerByTilesId[data.tilesId]) {
+      return null;
+    }
+    return data.tilesId;
+  };
+
+  writePersistedBaseLayerTilesId = (tilesId) => {
+    if (!this.tripIdValue) {
+      return;
+    }
+    const key = mapBaseLayerStorageKey(this.tripIdValue);
+    const payload = JSON.stringify({
+      tilesId,
+      expiresAt: Date.now() + MAP_BASE_LAYER_TTL_MS,
+    });
+    try {
+      localStorage.setItem(key, payload);
+    } catch {
+      // ignore quota / private mode
+    }
   };
 
   // Actions
@@ -642,6 +735,7 @@ export default class extends Controller {
     this.cacheNameValue = null;
     this.isPublicValue = null;
     this.isLiveValue = null;
+    this.tripIdValue = '';
     this.optionsValue = { center: { lat: null, lon: null } };
     this.tilesValue = null;
     this.translationsValue = {
