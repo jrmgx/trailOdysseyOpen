@@ -10,6 +10,8 @@ import { iconSymbol, removeFromMap } from '../js/helpers';
 import createDraggableMarker from '../js/draggableMarker';
 import '../js/leaflet-double-touch-drag-zoom';
 
+const DIARY_MAP_NEW_ENTRY_CLICK_MS = 280;
+
 export default class extends Controller {
   static targets = [
     'myLivePosition',
@@ -24,6 +26,7 @@ export default class extends Controller {
   connect = () => {
     this.diaryEntries = {};
     this.cache = {};
+    this.pendingDiaryMapNewEntryTimeout = null;
 
     // Even if Stimulus has Outlets, we use this mechanism to export method for external use
     window.diaryController = {
@@ -33,9 +36,15 @@ export default class extends Controller {
     };
 
     window.mapCommonController.mapClickActionDelegate(this.mapClickAction);
+    this.map().on('dblclick', this.clearPendingDiaryMapNewEntry);
   };
 
   disconnect() {
+    this.clearPendingDiaryMapNewEntry();
+    const map = window.mapCommonController?.map;
+    if (map) {
+      map.off('dblclick', this.clearPendingDiaryMapNewEntry);
+    }
     this.mapLocationRemoveHandler();
   }
 
@@ -67,13 +76,24 @@ export default class extends Controller {
     );
   };
 
-  mapClickAction = (e) => {
-    Turbo.visit(
-      Routing.generate('diaryEntry_new', { lat: e.latlng.lat, lon: e.latlng.lng, trip: tripId }),
-      { frame: 'diaryEntry-new' },
-    );
+  clearPendingDiaryMapNewEntry = () => {
+    if (this.pendingDiaryMapNewEntryTimeout !== null) {
+      clearTimeout(this.pendingDiaryMapNewEntryTimeout);
+      this.pendingDiaryMapNewEntryTimeout = null;
+    }
+  };
 
-    sidebarController.switchToSidebarAction(true);
+  mapClickAction = (e) => {
+    this.clearPendingDiaryMapNewEntry();
+    const { lat, lng } = e.latlng;
+    this.pendingDiaryMapNewEntryTimeout = setTimeout(() => {
+      this.pendingDiaryMapNewEntryTimeout = null;
+      Turbo.visit(
+        Routing.generate('diaryEntry_new', { lat, lon: lng, trip: tripId }),
+        { frame: 'diaryEntry-new' },
+      );
+      sidebarController.switchToSidebarAction(true);
+    }, DIARY_MAP_NEW_ENTRY_CLICK_MS);
   };
 
   // Marker related

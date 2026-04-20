@@ -104,6 +104,7 @@ export default class extends Controller {
     this.map = L.map('map', {
       layers: layersForMap,
       preferCanvas: true,
+      doubleClickZoom: true,
       doubleTouchDragZoom: true,
       doubleTouchDragZoomInvert: true,
       zoomControl: !this.isPublic,
