@@ -18,10 +18,14 @@ use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Constraints\Image as ImageConstraint;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_USER')]
@@ -32,6 +36,7 @@ class PhotoController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $logger,
+        private readonly ValidatorInterface $validator,
         private readonly string $uploadsDirectory,
     ) {
     }
@@ -145,5 +150,59 @@ class PhotoController extends AbstractController
         }
 
         return compact('trip', 'form');
+    }
+
+    #[Route('/upload', name: 'upload', options: ['expose' => true], methods: ['POST'])]
+    public function upload(Request $request, Trip $trip): JsonResponse
+    {
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $trip);
+
+        if (!$this->isCsrfTokenValid('photo_upload' . $trip->getId(), $request->headers->get('X-CSRF-Token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        /** @var UploadedFile|null $uploadedFile */
+        $uploadedFile = $request->files->get('file');
+        if (!$uploadedFile) {
+            return new JsonResponse(['error' => 'No file provided.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $violations = $this->validator->validate($uploadedFile, new ImageConstraint(maxSize: '200M'));
+        if ($violations->count() > 0) {
+            return new JsonResponse(['error' => (string) $violations->get(0)->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+
+        $directory = $this->uploadsDirectory . '/' . $user->getId();
+        $filename = sha1(random_bytes(96));
+        $extension = $uploadedFile->guessExtension();
+
+        try {
+            $uploadedFile->move($directory, "$filename.$extension");
+        } catch (FileException $e) {
+            $this->logger->error("Error while uploading: $filename.$extension", ['exception' => $e]);
+
+            return new JsonResponse(['error' => 'Upload failed.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $mime = mime_content_type("$directory/$filename.$extension");
+        if ($mime && preg_match('`^image/(heif|heic)(-sequence)?$`', $mime)) {
+            ImageService::convertHeicToJpg("$directory/$filename.$extension", "$directory/$filename.jpg");
+            unlink("$directory/$filename.$extension");
+            $extension = 'jpg';
+        }
+
+        $photo = new Photo();
+        $photo->setUser($trip->getUser());
+        $photo->setTrip($trip);
+        $photo->setPath("$filename.$extension");
+        $this->entityManager->persist($photo);
+        $this->entityManager->flush();
+
+        $markdown = '![](/' . $user->getId() . '/' . $trip->getId() . '/' . $photo->getPath() . ')';
+
+        return new JsonResponse(['markdown' => $markdown]);
     }
 }

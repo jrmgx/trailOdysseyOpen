@@ -30,6 +30,10 @@ npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
+###> friendsofsymfony/jsrouting-bundle ###
+/public/js/fos_js_routes*
+###< friendsofsymfony/jsrouting-bundle ###
+
 ###> liip/imagine-bundle ###
 /public/media/cache/
 ###< liip/imagine-bundle ###

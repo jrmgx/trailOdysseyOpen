@@ -8,8 +8,17 @@
     </div>
 </div>
 <div class="card-body">
-    <div>
-        {{ form_widget(form.description) }}
+    <div data-controller="description-upload"
+         data-description-upload-trip-value="{{ trip.id }}"
+         data-description-upload-csrf-value="{{ csrf_token('photo_upload' ~ trip.id) }}"
+         {% if form.symbol is defined %}data-description-upload-symbol-id-value="{{ form.symbol.vars.id }}"{% endif %}>
+        {{ form_widget(form.description, { attr: { 'data-description-upload-target': 'textarea' }}) }}
+        <input type="file" accept="image/*" multiple class="d-none"
+               data-description-upload-target="input"
+               data-action="change->description-upload#upload">
+        <button type="button" class="btn btn-sm btn-outline-secondary mt-1"
+                data-description-upload-target="button"
+                data-action="click->description-upload#selectFiles">{{ 'action.upload_picture'|trans }}</button>
         {{ form_errors(form.name) }}
         {{ form_errors(form.description) }}
         {{ form_errors(form.arrivingAt) }}
